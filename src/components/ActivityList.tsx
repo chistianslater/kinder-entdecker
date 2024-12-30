@@ -9,12 +9,9 @@ import EmptyState from './activity/EmptyState';
 import ActivityListContent from './activity/ActivityListContent';
 import { useActivities } from '@/hooks/useActivities';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
-import { Button } from './ui/button';
-import { Download } from 'lucide-react';
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const [importing, setImporting] = useState(false);
   const { toast } = useToast();
   const { userBusinessProfile } = useBusinessProfile();
   const { 
@@ -49,63 +46,13 @@ const ActivityList = () => {
     }
   };
 
-  const importDZTData = async () => {
-    try {
-      setImporting(true);
-      
-      // Fetch data from our Edge Function
-      const { data: attractions, error: fetchError } = await supabase.functions.invoke('fetch-dzt-data');
-      
-      if (fetchError) throw fetchError;
-
-      // Insert each attraction into our database
-      for (const attraction of attractions) {
-        const { error: insertError } = await supabase
-          .from('activities')
-          .insert([attraction]);
-
-        if (insertError) {
-          console.error('Error inserting attraction:', insertError);
-          continue;
-        }
-      }
-
-      toast({
-        title: "Import erfolgreich",
-        description: `${attractions.length} Aktivitäten wurden importiert.`,
-      });
-
-      // Refresh the activities list
-      fetchActivities();
-    } catch (error) {
-      console.error('Import error:', error);
-      toast({
-        title: "Import fehlgeschlagen",
-        description: "Die Aktivitäten konnten nicht importiert werden.",
-        variant: "destructive",
-      });
-    } finally {
-      setImporting(false);
-    }
-  };
-
   if (loading) {
     return <LoadingState />;
   }
 
   return (
     <div className="space-y-4 p-4">
-      <div className="flex justify-between items-center">
-        <FilterBar onFiltersChange={handleFiltersChange} />
-        <Button
-          onClick={importDZTData}
-          disabled={importing}
-          className="bg-primary hover:bg-primary/90"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          {importing ? 'Importiere...' : 'DZT Daten importieren'}
-        </Button>
-      </div>
+      <FilterBar onFiltersChange={handleFiltersChange} />
       
       {filteredActivities.length === 0 ? (
         <EmptyState />
