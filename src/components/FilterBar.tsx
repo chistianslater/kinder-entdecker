@@ -3,12 +3,14 @@ import { TypeFilter } from './filters/TypeFilter';
 import { AgeFilter } from './filters/AgeFilter';
 import { PriceFilter } from './filters/PriceFilter';
 import { CategoryFilter } from './filters/CategoryFilter';
+import { DistanceFilter } from './filters/DistanceFilter';
 
 export type Filters = {
   type?: string;
   ageRange?: string;
   priceRange?: string;
   category?: string;
+  distance?: string;
 };
 
 interface FilterBarProps {
@@ -27,6 +29,10 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   return (
     <div className="bg-white shadow-soft rounded-2xl p-6 mb-6">
       <div className="flex gap-3 overflow-x-auto pb-2">
+        <DistanceFilter
+          value={filters.distance}
+          onChange={(value) => handleFilterChange('distance', value)}
+        />
         <TypeFilter 
           value={filters.type}
           onChange={(value) => handleFilterChange('type', value)}
