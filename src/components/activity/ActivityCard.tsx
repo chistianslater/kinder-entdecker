@@ -60,7 +60,7 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
               <span className="text-lg">{activity.location}</span>
             </div>
             
-            <div className="bg-[#F5F5F5] p-3 rounded-xl">
+            <div className="flex items-center gap-2 text-[#94A684]">
               <WeatherInfo location={activity.location} />
             </div>
 
