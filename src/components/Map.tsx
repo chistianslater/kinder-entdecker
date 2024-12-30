@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Map = () => {
@@ -9,18 +10,8 @@ const Map = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isContainerReady, setIsContainerReady] = useState(false);
-
-  // Check if container is ready
-  useEffect(() => {
-    if (mapContainer.current) {
-      setIsContainerReady(true);
-    }
-  }, []);
 
   useEffect(() => {
-    if (!isContainerReady) return;
-
     const initializeMap = async (token: string) => {
       try {
         if (!mapContainer.current) {
@@ -30,7 +21,6 @@ const Map = () => {
         console.log('Initializing map with token');
         mapboxgl.accessToken = token;
 
-        // Create new map instance
         const newMap = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -108,6 +98,7 @@ const Map = () => {
       }
     };
 
+    // Start initialization
     fetchMapboxToken();
 
     // Cleanup
@@ -117,12 +108,13 @@ const Map = () => {
         map.current = null;
       }
     };
-  }, [isContainerReady]); // Only run when container is ready
+  }, []); // Only run once on mount
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
-        <p>Karte wird geladen...</p>
+      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+        <p className="text-gray-600">Karte wird geladen...</p>
       </div>
     );
   }
@@ -130,7 +122,7 @@ const Map = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-red-50 rounded-lg">
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="max-w-md">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       </div>
@@ -142,7 +134,6 @@ const Map = () => {
       <div 
         ref={mapContainer} 
         className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
-        style={{ minHeight: '400px' }}
       />
     </div>
   );
