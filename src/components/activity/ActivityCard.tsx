@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Star, Clock, Euro, Users, Tag, Building2, Check, TreePine } from 'lucide-react';
 import { Activity } from '@/types/activity';
+import WeatherInfo from './WeatherInfo';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -59,6 +60,7 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
                 <MapPin className="w-4 h-4" />
                 {activity.location}
               </div>
+              <WeatherInfo location={activity.location} />
               <div className="flex items-center gap-2 text-sm text-primary">
                 <Euro className="w-4 h-4" />
                 {activity.price_range}
