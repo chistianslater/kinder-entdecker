@@ -4,10 +4,13 @@ import DetailView from './DetailView';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Activity } from '@/types/activity';
+import { Filters } from './FilterBar';
+import FilterBar from './FilterBar';
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [userBusinessProfile, setUserBusinessProfile] = useState<any>(null);
@@ -32,6 +35,7 @@ const ActivityList = () => {
       
       console.log('Activities fetched:', data);
       setActivities(data || []);
+      setFilteredActivities(data || []);
     } catch (error) {
       console.error('Error fetching activities:', error);
       toast({
@@ -42,6 +46,43 @@ const ActivityList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFiltersChange = (filters: Filters) => {
+    let filtered = [...activities];
+
+    if (filters.type && filters.type !== 'both') {
+      filtered = filtered.filter(activity => activity.type === filters.type);
+    }
+
+    if (filters.ageRange && filters.ageRange !== 'all') {
+      filtered = filtered.filter(activity => activity.age_range?.includes(filters.ageRange || ''));
+    }
+
+    if (filters.priceRange) {
+      filtered = filtered.filter(activity => {
+        switch (filters.priceRange) {
+          case 'free':
+            return activity.price_range?.toLowerCase().includes('kostenlos');
+          case 'low':
+            return activity.price_range?.toLowerCase().includes('günstig');
+          case 'medium':
+            return activity.price_range?.toLowerCase().includes('mittel');
+          case 'high':
+            return activity.price_range?.toLowerCase().includes('teuer');
+          default:
+            return true;
+        }
+      });
+    }
+
+    if (filters.category) {
+      filtered = filtered.filter(activity => 
+        activity.type.toLowerCase().includes(filters.category?.toLowerCase() || '')
+      );
+    }
+
+    setFilteredActivities(filtered);
   };
 
   const checkBusinessProfile = async () => {
@@ -98,13 +139,21 @@ const ActivityList = () => {
     return <div className="p-4">Lädt Aktivitäten...</div>;
   }
 
-  if (activities.length === 0) {
-    return <div className="p-4">Keine Aktivitäten gefunden.</div>;
+  if (filteredActivities.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-lg text-muted-foreground">
+          Keine Aktivitäten gefunden. Versuche andere Filter-Einstellungen.
+        </p>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4 p-4">
-      {activities.map((activity) => (
+      <FilterBar onFiltersChange={handleFiltersChange} />
+      
+      {filteredActivities.map((activity) => (
         <ActivityCard
           key={activity.id}
           activity={activity}
