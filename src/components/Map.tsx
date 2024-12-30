@@ -10,29 +10,26 @@ const Map = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isContainerMounted, setIsContainerMounted] = useState(false);
-
-  // Effect to handle container mounting
-  useEffect(() => {
-    if (mapContainer.current) {
-      setIsContainerMounted(true);
-    }
-  }, []);
 
   useEffect(() => {
-    if (!isContainerMounted) return;
-
     let isMounted = true;
 
     const initializeMap = async (token: string) => {
       try {
-        if (!isMounted || !mapContainer.current) {
-          console.log('Container not ready or component unmounted');
+        if (!isMounted) {
+          console.log('Component unmounted, aborting map initialization');
           return;
+        }
+
+        // Wait for container to be available
+        if (!mapContainer.current) {
+          console.error('Map container not found');
+          throw new Error('Map container not found');
         }
 
         mapboxgl.accessToken = token;
 
+        // Create map instance
         const newMap = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -94,10 +91,10 @@ const Map = () => {
         
         console.log('Token received successfully');
         
-        // Add a delay to ensure DOM is fully ready
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Wait for next render cycle
+        await new Promise(resolve => setTimeout(resolve, 0));
         
-        if (!isMounted || !mapContainer.current) return;
+        if (!isMounted) return;
         await initializeMap(data.token);
       } catch (err) {
         if (!isMounted) return;
@@ -107,6 +104,7 @@ const Map = () => {
       }
     };
 
+    // Start initialization
     fetchMapboxToken();
 
     return () => {
@@ -116,7 +114,7 @@ const Map = () => {
         map.current = null;
       }
     };
-  }, [isContainerMounted]);
+  }, []);
 
   if (isLoading) {
     return (
