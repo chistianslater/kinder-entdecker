@@ -12,8 +12,15 @@ const Map = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const initializeMap = async (token: string) => {
       try {
+        // Wait a bit to ensure DOM is ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (!isMounted) return;
+        
         if (!mapContainer.current) {
           throw new Error('Kartenbehälter nicht gefunden');
         }
@@ -44,6 +51,7 @@ const Map = () => {
 
         // Handle successful map load
         newMap.on('load', () => {
+          if (!isMounted) return;
           console.log('Map loaded successfully');
           setIsLoading(false);
           setError('');
@@ -51,6 +59,7 @@ const Map = () => {
 
         // Handle map errors
         newMap.on('error', (e) => {
+          if (!isMounted) return;
           console.error('Map error:', e);
           setError(`Kartenfehler: ${e.error.message}`);
           setIsLoading(false);
@@ -60,6 +69,7 @@ const Map = () => {
 
         // Handle style load errors
         newMap.on('styledata', () => {
+          if (!isMounted) return;
           const loaded = newMap.isStyleLoaded();
           if (!loaded) {
             console.error('Style failed to load');
@@ -68,6 +78,7 @@ const Map = () => {
         });
 
       } catch (err) {
+        if (!isMounted) return;
         console.error('Map initialization error:', err);
         setError('Karte konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.');
         setIsLoading(false);
@@ -76,6 +87,8 @@ const Map = () => {
 
     const fetchMapboxToken = async () => {
       try {
+        if (!isMounted) return;
+        
         console.log('Fetching Mapbox token...');
         const { data, error: supabaseError } = await supabase.functions.invoke('get-mapbox-token');
         
@@ -92,23 +105,23 @@ const Map = () => {
         console.log('Token received successfully');
         await initializeMap(data.token);
       } catch (err) {
+        if (!isMounted) return;
         console.error('Error fetching Mapbox token:', err);
         setError('Fehler beim Laden der Karte. Bitte versuchen Sie es später erneut.');
         setIsLoading(false);
       }
     };
 
-    // Start initialization
     fetchMapboxToken();
 
-    // Cleanup
     return () => {
+      isMounted = false;
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, []); // Only run once on mount
+  }, []);
 
   if (isLoading) {
     return (
