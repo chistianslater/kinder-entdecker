@@ -20,8 +20,6 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
       if (!mapContainer.current) return;
 
       try {
-        console.log('Activities received:', activities);
-        
         // Fetch Mapbox token from Edge Function
         const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
         
@@ -41,8 +39,6 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
 
         // Add markers for activities
         activities.forEach(activity => {
-          console.log('Processing activity:', activity.title, 'coordinates:', activity.coordinates);
-          
           if (activity.coordinates && typeof activity.coordinates === 'string') {
             // Parse coordinates from string format "(longitude,latitude)"
             const coordsMatch = activity.coordinates.match(/\(([-\d.]+),([-\d.]+)\)/);
@@ -59,8 +55,6 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
               console.warn('Invalid coordinates values for activity:', activity);
               return;
             }
-
-            console.log('Parsed coordinates:', { longitude, latitude });
 
             // Create marker element
             const markerEl = document.createElement('div');
@@ -98,7 +92,7 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
                       </svg>
                       Navigation
                     </button>
-                    <button onclick="window.dispatchEvent(new CustomEvent('openActivityDetail', {detail: '${activity.id}'}))"
+                    <button onclick="window.dispatchEvent(new CustomEvent('openActivityDetail', { detail: '${activity.id}' }))"
                       class="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors">
                       Details
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -122,7 +116,7 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
         });
 
         // Listen for custom event to open activity detail
-        const handleOpenDetail = (e: CustomEvent) => {
+        const handleOpenDetail = (e: CustomEvent<string>) => {
           const activity = activities.find(a => a.id === e.detail);
           if (activity && onSelectActivity) {
             onSelectActivity(activity);
