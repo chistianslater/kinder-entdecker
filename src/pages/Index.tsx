@@ -72,6 +72,7 @@ const Index = () => {
           </Button>
         </div>
 
+        <FilterBar onFiltersChange={handleFiltersChange} />
         <ActivityList />
       </main>
     </div>

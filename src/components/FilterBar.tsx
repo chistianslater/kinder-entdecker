@@ -44,13 +44,13 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="bg-secondary/50 hover:bg-secondary border-accent flex items-center gap-2 rounded-xl min-w-[140px]"
+              className="bg-white hover:bg-secondary/80 border-accent flex items-center gap-2 rounded-xl min-w-[140px]"
             >
               <Sun className="w-4 h-4" />
               {filters.type || 'Indoor/Outdoor'}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-3">
+          <PopoverContent className="w-[200px] p-3 bg-white border border-accent shadow-md">
             <RadioGroup
               value={filters.type}
               onValueChange={(value) => handleFilterChange('type', value)}
@@ -76,11 +76,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           value={filters.ageRange}
           onValueChange={(value) => handleFilterChange('ageRange', value)}
         >
-          <SelectTrigger className="bg-secondary/50 hover:bg-secondary border-accent rounded-xl min-w-[140px]">
+          <SelectTrigger className="bg-white hover:bg-secondary/80 border-accent rounded-xl min-w-[140px]">
             <Baby className="w-4 h-4 mr-2" />
             <SelectValue placeholder="Altersgruppe" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white border border-accent shadow-md">
             <SelectItem value="0-2">0-2 Jahre</SelectItem>
             <SelectItem value="3-5">3-5 Jahre</SelectItem>
             <SelectItem value="6-8">6-8 Jahre</SelectItem>
@@ -94,11 +94,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           value={filters.priceRange}
           onValueChange={(value) => handleFilterChange('priceRange', value)}
         >
-          <SelectTrigger className="bg-secondary/50 hover:bg-secondary border-accent rounded-xl min-w-[140px]">
+          <SelectTrigger className="bg-white hover:bg-secondary/80 border-accent rounded-xl min-w-[140px]">
             <Euro className="w-4 h-4 mr-2" />
             <SelectValue placeholder="Preis" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white border border-accent shadow-md">
             <SelectItem value="free">Kostenlos</SelectItem>
             <SelectItem value="low">Günstig (bis 10€)</SelectItem>
             <SelectItem value="medium">Mittel (10-30€)</SelectItem>
@@ -111,11 +111,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           value={filters.category}
           onValueChange={(value) => handleFilterChange('category', value)}
         >
-          <SelectTrigger className="bg-secondary/50 hover:bg-secondary border-accent rounded-xl min-w-[140px]">
+          <SelectTrigger className="bg-white hover:bg-secondary/80 border-accent rounded-xl min-w-[140px]">
             <TreePine className="w-4 h-4 mr-2" />
             <SelectValue placeholder="Kategorie" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white border border-accent shadow-md">
             <SelectItem value="nature">Natur & Wandern</SelectItem>
             <SelectItem value="sports">Sport & Bewegung</SelectItem>
             <SelectItem value="culture">Kultur & Museum</SelectItem>
