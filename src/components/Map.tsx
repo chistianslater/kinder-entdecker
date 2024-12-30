@@ -1,39 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<mapboxgl.Map | null>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    let mapInstance: mapboxgl.Map | null = null;
+    if (!mapContainer.current || mapRef.current) return;
 
-    const initializeMap = () => {
-      if (!mapContainer.current) return;
+    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpYnB5Y2QwMWJqMmtvOW1qZjB0aTd0In0.O8lasM04g-C8wzTz8_IQSQ';
 
-      mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpYnB5Y2QwMWJqMmtvOW1qZjB0aTd0In0.O8lasM04g-C8wzTz8_IQSQ';
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [10.4515, 51.1657], // Center of Germany
+      zoom: 5,
+    });
 
-      mapInstance = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [10.4515, 51.1657], // Center of Germany
-        zoom: 5,
-      });
+    map.on('load', () => {
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    });
 
-      mapInstance.on('load', () => {
-        mapInstance?.addControl(new mapboxgl.NavigationControl(), 'top-right');
-      });
-
-      setMap(mapInstance);
-    };
-
-    initializeMap();
+    mapRef.current = map;
 
     return () => {
-      if (mapInstance) {
-        mapInstance.remove();
-        setMap(null);
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
       }
     };
   }, []);
