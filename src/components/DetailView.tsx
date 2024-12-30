@@ -1,7 +1,8 @@
 import React from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { MapPin, Clock, Euro, Users, Tag, Phone, Mail, Globe, Building2, Ticket, Check } from 'lucide-react';
+import { MapPin, Clock, Euro, Users, Tag, Phone, Mail, Globe, Building2, Ticket, Check, Navigation } from 'lucide-react';
 import { Activity } from '@/types/activity';
+import { Button } from '@/components/ui/button';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -11,6 +12,11 @@ interface DetailViewProps {
 
 const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
   if (!activity) return null;
+
+  const handleNavigate = () => {
+    const encodedAddress = encodeURIComponent(activity.location);
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, '_blank');
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -46,6 +52,15 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-primary" />
               <span>{activity.location}</span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleNavigate}
+                className="ml-auto"
+              >
+                <Navigation className="w-4 h-4 mr-2" />
+                Navigation starten
+              </Button>
             </div>
 
             <div className="flex items-center gap-3">
@@ -69,27 +84,35 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
             </div>
           </div>
 
-          {(activity.website_url || activity.ticket_url) && (
-            <div className="space-y-3">
-              <h3 className="font-semibold">Links</h3>
-              {activity.website_url && (
-                <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-primary" />
-                  <a href={activity.website_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
-                    Website besuchen
-                  </a>
-                </div>
-              )}
-              {activity.ticket_url && (
-                <div className="flex items-center gap-3">
-                  <Ticket className="w-5 h-5 text-primary" />
-                  <a href={activity.ticket_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
-                    Tickets kaufen
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="space-y-3">
+            <h3 className="font-semibold">Links & Kontakt</h3>
+            {activity.website_url && (
+              <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-primary" />
+                <a 
+                  href={activity.website_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-primary"
+                >
+                  Website besuchen
+                </a>
+              </div>
+            )}
+            {activity.ticket_url && (
+              <div className="flex items-center gap-3">
+                <Ticket className="w-5 h-5 text-primary" />
+                <a 
+                  href={activity.ticket_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-primary"
+                >
+                  Tickets kaufen
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>
