@@ -1,48 +1,42 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<mapboxgl.Map | null>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    let mapInstance: mapboxgl.Map | null = null;
 
-    // Cleanup any existing map instance
-    if (mapInstance.current) {
-      mapInstance.current.remove();
-      mapInstance.current = null;
-    }
+    const initializeMap = () => {
+      if (!mapContainer.current) return;
 
-    // Initialize map
-    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpYnB5Y2QwMWJqMmtvOW1qZjB0aTd0In0.O8lasM04g-C8wzTz8_IQSQ';
-    
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [10.4515, 51.1657], // Center of Germany
-      zoom: 5,
-    });
+      mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpYnB5Y2QwMWJqMmtvOW1qZjB0aTd0In0.O8lasM04g-C8wzTz8_IQSQ';
 
-    // Store the instance
-    mapInstance.current = map;
+      mapInstance = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [10.4515, 51.1657], // Center of Germany
+        zoom: 5,
+      });
 
-    // Add controls after map is loaded
-    map.on('load', () => {
-      if (mapInstance.current) {
-        mapInstance.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-      }
-    });
+      mapInstance.on('load', () => {
+        mapInstance?.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      });
 
-    // Cleanup function
+      setMap(mapInstance);
+    };
+
+    initializeMap();
+
     return () => {
-      if (mapInstance.current) {
-        mapInstance.current.remove();
-        mapInstance.current = null;
+      if (mapInstance) {
+        mapInstance.remove();
+        setMap(null);
       }
     };
-  }, []); // Empty dependency array since we only want to initialize once
+  }, []);
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
