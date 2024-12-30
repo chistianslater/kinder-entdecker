@@ -93,7 +93,7 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
                       Navigation
                     </button>
                     <button 
-                      onclick="const event = new CustomEvent('openActivityDetail', { detail: '${activity.id}' }); window.dispatchEvent(event);"
+                      onclick="const customEvt = new CustomEvent('openActivityDetail', { detail: '${activity.id}' }); window.dispatchEvent(customEvt);"
                       class="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors">
                       Details
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
