@@ -1,10 +1,13 @@
 import React from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { MapPin, Clock, Euro, Users, Tag, Phone, Mail, Globe, Building2, Ticket, Check, Navigation } from 'lucide-react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
+import { X } from 'lucide-react';
 import { Activity } from '@/types/activity';
 import { Button } from '@/components/ui/button';
 import { ActivityReviews } from './activity/ActivityReviews';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ActivityBadges } from './activity/ActivityBadges';
+import { ActivityDetails } from './activity/ActivityDetails';
+import { ActivityLinks } from './activity/ActivityLinks';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -30,8 +33,13 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
       <DrawerContent>
         <ScrollArea className="h-[95vh]">
           <div className="container max-w-2xl mx-auto">
-            <DrawerHeader className="text-left">
-              <DrawerTitle className="text-2xl font-bold text-primary">{activity.title}</DrawerTitle>
+            <DrawerHeader className="text-left relative">
+              <DrawerTitle className="text-2xl font-bold text-primary pr-12">{activity.title}</DrawerTitle>
+              <DrawerClose className="absolute right-4 top-4">
+                <Button variant="ghost" size="icon">
+                  <X className="h-4 w-4" />
+                </Button>
+              </DrawerClose>
             </DrawerHeader>
 
             <div className="px-4 pb-8 space-y-6">
@@ -45,93 +53,28 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
                 </div>
               )}
 
-              <div className="flex items-center gap-2">
-                {activity.is_business && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                    <Building2 className="w-4 h-4 mr-1" />
-                    Business
-                  </span>
-                )}
-                {activity.is_verified && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    <Check className="w-4 h-4 mr-1" />
-                    Verifiziert
-                  </span>
-                )}
-              </div>
+              <ActivityBadges 
+                isBusiness={activity.is_business} 
+                isVerified={activity.is_verified} 
+              />
 
               {activity.description && (
                 <p className="text-muted-foreground leading-relaxed">{activity.description}</p>
               )}
 
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Details</h3>
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-5 h-5 text-primary" />
-                      <span>{activity.location}</span>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={handleNavigate}
-                      className="shrink-0"
-                    >
-                      <Navigation className="w-4 h-4 mr-2" />
-                      Navigation
-                    </Button>
-                  </div>
+              <ActivityDetails
+                location={activity.location}
+                openingHours={activity.opening_hours}
+                priceRange={activity.price_range}
+                ageRange={activity.age_range}
+                type={activity.type}
+                onNavigate={handleNavigate}
+              />
 
-                  <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
-                    <Clock className="w-5 h-5 text-primary" />
-                    <span>{activity.opening_hours}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
-                    <Euro className="w-5 h-5 text-primary" />
-                    <span>{activity.price_range}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
-                    <Users className="w-5 h-5 text-primary" />
-                    <span>{activity.age_range}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
-                    <Tag className="w-5 h-5 text-primary" />
-                    <span>{activity.type}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-primary">Links & Kontakt</h3>
-                <div className="grid gap-3">
-                  {activity.website_url && (
-                    <a 
-                      href={activity.website_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg hover:bg-accent/20 transition-colors"
-                    >
-                      <Globe className="w-5 h-5 text-primary" />
-                      <span>Website besuchen</span>
-                    </a>
-                  )}
-                  {activity.ticket_url && (
-                    <a 
-                      href={activity.ticket_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg hover:bg-accent/20 transition-colors"
-                    >
-                      <Ticket className="w-5 h-5 text-primary" />
-                      <span>Tickets kaufen</span>
-                    </a>
-                  )}
-                </div>
-              </div>
+              <ActivityLinks
+                websiteUrl={activity.website_url}
+                ticketUrl={activity.ticket_url}
+              />
 
               <div className="pt-6 border-t">
                 <ActivityReviews activity={activity} />
