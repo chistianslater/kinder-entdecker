@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { MapPin, Star, Clock, Euro, Users, Tag, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, Star, Clock, Euro, Users, Tag, Calendar, Building2, User, Check, Globe } from 'lucide-react';
 import DetailView from './DetailView';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface Activity {
   id: number;
@@ -23,54 +26,87 @@ export interface Activity {
     phone?: string;
     email?: string;
   };
+  is_business: boolean;
+  is_verified: boolean;
+  website_url?: string;
+  ticket_url?: string;
+  claimed_by?: string;
+  created_by?: string;
 }
-
-const activities: Activity[] = [
-  {
-    id: 1,
-    title: "Abenteuer Spielplatz Waldpark",
-    description: "Großer Naturspielplatz mit Klettermöglichkeiten, Wasserspielbereich und Sandkästen. Perfekt für aktive Kinder, die gerne die Natur erkunden. Mit Picknickbereich und schattigen Plätzen für die Eltern.",
-    location: "Waldstraße 123, 60323 Frankfurt am Main",
-    rating: 4.8,
-    price: "Kostenlos",
-    type: "Outdoor",
-    ageRange: "3-12 Jahre",
-    image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
-    facilities: ["Toiletten", "Parkplätze", "Picknickbereich", "Trinkwasserbrunnen"],
-    openingHours: "Täglich von Sonnenaufgang bis Sonnenuntergang",
-    maxGroupSize: 30,
-    seasonality: ["Frühling", "Sommer", "Herbst"],
-    accessibility: true,
-    contact: {
-      phone: "069-123456",
-      email: "waldpark@frankfurt.de"
-    }
-  },
-  {
-    id: 2,
-    title: "Indoor Spielparadies Regenbogen",
-    description: "Klimatisierte Spielhalle mit verschiedenen Bereichen für alle Altersgruppen. Kletterwand, Bällebad, Softplay-Bereich und separate Kleinkinderecke. Café mit gesunden Snacks für die ganze Familie.",
-    location: "Spielstraße 42, 80339 München",
-    rating: 4.5,
-    price: "€€",
-    type: "Indoor",
-    ageRange: "1-10 Jahre",
-    image: "https://images.unsplash.com/photo-1501286353178-1ec881214838",
-    facilities: ["Café", "Wickelraum", "Kindergeburtstage", "WLAN"],
-    openingHours: "Mo-Fr: 10-19 Uhr, Sa-So: 9-20 Uhr",
-    maxGroupSize: 50,
-    seasonality: ["Ganzjährig"],
-    accessibility: true,
-    website: "www.spielparadies-regenbogen.de",
-    contact: {
-      phone: "089-987654",
-      email: "info@spielparadies-regenbogen.de"
-    }
-  },
-];
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [userBusinessProfile, setUserBusinessProfile] = useState<any>(null);
+
+  useEffect(() => {
+    fetchActivities();
+    checkBusinessProfile();
+  }, []);
+
+  const fetchActivities = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setActivities(data || []);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+      toast({
+        title: "Fehler",
+        description: "Aktivitäten konnten nicht geladen werden.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkBusinessProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('business_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      setUserBusinessProfile(data);
+    }
+  };
+
+  const handleClaimActivity = async (activityId: number) => {
+    try {
+      const { error } = await supabase
+        .from('activities')
+        .update({ claimed_by: userBusinessProfile.user_id, is_business: true })
+        .eq('id', activityId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Erfolg",
+        description: "Aktivität erfolgreich beansprucht.",
+      });
+
+      fetchActivities();
+    } catch (error) {
+      console.error('Error claiming activity:', error);
+      toast({
+        title: "Fehler",
+        description: "Aktivität konnte nicht beansprucht werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading) {
+    return <div className="p-4">Lädt Aktivitäten...</div>;
+  }
 
   return (
     <div className="space-y-4 p-4">
@@ -89,7 +125,21 @@ const ActivityList = () => {
             <div className="flex-1 space-y-4">
               <div>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold">{activity.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-semibold">{activity.title}</h3>
+                    {activity.is_business && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <Building2 className="w-3 h-3 mr-1" />
+                        Business
+                      </span>
+                    )}
+                    {activity.is_verified && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <Check className="w-3 h-3 mr-1" />
+                        Verifiziert
+                      </span>
+                    )}
+                  </div>
                   <span className="flex items-center gap-1 text-yellow-500">
                     <Star className="w-5 h-5 fill-current" />
                     {activity.rating}
@@ -130,15 +180,31 @@ const ActivityList = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                {activity.facilities.map((facility, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap gap-2">
+                  {activity.facilities.map((facility, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
+                    >
+                      {facility}
+                    </span>
+                  ))}
+                </div>
+                
+                {userBusinessProfile && !activity.claimed_by && !activity.is_business && (
+                  <Button
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClaimActivity(activity.id);
+                    }}
+                    className="flex items-center gap-2"
                   >
-                    {facility}
-                  </span>
-                ))}
+                    <Building2 className="w-4 h-4" />
+                    Als Unternehmen beanspruchen
+                  </Button>
+                )}
               </div>
             </div>
           </div>

@@ -9,7 +9,102 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          age_range: string | null
+          claimed_by: string | null
+          coordinates: unknown | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_business: boolean | null
+          is_verified: boolean | null
+          location: string
+          opening_hours: string | null
+          price_range: string | null
+          ticket_url: string | null
+          title: string
+          type: string
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          age_range?: string | null
+          claimed_by?: string | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_business?: boolean | null
+          is_verified?: boolean | null
+          location: string
+          opening_hours?: string | null
+          price_range?: string | null
+          ticket_url?: string | null
+          title: string
+          type: string
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          age_range?: string | null
+          claimed_by?: string | null
+          coordinates?: unknown | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_business?: boolean | null
+          is_verified?: boolean | null
+          location?: string
+          opening_hours?: string | null
+          price_range?: string | null
+          ticket_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      business_profiles: {
+        Row: {
+          business_name: string
+          business_type: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          id: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          business_name: string
+          business_type?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          business_name?: string
+          business_type?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
