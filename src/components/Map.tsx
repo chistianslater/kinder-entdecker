@@ -9,8 +9,18 @@ const Map = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isContainerReady, setIsContainerReady] = useState(false);
+
+  // Check if container is ready
+  useEffect(() => {
+    if (mapContainer.current) {
+      setIsContainerReady(true);
+    }
+  }, []);
 
   useEffect(() => {
+    if (!isContainerReady) return;
+
     const initializeMap = async (token: string) => {
       try {
         if (!mapContainer.current) {
@@ -107,7 +117,7 @@ const Map = () => {
         map.current = null;
       }
     };
-  }, []);
+  }, [isContainerReady]); // Only run when container is ready
 
   if (isLoading) {
     return (
