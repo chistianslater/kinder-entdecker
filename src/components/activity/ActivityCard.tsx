@@ -60,7 +60,9 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
                 <MapPin className="w-4 h-4" />
                 {activity.location}
               </div>
-              <WeatherInfo location={activity.location} />
+              <div className="bg-secondary/30 p-2 rounded-lg">
+                <WeatherInfo location={activity.location} />
+              </div>
               <div className="flex items-center gap-2 text-sm text-primary">
                 <Euro className="w-4 h-4" />
                 {activity.price_range}
