@@ -7,8 +7,7 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Set up default marker icon
-const DefaultIcon = L.icon({
+let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
   iconSize: [25, 41],
@@ -17,12 +16,12 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-interface CustomMapProps {
+interface MapProps {
   defaultCenter?: [number, number];
   defaultZoom?: number;
 }
 
-const Map: React.FC<CustomMapProps> = ({
+const Map: React.FC<MapProps> = ({
   defaultCenter = [51.1657, 10.4515], // Center of Germany
   defaultZoom = 5.5
 }) => {
@@ -30,7 +29,7 @@ const Map: React.FC<CustomMapProps> = ({
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div className="absolute inset-0 rounded-lg shadow-md overflow-hidden">
         <MapContainer
-          center={defaultCenter}
+          center={defaultCenter as L.LatLngExpression}
           zoom={defaultZoom}
           style={{ height: '100%', width: '100%' }}
           zoomControl={false}
@@ -38,8 +37,8 @@ const Map: React.FC<CustomMapProps> = ({
         >
           <ZoomControl position="topright" />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
         </MapContainer>
       </div>
