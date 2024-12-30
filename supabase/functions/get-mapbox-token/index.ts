@@ -6,14 +6,12 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
     const mapboxToken = Deno.env.get('MAPBOX_TOKEN')
-    console.log('Retrieved Mapbox token:', mapboxToken ? 'Token exists' : 'Token missing')
     
     if (!mapboxToken) {
       console.error('MAPBOX_TOKEN not found in environment variables')

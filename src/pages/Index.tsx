@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import ActivityList from '@/components/ActivityList';
 import { Button } from '@/components/ui/button';
 import { TreePine, Users, MapPin, Footprints } from 'lucide-react';
+import Map from '@/components/Map';
+import { useActivities } from '@/hooks/useActivities';
 
 const Index = () => {
   const [view, setView] = useState<'list'>('list');
+  const { filteredActivities } = useActivities();
 
   return (
     <div className="min-h-screen bg-secondary/30">
@@ -65,7 +68,10 @@ const Index = () => {
           </Button>
         </div>
 
-        <ActivityList />
+        <div className="space-y-8">
+          <Map activities={filteredActivities} />
+          <ActivityList />
+        </div>
       </main>
     </div>
   );
