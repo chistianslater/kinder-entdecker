@@ -16,18 +16,18 @@ const Map = () => {
 
     const initializeMap = async (token: string) => {
       try {
-        // Wait a bit to ensure DOM is ready
-        await new Promise(resolve => setTimeout(resolve, 100));
-
+        // Ensure the component is still mounted
         if (!isMounted) return;
-        
+
+        // Ensure container exists
         if (!mapContainer.current) {
-          throw new Error('Kartenbehälter nicht gefunden');
+          throw new Error('Map container not found');
         }
 
-        console.log('Initializing map with token');
+        // Set access token
         mapboxgl.accessToken = token;
 
+        // Create map instance
         const newMap = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -61,26 +61,16 @@ const Map = () => {
         newMap.on('error', (e) => {
           if (!isMounted) return;
           console.error('Map error:', e);
-          setError(`Kartenfehler: ${e.error.message}`);
+          setError(`Map error: ${e.error.message}`);
           setIsLoading(false);
         });
 
         map.current = newMap;
 
-        // Handle style load errors
-        newMap.on('styledata', () => {
-          if (!isMounted) return;
-          const loaded = newMap.isStyleLoaded();
-          if (!loaded) {
-            console.error('Style failed to load');
-            setError('Kartenstil konnte nicht geladen werden');
-          }
-        });
-
       } catch (err) {
         if (!isMounted) return;
         console.error('Map initialization error:', err);
-        setError('Karte konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.');
+        setError('Map initialization failed. Please try again later.');
         setIsLoading(false);
       }
     };
@@ -99,21 +89,28 @@ const Map = () => {
         
         if (!data?.token) {
           console.error('No token received from function');
-          throw new Error('Kein Token erhalten');
+          throw new Error('No token received');
         }
         
         console.log('Token received successfully');
+        
+        // Add a small delay to ensure DOM is ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (!isMounted) return;
         await initializeMap(data.token);
       } catch (err) {
         if (!isMounted) return;
         console.error('Error fetching Mapbox token:', err);
-        setError('Fehler beim Laden der Karte. Bitte versuchen Sie es später erneut.');
+        setError('Failed to load map. Please try again later.');
         setIsLoading(false);
       }
     };
 
+    // Start the initialization process
     fetchMapboxToken();
 
+    // Cleanup function
     return () => {
       isMounted = false;
       if (map.current) {
@@ -123,15 +120,17 @@ const Map = () => {
     };
   }, []);
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
         <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
-        <p className="text-gray-600">Karte wird geladen...</p>
+        <p className="text-gray-600">Loading map...</p>
       </div>
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-red-50 rounded-lg">
@@ -142,11 +141,13 @@ const Map = () => {
     );
   }
 
+  // Map container
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div 
         ref={mapContainer} 
         className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
+        style={{ visibility: isLoading ? 'hidden' : 'visible' }}
       />
     </div>
   );
