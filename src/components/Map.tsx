@@ -10,46 +10,49 @@ const Map = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isContainerMounted, setIsContainerMounted] = useState(false);
+
+  // Effect to handle container mounting
+  useEffect(() => {
+    if (mapContainer.current) {
+      setIsContainerMounted(true);
+    }
+  }, []);
 
   useEffect(() => {
+    if (!isContainerMounted) return;
+
     let isMounted = true;
 
     const initializeMap = async (token: string) => {
       try {
-        // Ensure the component is still mounted
-        if (!isMounted) return;
-
-        // Ensure container exists
-        if (!mapContainer.current) {
-          throw new Error('Map container not found');
+        if (!isMounted || !mapContainer.current) {
+          console.log('Container not ready or component unmounted');
+          return;
         }
 
-        // Set access token
         mapboxgl.accessToken = token;
 
-        // Create map instance
         const newMap = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
-          center: [10.4515, 51.1657], // Center on Germany
+          center: [10.4515, 51.1657],
           zoom: 5.5,
           maxBounds: [
-            [-5, 47], // Southwest coordinates
-            [25, 56]  // Northeast coordinates
+            [-5, 47],
+            [25, 56]
           ]
         });
 
-        // Add navigation controls
         newMap.addControl(
           new mapboxgl.NavigationControl({
             showCompass: true,
             showZoom: true,
             visualizePitch: false
-          }), 
+          }),
           'top-right'
         );
 
-        // Handle successful map load
         newMap.on('load', () => {
           if (!isMounted) return;
           console.log('Map loaded successfully');
@@ -57,7 +60,6 @@ const Map = () => {
           setError('');
         });
 
-        // Handle map errors
         newMap.on('error', (e) => {
           if (!isMounted) return;
           console.error('Map error:', e);
@@ -83,21 +85,19 @@ const Map = () => {
         const { data, error: supabaseError } = await supabase.functions.invoke('get-mapbox-token');
         
         if (supabaseError) {
-          console.error('Supabase function error:', supabaseError);
           throw supabaseError;
         }
         
         if (!data?.token) {
-          console.error('No token received from function');
           throw new Error('No token received');
         }
         
         console.log('Token received successfully');
         
-        // Add a small delay to ensure DOM is ready
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Add a delay to ensure DOM is fully ready
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        if (!isMounted) return;
+        if (!isMounted || !mapContainer.current) return;
         await initializeMap(data.token);
       } catch (err) {
         if (!isMounted) return;
@@ -107,10 +107,8 @@ const Map = () => {
       }
     };
 
-    // Start the initialization process
     fetchMapboxToken();
 
-    // Cleanup function
     return () => {
       isMounted = false;
       if (map.current) {
@@ -118,9 +116,8 @@ const Map = () => {
         map.current = null;
       }
     };
-  }, []);
+  }, [isContainerMounted]);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
@@ -130,7 +127,6 @@ const Map = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-red-50 rounded-lg">
@@ -141,13 +137,11 @@ const Map = () => {
     );
   }
 
-  // Map container
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div 
-        ref={mapContainer} 
+        ref={mapContainer}
         className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
-        style={{ visibility: isLoading ? 'hidden' : 'visible' }}
       />
     </div>
   );
