@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,32 +18,67 @@ serve(async (req) => {
     const { location } = await req.json();
     console.log('Fetching weather for location:', location);
 
+    // Extract city name from location string (take first part before comma)
+    const city = location.split(',')[0].trim();
+    console.log('Using city:', city);
+
     // First, get coordinates from location name
-    const geocodeUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
+    const geocodeUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
     const geocodeResponse = await fetch(geocodeUrl);
+    
+    if (!geocodeResponse.ok) {
+      throw new Error(`Geocoding API error: ${geocodeResponse.statusText}`);
+    }
+    
     const geocodeData = await geocodeResponse.json();
+    console.log('Geocode data:', geocodeData);
 
     if (!geocodeData.length) {
-      throw new Error('Location not found');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Location not found',
+          weather: [{ id: 800 }], // Default to clear weather
+          main: { temp: null }
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 // Return 200 but with null data
+        }
+      );
     }
 
     const { lat, lon } = geocodeData[0];
 
     // Then, get weather data using coordinates
-    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPENWEATHER_API_KEY}`;
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=de&appid=${OPENWEATHER_API_KEY}`;
     const weatherResponse = await fetch(weatherUrl);
+    
+    if (!weatherResponse.ok) {
+      throw new Error(`Weather API error: ${weatherResponse.statusText}`);
+    }
+    
     const weatherData = await weatherResponse.json();
-
     console.log('Weather data received:', weatherData);
 
-    return new Response(JSON.stringify(weatherData), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify(weatherData),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      }
+    );
   } catch (error) {
     console.error('Error fetching weather:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        weather: [{ id: 800 }], // Default to clear weather
+        main: { temp: null }
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 // Return 200 but with fallback data
+      }
+    );
   }
 });

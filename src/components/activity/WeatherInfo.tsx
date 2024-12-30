@@ -8,29 +8,34 @@ interface WeatherInfoProps {
 }
 
 const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
-  const { data: weather, isLoading, error } = useQuery({
+  const { data: weather, isLoading } = useQuery({
     queryKey: ['weather', location],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke('get-weather', {
         body: { location },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Weather fetch error:', error);
+        return null;
+      }
       return data;
     },
     enabled: !!location,
+    retry: 1,
+    staleTime: 1000 * 60 * 15, // Cache for 15 minutes
   });
 
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
         <Cloud className="w-4 h-4" />
-        Wetter wird geladen...
+        <span>Wetter wird geladen...</span>
       </div>
     );
   }
 
-  if (error || !weather) {
+  if (!weather || !weather.main.temp) {
     return null;
   }
 
