@@ -43,14 +43,23 @@ const Map = ({ activities }: MapProps) => {
           console.log('Processing activity:', activity.title, 'coordinates:', activity.coordinates);
           
           if (activity.coordinates) {
-            // Parse coordinates from the point type
-            const coords = activity.coordinates as unknown as { x: number; y: number };
-            console.log('Parsed coordinates:', coords);
+            // Parse coordinates from string format "(longitude,latitude)"
+            const coordsMatch = activity.coordinates.match(/\(([-\d.]+),([-\d.]+)\)/);
             
-            if (!coords || typeof coords.x !== 'number' || typeof coords.y !== 'number') {
-              console.warn('Invalid coordinates for activity:', activity);
+            if (!coordsMatch) {
+              console.warn('Invalid coordinates format for activity:', activity);
               return;
             }
+
+            const longitude = parseFloat(coordsMatch[1]);
+            const latitude = parseFloat(coordsMatch[2]);
+
+            if (isNaN(longitude) || isNaN(latitude)) {
+              console.warn('Invalid coordinates values for activity:', activity);
+              return;
+            }
+
+            console.log('Parsed coordinates:', { longitude, latitude });
 
             // Create marker element
             const markerEl = document.createElement('div');
@@ -67,7 +76,7 @@ const Map = ({ activities }: MapProps) => {
             const root = createRoot(markerEl);
             root.render(<MarkerComponent />);
 
-            console.log('Adding marker at coordinates:', [coords.x, coords.y]);
+            console.log('Adding marker at coordinates:', [longitude, latitude]);
 
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
@@ -91,7 +100,7 @@ const Map = ({ activities }: MapProps) => {
               anchor: 'bottom',
               scale: 1.2
             })
-              .setLngLat([coords.x, coords.y])
+              .setLngLat([longitude, latitude])
               .setPopup(popup)
               .addTo(map.current);
           }
