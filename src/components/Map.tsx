@@ -47,7 +47,9 @@ const Map = () => {
   useEffect(() => {
     const fetchMapboxToken = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token', {
+          method: 'GET'
+        });
         
         if (error) throw error;
         if (!data?.token) throw new Error('No token received');
