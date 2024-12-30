@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapContainer, TileLayer, ZoomControl, MapContainerProps } from 'react-leaflet';
+import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -30,16 +30,16 @@ const Map: React.FC<CustomMapProps> = ({
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div className="absolute inset-0 rounded-lg shadow-md overflow-hidden">
         <MapContainer
-          key="map"
           center={defaultCenter}
           zoom={defaultZoom}
           style={{ height: '100%', width: '100%' }}
           zoomControl={false}
+          scrollWheelZoom={true}
         >
           <ZoomControl position="topright" />
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
         </MapContainer>
       </div>
