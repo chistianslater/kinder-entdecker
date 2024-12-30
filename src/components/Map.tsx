@@ -17,6 +17,7 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
 
   useEffect(() => {
     const initializeMap = async () => {
+      console.log('Initializing map with activities:', activities);
       if (!mapContainer.current) return;
 
       try {
@@ -38,7 +39,9 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         // Add markers for activities
-        activities.forEach(activity => {
+        activities.forEach((activity, index) => {
+          console.log(`Processing activity ${index}:`, activity);
+          
           if (activity.coordinates && typeof activity.coordinates === 'string') {
             // Parse coordinates from string format "(longitude,latitude)"
             const coordsMatch = activity.coordinates.match(/\(([-\d.]+),([-\d.]+)\)/);
@@ -55,6 +58,8 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
               console.warn('Invalid coordinates values for activity:', activity);
               return;
             }
+
+            console.log(`Creating marker for activity ${activity.title} at:`, longitude, latitude);
 
             // Create marker element
             const markerEl = document.createElement('div');
@@ -105,18 +110,29 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
 
             // Add event listeners after popup is added to the map
             popup.on('open', () => {
+              console.log('Popup opened for activity:', activity.title);
+              
               const navigationBtn = popupContent.querySelector('.navigation-btn');
               const detailsBtn = popupContent.querySelector('.details-btn');
 
+              console.log('Found buttons:', { 
+                navigationBtn: !!navigationBtn, 
+                detailsBtn: !!detailsBtn 
+              });
+
               if (navigationBtn) {
-                navigationBtn.addEventListener('click', () => {
+                navigationBtn.addEventListener('click', (e) => {
+                  console.log('Navigation button clicked');
+                  e.stopPropagation();
                   const encodedAddress = encodeURIComponent(activity.location);
                   window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
                 });
               }
 
               if (detailsBtn && onSelectActivity) {
-                detailsBtn.addEventListener('click', () => {
+                detailsBtn.addEventListener('click', (e) => {
+                  console.log('Details button clicked for activity:', activity.title);
+                  e.stopPropagation();
                   onSelectActivity(activity);
                 });
               }
@@ -131,6 +147,7 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
               .setLngLat([longitude, latitude])
               .setPopup(popup)
               .addTo(map.current);
+
           }
         });
 
