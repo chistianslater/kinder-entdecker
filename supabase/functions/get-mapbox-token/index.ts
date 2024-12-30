@@ -13,6 +13,7 @@ serve(async (req) => {
 
   try {
     const mapboxToken = Deno.env.get('MAPBOX_TOKEN')
+    console.log('Retrieved Mapbox token:', mapboxToken ? 'Token exists' : 'Token missing')
     
     if (!mapboxToken) {
       console.error('MAPBOX_TOKEN not found in environment variables')
