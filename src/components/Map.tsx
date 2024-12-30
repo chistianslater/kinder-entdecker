@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Activity } from '@/types/activity';
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin } from 'lucide-react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 interface MapProps {
   activities: Activity[];
@@ -39,8 +39,14 @@ const Map = ({ activities }: MapProps) => {
         // Add markers for activities
         activities.forEach(activity => {
           if (activity.coordinates) {
+            // Parse coordinates from the point type
             const coords = activity.coordinates as unknown as { x: number; y: number };
             
+            if (!coords || typeof coords.x !== 'number' || typeof coords.y !== 'number') {
+              console.warn('Invalid coordinates for activity:', activity);
+              return;
+            }
+
             // Create marker element
             const markerEl = document.createElement('div');
             markerEl.className = 'marker-pin';
@@ -52,8 +58,9 @@ const Map = ({ activities }: MapProps) => {
               </div>
             );
 
-            // Render React component into marker element
-            ReactDOM.render(<MarkerComponent />, markerEl);
+            // Create root for React component
+            const root = createRoot(markerEl);
+            root.render(<MarkerComponent />);
 
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
