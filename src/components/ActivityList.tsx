@@ -19,12 +19,18 @@ const ActivityList = () => {
 
   const fetchActivities = async () => {
     try {
+      console.log('Fetching activities...');
       const { data, error } = await supabase
         .from('activities')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching activities:', error);
+        throw error;
+      }
+      
+      console.log('Activities fetched:', data);
       setActivities(data || []);
     } catch (error) {
       console.error('Error fetching activities:', error);
@@ -39,14 +45,27 @@ const ActivityList = () => {
   };
 
   const checkBusinessProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await supabase
-        .from('business_profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-      setUserBusinessProfile(data);
+    try {
+      console.log('Checking business profile...');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        console.log('User found:', user.id);
+        const { data, error } = await supabase
+          .from('business_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching business profile:', error);
+          throw error;
+        }
+
+        console.log('Business profile:', data);
+        setUserBusinessProfile(data);
+      }
+    } catch (error) {
+      console.error('Error checking business profile:', error);
     }
   };
 
@@ -77,6 +96,10 @@ const ActivityList = () => {
 
   if (loading) {
     return <div className="p-4">Lädt Aktivitäten...</div>;
+  }
+
+  if (activities.length === 0) {
+    return <div className="p-4">Keine Aktivitäten gefunden.</div>;
   }
 
   return (

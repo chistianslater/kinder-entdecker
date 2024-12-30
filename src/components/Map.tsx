@@ -22,7 +22,7 @@ const Map = () => {
       // Create map instance
       mapInstance.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12', // Changed to streets style for better visibility
+        style: 'mapbox://styles/mapbox/streets-v12',
         center: [10.4515, 51.1657], // Center on Germany
         zoom: 5.5,
         attributionControl: true,
