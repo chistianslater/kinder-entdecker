@@ -19,6 +19,8 @@ const Map = ({ activities }: MapProps) => {
       if (!mapContainer.current) return;
 
       try {
+        console.log('Activities received:', activities);
+        
         // Fetch Mapbox token from Edge Function
         const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
         
@@ -38,9 +40,12 @@ const Map = ({ activities }: MapProps) => {
 
         // Add markers for activities
         activities.forEach(activity => {
+          console.log('Processing activity:', activity.title, 'coordinates:', activity.coordinates);
+          
           if (activity.coordinates) {
             // Parse coordinates from the point type
             const coords = activity.coordinates as unknown as { x: number; y: number };
+            console.log('Parsed coordinates:', coords);
             
             if (!coords || typeof coords.x !== 'number' || typeof coords.y !== 'number') {
               console.warn('Invalid coordinates for activity:', activity);
@@ -61,6 +66,8 @@ const Map = ({ activities }: MapProps) => {
             // Create root for React component
             const root = createRoot(markerEl);
             root.render(<MarkerComponent />);
+
+            console.log('Adding marker at coordinates:', [coords.x, coords.y]);
 
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
