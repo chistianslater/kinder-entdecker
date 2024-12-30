@@ -13,7 +13,6 @@ interface ActivityCardProps {
 }
 
 export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: ActivityCardProps) => {
-  // Fallback image if no image_url is provided
   const imageUrl = activity.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b';
 
   return (
@@ -32,22 +31,20 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
       <div className="p-6 space-y-4">
         {/* Header */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <h3 className="text-2xl font-semibold text-[#94A684]">{activity.title}</h3>
-            <div className="flex gap-2">
-              {activity.is_business && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#E4E4D0] text-[#94A684]">
-                  <Building2 className="w-4 h-4 mr-1" />
-                  Business
-                </span>
-              )}
-              {activity.is_verified && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#F5F5F5] text-[#94A684]">
-                  <Check className="w-4 h-4 mr-1" />
-                  Verifiziert
-                </span>
-              )}
-            </div>
+          <h3 className="text-2xl font-semibold text-[#94A684]">{activity.title}</h3>
+          <div className="flex flex-wrap gap-2">
+            {activity.is_business && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#E4E4D0] text-[#94A684]">
+                <Building2 className="w-4 h-4 mr-1" />
+                Business
+              </span>
+            )}
+            {activity.is_verified && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#F5F5F5] text-[#94A684]">
+                <Check className="w-4 h-4 mr-1" />
+                Verifiziert
+              </span>
+            )}
           </div>
           <p className="text-gray-600">{activity.description}</p>
         </div>
