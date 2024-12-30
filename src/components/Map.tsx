@@ -4,27 +4,33 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapInstance = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || mapInstance.current) return;
 
     // Temporärer Token - später durch Supabase Edge Function Secret ersetzen
     mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpYnB5Y2QwMWJqMmtvOW1qZjB0aTd0In0.O8lasM04g-C8wzTz8_IQSQ';
     
-    map.current = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
       center: [10.4515, 51.1657], // Zentrum von Deutschland
       zoom: 5,
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    
+    mapInstance.current = map;
 
+    // Cleanup function
     return () => {
-      map.current?.remove();
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
     };
-  }, []);
+  }, []); // Empty dependency array since we only want to initialize once
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
