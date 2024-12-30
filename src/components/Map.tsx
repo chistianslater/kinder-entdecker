@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Activity } from '@/types/activity';
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin } from 'lucide-react';
+import ReactDOM from 'react-dom';
 
 interface MapProps {
   activities: Activity[];
@@ -25,12 +26,11 @@ const Map = ({ activities }: MapProps) => {
         
         mapboxgl.accessToken = token;
         
-        // Initialize map centered on Germany with adjusted zoom for better overview
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
           center: [10.4515, 51.1657], // Center of Germany
-          zoom: 5 // Slightly zoomed out for better overview
+          zoom: 5.5
         });
 
         // Add navigation controls
@@ -41,14 +41,23 @@ const Map = ({ activities }: MapProps) => {
           if (activity.coordinates) {
             const coords = activity.coordinates as unknown as { x: number; y: number };
             
-            // Create custom marker element with extra large size and enhanced visibility
+            // Create marker element
             const markerEl = document.createElement('div');
-            markerEl.className = 'w-16 h-16 bg-primary rounded-full flex items-center justify-center cursor-pointer transform transition-transform hover:scale-110 shadow-xl border-4 border-white';
-            markerEl.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+            markerEl.className = 'marker-pin';
+            
+            // Create a React component for the marker
+            const MarkerComponent = () => (
+              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform shadow-xl border-4 border-white">
+                <MapPin size={40} color="white" strokeWidth={3} />
+              </div>
+            );
+
+            // Render React component into marker element
+            ReactDOM.render(<MarkerComponent />, markerEl);
 
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
-              offset: 35, 
+              offset: 35,
               closeButton: true,
               className: 'custom-popup',
               maxWidth: '300px'
@@ -66,7 +75,7 @@ const Map = ({ activities }: MapProps) => {
             new mapboxgl.Marker({
               element: markerEl,
               anchor: 'bottom',
-              scale: 1.2 // Make the marker slightly larger
+              scale: 1.2
             })
               .setLngLat([coords.x, coords.y])
               .setPopup(popup)
