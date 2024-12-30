@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Activity } from '@/types/activity';
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Navigation, ArrowRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 
 interface MapProps {
@@ -68,16 +68,14 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
             
             // Create a React component for the marker
             const MarkerComponent = () => (
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform shadow-md border-2 border-white">
-                <MapPin size={16} color="white" />
+              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform shadow-md border-2 border-white">
+                <MapPin size={12} color="white" />
               </div>
             );
 
             // Create root for React component
             const root = createRoot(markerEl);
             root.render(<MarkerComponent />);
-
-            console.log('Adding marker at coordinates:', [longitude, latitude]);
 
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
@@ -124,12 +122,18 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
         });
 
         // Listen for custom event to open activity detail
-        window.addEventListener('openActivityDetail', ((e: CustomEvent) => {
+        const handleOpenDetail = (e: CustomEvent) => {
           const activity = activities.find(a => a.id === e.detail);
           if (activity && onSelectActivity) {
             onSelectActivity(activity);
           }
-        }) as EventListener);
+        };
+
+        window.addEventListener('openActivityDetail', handleOpenDetail as EventListener);
+
+        return () => {
+          window.removeEventListener('openActivityDetail', handleOpenDetail as EventListener);
+        };
 
       } catch (error) {
         console.error('Error initializing map:', error);
@@ -140,7 +144,6 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
 
     return () => {
       map.current?.remove();
-      window.removeEventListener('openActivityDetail', (() => {}) as EventListener);
     };
   }, [activities, onSelectActivity]);
 
