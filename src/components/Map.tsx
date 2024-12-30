@@ -2,17 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>(() => 
-    localStorage.getItem('mapbox_token') || ''
-  );
-  const [tempToken, setTempToken] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
 
   const initializeMap = async (token: string) => {
     if (!mapContainer.current) return;
@@ -42,63 +38,42 @@ const Map = () => {
       });
 
       setError('');
-      localStorage.setItem('mapbox_token', token);
-      setMapboxToken(token);
     } catch (err) {
       console.error('Map initialization error:', err);
-      setError('Failed to initialize map. Please check your Mapbox token.');
-      localStorage.removeItem('mapbox_token');
-      setMapboxToken('');
-    }
-  };
-
-  const handleTokenSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (tempToken) {
-      initializeMap(tempToken);
+      setError('Failed to initialize map. Please try again later.');
     }
   };
 
   useEffect(() => {
-    if (mapboxToken) {
-      initializeMap(mapboxToken);
-    }
+    const fetchMapboxToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) throw error;
+        if (!data?.token) throw new Error('No token received');
+        
+        await initializeMap(data.token);
+      } catch (err) {
+        console.error('Error fetching Mapbox token:', err);
+        setError('Error loading map. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMapboxToken();
 
     return () => {
       if (mapInstance.current) {
         mapInstance.current.remove();
       }
     };
-  }, []); // Only run on mount
+  }, []);
 
-  if (!mapboxToken) {
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg p-4 space-y-4">
-        <Alert>
-          <AlertDescription>
-            Please enter your Mapbox public token to view the map. You can find your token in the 
-            <a 
-              href="https://account.mapbox.com/access-tokens/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary hover:underline mx-1"
-            >
-              Mapbox account dashboard
-            </a>
-          </AlertDescription>
-        </Alert>
-        <form onSubmit={handleTokenSubmit} className="flex flex-col space-y-2 w-full max-w-md">
-          <Input
-            type="text"
-            value={tempToken}
-            onChange={(e) => setTempToken(e.target.value)}
-            placeholder="Enter your Mapbox token"
-            className="w-full"
-          />
-          <Button type="submit" disabled={!tempToken}>
-            Load Map
-          </Button>
-        </form>
+      <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
+        <p>Loading map...</p>
       </div>
     );
   }
