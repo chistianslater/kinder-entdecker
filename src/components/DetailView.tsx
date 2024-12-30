@@ -14,16 +14,32 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
   if (!activity) return null;
 
   const handleNavigate = () => {
-    const encodedAddress = encodeURIComponent(activity.location);
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, '_blank');
+    try {
+      const encodedAddress = encodeURIComponent(activity.location);
+      const navigationUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+      window.open(navigationUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent className="overflow-y-auto">
         <SheetHeader>
+          <SheetTitle className="text-xl font-bold">{activity.title}</SheetTitle>
+        </SheetHeader>
+
+        <div className="mt-6 space-y-6">
+          {activity.image_url && (
+            <img
+              src={activity.image_url}
+              alt={activity.title}
+              className="w-full h-48 object-cover rounded-lg"
+            />
+          )}
+
           <div className="flex items-center gap-2">
-            <SheetTitle className="text-2xl font-bold">{activity.title}</SheetTitle>
             {activity.is_business && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                 <Building2 className="w-3 h-3 mr-1" />
@@ -37,18 +53,13 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
               </span>
             )}
           </div>
-        </SheetHeader>
-        
-        <div className="mt-6 space-y-6">
-          <img 
-            src={activity.image_url || '/placeholder.svg'} 
-            alt={activity.title}
-            className="w-full h-64 object-cover rounded-lg"
-          />
 
-          <p className="text-muted-foreground">{activity.description}</p>
+          {activity.description && (
+            <p className="text-muted-foreground">{activity.description}</p>
+          )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
+            <h3 className="font-semibold">Details</h3>
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-primary" />
               <span>{activity.location}</span>
@@ -75,7 +86,7 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
 
             <div className="flex items-center gap-3">
               <Users className="w-5 h-5 text-primary" />
-              <span>Altersempfehlung: {activity.age_range}</span>
+              <span>{activity.age_range}</span>
             </div>
 
             <div className="flex items-center gap-3">
