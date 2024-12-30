@@ -19,19 +19,19 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const Map = () => {
-  const center: [number, number] = [51.1657, 10.4515]; // Zentrum von Deutschland
+  const center: [number, number] = [51.1657, 10.4515]; // Center of Germany
   const zoom = 5.5;
 
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <MapContainer
-        center={center}
+        center={center as L.LatLngExpression}
         zoom={zoom}
         className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
         zoomControl={false}
         maxBounds={[
-          [47, -5], // Südwestliche Grenze
-          [56, 25]  // Nordöstliche Grenze
+          [47, -5] as L.LatLngTuple, // Southwest bounds
+          [56, 25] as L.LatLngTuple  // Northeast bounds
         ]}
       >
         <ZoomControl position="topright" />
