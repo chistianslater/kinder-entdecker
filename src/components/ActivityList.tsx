@@ -139,29 +139,29 @@ const ActivityList = () => {
     return <div className="p-4">Lädt Aktivitäten...</div>;
   }
 
-  if (filteredActivities.length === 0) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-lg text-muted-foreground">
-          Keine Aktivitäten gefunden. Versuche andere Filter-Einstellungen.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4 p-4">
       <FilterBar onFiltersChange={handleFiltersChange} />
       
-      {filteredActivities.map((activity) => (
-        <ActivityCard
-          key={activity.id}
-          activity={activity}
-          onSelect={setSelectedActivity}
-          onClaim={handleClaimActivity}
-          showClaimButton={!!userBusinessProfile}
-        />
-      ))}
+      {filteredActivities.length === 0 ? (
+        <div className="p-8 text-center">
+          <p className="text-lg text-muted-foreground">
+            Keine Aktivitäten gefunden. Versuche andere Filter-Einstellungen.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredActivities.map((activity) => (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              onSelect={setSelectedActivity}
+              onClaim={handleClaimActivity}
+              showClaimButton={!!userBusinessProfile}
+            />
+          ))}
+        </div>
+      )}
 
       <DetailView 
         activity={selectedActivity}
