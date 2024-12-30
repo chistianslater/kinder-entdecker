@@ -13,13 +13,16 @@ const Map = () => {
   useEffect(() => {
     const initializeMap = async (token: string) => {
       try {
+        if (!mapContainer.current) {
+          throw new Error('Kartenbehälter nicht gefunden');
+        }
+
         console.log('Initializing map with token');
-        
         mapboxgl.accessToken = token;
 
         // Create new map instance
         const newMap = new mapboxgl.Map({
-          container: 'map-container', // Using ID instead of ref directly
+          container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
           center: [10.4515, 51.1657], // Center on Germany
           zoom: 5.5,
@@ -127,7 +130,6 @@ const Map = () => {
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div 
-        id="map-container"
         ref={mapContainer} 
         className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
         style={{ minHeight: '400px' }}
