@@ -3,14 +3,15 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Activity } from '@/types/activity';
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin } from 'lucide-react';
+import { MapPin, Navigation, ArrowRight } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 
 interface MapProps {
   activities: Activity[];
+  onSelectActivity?: (activity: Activity) => void;
 }
 
-const Map = ({ activities }: MapProps) => {
+const Map = ({ activities, onSelectActivity }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
@@ -42,7 +43,7 @@ const Map = ({ activities }: MapProps) => {
         activities.forEach(activity => {
           console.log('Processing activity:', activity.title, 'coordinates:', activity.coordinates);
           
-          if (activity.coordinates) {
+          if (activity.coordinates && typeof activity.coordinates === 'string') {
             // Parse coordinates from string format "(longitude,latitude)"
             const coordsMatch = activity.coordinates.match(/\(([-\d.]+),([-\d.]+)\)/);
             
@@ -67,8 +68,8 @@ const Map = ({ activities }: MapProps) => {
             
             // Create a React component for the marker
             const MarkerComponent = () => (
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform shadow-xl border-4 border-white">
-                <MapPin size={40} color="white" strokeWidth={3} />
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer transform hover:scale-110 transition-transform shadow-md border-2 border-white">
+                <MapPin size={16} color="white" />
               </div>
             );
 
@@ -80,17 +81,33 @@ const Map = ({ activities }: MapProps) => {
 
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
-              offset: 35,
+              offset: 25,
               closeButton: true,
               className: 'custom-popup',
               maxWidth: '300px'
             })
               .setHTML(`
-                <div class="p-6">
-                  <h3 class="font-bold text-2xl mb-3">${activity.title}</h3>
-                  <p class="text-base text-gray-600 mb-3">${activity.type}</p>
-                  ${activity.price_range ? `<p class="text-base font-medium mb-2">Preis: ${activity.price_range}</p>` : ''}
-                  ${activity.location ? `<p class="text-base mt-2">${activity.location}</p>` : ''}
+                <div class="p-4">
+                  <h3 class="font-bold text-lg mb-2">${activity.title}</h3>
+                  <p class="text-sm text-gray-600 mb-2">${activity.type}</p>
+                  ${activity.price_range ? `<p class="text-sm mb-1">Preis: ${activity.price_range}</p>` : ''}
+                  <div class="flex gap-2 mt-3">
+                    <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location)}', '_blank')" 
+                      class="flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-md text-sm hover:bg-accent/80 transition-colors">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      Navigation
+                    </button>
+                    <button onclick="window.dispatchEvent(new CustomEvent('openActivityDetail', {detail: '${activity.id}'}))"
+                      class="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors">
+                      Details
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               `);
 
@@ -98,13 +115,21 @@ const Map = ({ activities }: MapProps) => {
             new mapboxgl.Marker({
               element: markerEl,
               anchor: 'bottom',
-              scale: 1.2
+              scale: 1
             })
               .setLngLat([longitude, latitude])
               .setPopup(popup)
               .addTo(map.current);
           }
         });
+
+        // Listen for custom event to open activity detail
+        window.addEventListener('openActivityDetail', ((e: CustomEvent) => {
+          const activity = activities.find(a => a.id === e.detail);
+          if (activity && onSelectActivity) {
+            onSelectActivity(activity);
+          }
+        }) as EventListener);
 
       } catch (error) {
         console.error('Error initializing map:', error);
@@ -115,8 +140,9 @@ const Map = ({ activities }: MapProps) => {
 
     return () => {
       map.current?.remove();
+      window.removeEventListener('openActivityDetail', (() => {}) as EventListener);
     };
-  }, [activities]);
+  }, [activities, onSelectActivity]);
 
   return (
     <div className="w-full h-[calc(100vh-12rem)] rounded-xl overflow-hidden shadow-lg">
