@@ -92,7 +92,8 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
                       </svg>
                       Navigation
                     </button>
-                    <button onclick="window.dispatchEvent(new CustomEvent('openActivityDetail', { detail: '${activity.id}' }))"
+                    <button 
+                      onclick="const event = new CustomEvent('openActivityDetail', { detail: '${activity.id}' }); window.dispatchEvent(event);"
                       class="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors">
                       Details
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -115,18 +116,22 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
           }
         });
 
-        // Listen for custom event to open activity detail
-        const handleOpenDetail = (e: CustomEvent<string>) => {
-          const activity = activities.find(a => a.id === e.detail);
+        // Function to handle opening activity detail
+        function handleOpenDetail(event: Event) {
+          const customEvent = event as CustomEvent<string>;
+          const activity = activities.find(a => a.id === customEvent.detail);
           if (activity && onSelectActivity) {
             onSelectActivity(activity);
           }
-        };
+        }
 
-        window.addEventListener('openActivityDetail', handleOpenDetail as EventListener);
+        // Add event listener
+        window.addEventListener('openActivityDetail', handleOpenDetail);
 
+        // Cleanup function
         return () => {
-          window.removeEventListener('openActivityDetail', handleOpenDetail as EventListener);
+          window.removeEventListener('openActivityDetail', handleOpenDetail);
+          map.current?.remove();
         };
 
       } catch (error) {
@@ -135,10 +140,6 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
     };
 
     initializeMap();
-
-    return () => {
-      map.current?.remove();
-    };
   }, [activities, onSelectActivity]);
 
   return (
