@@ -71,7 +71,7 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
             const root = createRoot(markerEl);
             root.render(<MarkerComponent />);
 
-            // Create popup content element
+            // Create popup content
             const popupContent = document.createElement('div');
             popupContent.className = 'p-4';
             popupContent.innerHTML = `
@@ -95,28 +95,32 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
               </div>
             `;
 
-            // Add event listeners to buttons
-            const navigationBtn = popupContent.querySelector('.navigation-btn');
-            const detailsBtn = popupContent.querySelector('.details-btn');
-
-            navigationBtn?.addEventListener('click', () => {
-              const encodedAddress = encodeURIComponent(activity.location);
-              window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
-            });
-
-            detailsBtn?.addEventListener('click', () => {
-              if (onSelectActivity) {
-                onSelectActivity(activity);
-              }
-            });
-
-            // Create popup with enhanced styling
+            // Create popup
             const popup = new mapboxgl.Popup({ 
               offset: 25,
               closeButton: true,
               className: 'custom-popup',
               maxWidth: '300px'
             }).setDOMContent(popupContent);
+
+            // Add event listeners after popup is added to the map
+            popup.on('open', () => {
+              const navigationBtn = popupContent.querySelector('.navigation-btn');
+              const detailsBtn = popupContent.querySelector('.details-btn');
+
+              if (navigationBtn) {
+                navigationBtn.addEventListener('click', () => {
+                  const encodedAddress = encodeURIComponent(activity.location);
+                  window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
+                });
+              }
+
+              if (detailsBtn && onSelectActivity) {
+                detailsBtn.addEventListener('click', () => {
+                  onSelectActivity(activity);
+                });
+              }
+            });
 
             // Add marker to map with popup
             new mapboxgl.Marker({
