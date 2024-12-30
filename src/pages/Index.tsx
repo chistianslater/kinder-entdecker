@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import Map from '@/components/Map';
 import ActivityList from '@/components/ActivityList';
 import FilterBar from '@/components/FilterBar';
 import { Button } from '@/components/ui/button';
-import { MapPin, List } from 'lucide-react';
+import { List } from 'lucide-react';
 
 const Index = () => {
-  const [view, setView] = useState<'map' | 'list'>('map');
+  const [view, setView] = useState<'list'>('list');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -20,16 +19,7 @@ const Index = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex gap-2">
             <Button
-              variant={view === 'map' ? 'default' : 'outline'}
-              onClick={() => setView('map')}
-              className="flex items-center gap-2"
-            >
-              <MapPin className="w-4 h-4" />
-              Karte
-            </Button>
-            <Button
-              variant={view === 'list' ? 'default' : 'outline'}
-              onClick={() => setView('list')}
+              variant="default"
               className="flex items-center gap-2"
             >
               <List className="w-4 h-4" />
@@ -39,8 +29,7 @@ const Index = () => {
         </div>
 
         <FilterBar />
-
-        {view === 'map' ? <Map /> : <ActivityList />}
+        <ActivityList />
       </main>
     </div>
   );
