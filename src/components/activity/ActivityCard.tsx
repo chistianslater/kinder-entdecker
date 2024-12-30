@@ -30,7 +30,7 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
         />
         
         {/* Weather Overlay - Top Right */}
-        <div className="absolute top-2 right-2 bg-white/90 rounded-lg p-2">
+        <div className="absolute top-2 right-2 bg-white/90 rounded-lg px-2 py-1">
           <WeatherInfo location={activity.location} />
         </div>
 

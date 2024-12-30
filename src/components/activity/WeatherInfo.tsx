@@ -28,9 +28,9 @@ const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-gray-500 animate-pulse">
-        <Cloud className="w-5 h-5" />
-        <span className="text-lg">Wetter wird geladen...</span>
+      <div className="flex items-center gap-1 text-gray-500 animate-pulse">
+        <Cloud className="w-4 h-4" />
+        <span className="text-sm">...</span>
       </div>
     );
   }
@@ -40,22 +40,19 @@ const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
   }
 
   const getWeatherIcon = (weatherId: number) => {
-    if (weatherId >= 200 && weatherId < 300) return <CloudRain className="w-5 h-5" />; // Thunderstorm
-    if (weatherId >= 300 && weatherId < 400) return <CloudRain className="w-5 h-5" />; // Drizzle
-    if (weatherId >= 500 && weatherId < 600) return <CloudRain className="w-5 h-5" />; // Rain
-    if (weatherId >= 600 && weatherId < 700) return <Snowflake className="w-5 h-5" />; // Snow
-    if (weatherId >= 700 && weatherId < 800) return <Wind className="w-5 h-5" />; // Atmosphere
-    if (weatherId === 800) return <Sun className="w-5 h-5" />; // Clear
-    return <Cloud className="w-5 h-5" />; // Clouds
+    if (weatherId >= 200 && weatherId < 300) return <CloudRain className="w-4 h-4" />; // Thunderstorm
+    if (weatherId >= 300 && weatherId < 400) return <CloudRain className="w-4 h-4" />; // Drizzle
+    if (weatherId >= 500 && weatherId < 600) return <CloudRain className="w-4 h-4" />; // Rain
+    if (weatherId >= 600 && weatherId < 700) return <Snowflake className="w-4 h-4" />; // Snow
+    if (weatherId >= 700 && weatherId < 800) return <Wind className="w-4 h-4" />; // Atmosphere
+    if (weatherId === 800) return <Sun className="w-4 h-4" />; // Clear
+    return <Cloud className="w-4 h-4" />; // Clouds
   };
 
   return (
-    <div className="flex items-center gap-2 text-[#94A684]">
+    <div className="flex items-center gap-1 text-[#94A684]">
       {getWeatherIcon(weather.weather[0].id)}
-      <span className="text-lg">{Math.round(weather.main.temp)}°C</span>
-      <span className="text-gray-600">
-        {weather.weather[0].description}
-      </span>
+      <span className="text-sm font-medium">{Math.round(weather.main.temp)}°C</span>
     </div>
   );
 };
