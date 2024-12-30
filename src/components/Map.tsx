@@ -5,15 +5,16 @@ import { Activity } from '@/types/activity';
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
+import DetailView from './DetailView';
 
 interface MapProps {
   activities: Activity[];
-  onSelectActivity?: (activity: Activity) => void;
 }
 
-const Map = ({ activities, onSelectActivity }: MapProps) => {
+const Map = ({ activities }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null);
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -39,8 +40,8 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         // Add markers for activities
-        activities.forEach((activity, index) => {
-          console.log(`Processing activity ${index}:`, activity);
+        activities.forEach((activity) => {
+          console.log(`Processing activity:`, activity);
           
           if (activity.coordinates && typeof activity.coordinates === 'string') {
             // Parse coordinates from string format "(longitude,latitude)"
@@ -136,10 +137,8 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
             detailsBtn.addEventListener('click', (e) => {
               console.log('Details button clicked for activity:', activity.title);
               e.stopPropagation();
-              if (onSelectActivity) {
-                onSelectActivity(activity);
-                popup.remove(); // Close the popup after selecting
-              }
+              setSelectedActivity(activity);
+              popup.remove(); // Close the popup after selecting
             });
 
             // Add marker to map with popup
@@ -164,12 +163,19 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
     return () => {
       map.current?.remove();
     };
-  }, [activities, onSelectActivity]);
+  }, [activities]);
 
   return (
-    <div className="w-full h-[calc(100vh-12rem)] rounded-xl overflow-hidden shadow-lg">
-      <div ref={mapContainer} className="w-full h-full" />
-    </div>
+    <>
+      <div className="w-full h-[calc(100vh-12rem)] rounded-xl overflow-hidden shadow-lg">
+        <div ref={mapContainer} className="w-full h-full" />
+      </div>
+      <DetailView 
+        activity={selectedActivity}
+        isOpen={selectedActivity !== null}
+        onClose={() => setSelectedActivity(null)}
+      />
+    </>
   );
 };
 
