@@ -12,41 +12,68 @@ const Map = () => {
 
   useEffect(() => {
     const initializeMap = async (token: string) => {
-      if (!mapContainer.current) return;
+      if (!mapContainer.current) {
+        console.error('Map container not found');
+        setError('Map container not found');
+        setIsLoading(false);
+        return;
+      }
       
       try {
-        console.log('Initializing map with token:', token ? 'Token exists' : 'No token');
+        console.log('Initializing map with token');
         
         mapboxgl.accessToken = token;
 
+        // Create new map instance
         const newMap = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
           center: [10.4515, 51.1657], // Center on Germany
           zoom: 5.5,
+          maxBounds: [
+            [-5, 47], // Southwest coordinates
+            [25, 56]  // Northeast coordinates
+          ]
         });
 
-        // Add navigation control
-        newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        // Add navigation controls
+        newMap.addControl(
+          new mapboxgl.NavigationControl({
+            showCompass: true,
+            showZoom: true,
+            visualizePitch: false
+          }), 
+          'top-right'
+        );
 
-        // Handle map load
+        // Handle successful map load
         newMap.on('load', () => {
           console.log('Map loaded successfully');
           setIsLoading(false);
+          setError('');
         });
 
-        // Handle map error
+        // Handle map errors
         newMap.on('error', (e) => {
           console.error('Map error:', e);
-          setError('Error loading map: ' + e.error.message);
+          setError(`Kartenfehler: ${e.error.message}`);
           setIsLoading(false);
         });
 
         map.current = newMap;
-        setError('');
+
+        // Handle style load errors
+        newMap.on('styledata', () => {
+          const loaded = newMap.isStyleLoaded();
+          if (!loaded) {
+            console.error('Style failed to load');
+            setError('Kartenstil konnte nicht geladen werden');
+          }
+        });
+
       } catch (err) {
         console.error('Map initialization error:', err);
-        setError('Failed to initialize map. Please try again later.');
+        setError('Karte konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.');
         setIsLoading(false);
       }
     };
@@ -54,32 +81,34 @@ const Map = () => {
     const fetchMapboxToken = async () => {
       try {
         console.log('Fetching Mapbox token...');
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        const { data, error: supabaseError } = await supabase.functions.invoke('get-mapbox-token');
         
-        if (error) {
-          console.error('Supabase function error:', error);
-          throw error;
+        if (supabaseError) {
+          console.error('Supabase function error:', supabaseError);
+          throw supabaseError;
         }
         
         if (!data?.token) {
           console.error('No token received from function');
-          throw new Error('No token received');
+          throw new Error('Kein Token erhalten');
         }
         
         console.log('Token received successfully');
         await initializeMap(data.token);
       } catch (err) {
         console.error('Error fetching Mapbox token:', err);
-        setError('Error loading map. Please try again later.');
+        setError('Fehler beim Laden der Karte. Bitte versuchen Sie es später erneut.');
         setIsLoading(false);
       }
     };
 
     fetchMapboxToken();
 
+    // Cleanup
     return () => {
       if (map.current) {
         map.current.remove();
+        map.current = null;
       }
     };
   }, []);
@@ -87,7 +116,7 @@ const Map = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
-        <p>Loading map...</p>
+        <p>Karte wird geladen...</p>
       </div>
     );
   }
@@ -106,7 +135,7 @@ const Map = () => {
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div 
         ref={mapContainer} 
-        className="absolute inset-0 rounded-lg shadow-md"
+        className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
       />
     </div>
   );
