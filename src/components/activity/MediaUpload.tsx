@@ -46,8 +46,6 @@ export const MediaUpload = ({ activity }: MediaUploadProps) => {
       const fileExt = selectedFile.name.split('.').pop();
       const filePath = `${activity.id}/${Math.random()}.${fileExt}`;
       const bucket = mediaType === 'photo' ? 'activity-photos' : 'activity-videos';
-      const table = mediaType === 'photo' ? 'photos' : 'videos';
-      const urlField = mediaType === 'photo' ? 'image_url' : 'video_url';
 
       const { error: uploadError } = await supabase.storage
         .from(bucket)
@@ -55,14 +53,20 @@ export const MediaUpload = ({ activity }: MediaUploadProps) => {
 
       if (uploadError) throw uploadError;
 
+      // Create the insert data based on media type
+      const insertData = {
+        activity_id: activity.id,
+        user_id: user.id,
+        caption,
+        ...(mediaType === 'photo' 
+          ? { image_url: filePath }
+          : { video_url: filePath }
+        )
+      };
+
       const { error: dbError } = await supabase
-        .from(table)
-        .insert({
-          activity_id: activity.id,
-          user_id: user.id,
-          [urlField]: filePath,
-          caption,
-        });
+        .from(mediaType === 'photo' ? 'photos' : 'videos')
+        .insert(insertData);
 
       if (dbError) throw dbError;
 
