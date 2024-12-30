@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import ActivityList from '@/components/ActivityList';
-import FilterBar from '@/components/FilterBar';
 import { Button } from '@/components/ui/button';
 import { TreePine, Users, MapPin, Footprints } from 'lucide-react';
-import { Filters } from '@/components/FilterBar';
 
 const Index = () => {
   const [view, setView] = useState<'list'>('list');
-
-  // This is just a placeholder since ActivityList handles the actual filtering
-  const handleFiltersChange = (filters: Filters) => {
-    console.log('Filters changed:', filters);
-  };
 
   return (
     <div className="min-h-screen bg-secondary/30">
@@ -72,7 +65,6 @@ const Index = () => {
           </Button>
         </div>
 
-        <FilterBar onFiltersChange={handleFiltersChange} />
         <ActivityList />
       </main>
     </div>
