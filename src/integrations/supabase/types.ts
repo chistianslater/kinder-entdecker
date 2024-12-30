@@ -105,6 +105,76 @@ export type Database = {
         }
         Relationships: []
       }
+      photos: {
+        Row: {
+          activity_id: string
+          caption: string | null
+          created_at: string | null
+          id: string
+          image_url: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          image_url: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          activity_id: string
+          comment: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

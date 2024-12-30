@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { MapPin, Clock, Euro, Users, Tag, Phone, Mail, Globe, Building2, Ticket, Check, Navigation } from 'lucide-react';
 import { Activity } from '@/types/activity';
 import { Button } from '@/components/ui/button';
+import { ActivityReviews } from './activity/ActivityReviews';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -123,6 +124,10 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
                 </a>
               </div>
             )}
+          </div>
+
+          <div className="border-t pt-6">
+            <ActivityReviews activity={activity} />
           </div>
         </div>
       </SheetContent>
