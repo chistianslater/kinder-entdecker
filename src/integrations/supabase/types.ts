@@ -175,6 +175,41 @@ export type Database = {
           },
         ]
       }
+      videos: {
+        Row: {
+          activity_id: string
+          caption: string | null
+          created_at: string | null
+          id: string
+          user_id: string
+          video_url: string
+        }
+        Insert: {
+          activity_id: string
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+          video_url: string
+        }
+        Update: {
+          activity_id?: string
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          video_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

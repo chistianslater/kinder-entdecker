@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, ImagePlus, MessageSquare } from 'lucide-react';
+import { Star, ImagePlus, MessageSquare, Video } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 
@@ -14,12 +14,19 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedVideo(event.target.files[0]);
     }
   };
 
@@ -87,7 +94,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
       const fileExt = selectedFile.name.split('.').pop();
       const filePath = `${activity.id}/${Math.random()}.${fileExt}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('activity-photos')
         .upload(filePath, selectedFile);
 
@@ -98,7 +105,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         .insert({
           activity_id: activity.id,
           user_id: user.id,
-          image_url: `${filePath}`,
+          image_url: filePath,
           caption,
         });
 
@@ -116,6 +123,64 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
       toast({
         title: "Fehler",
         description: "Foto konnte nicht hochgeladen werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUploadVideo = async () => {
+    try {
+      if (!selectedVideo) {
+        toast({
+          title: "Fehler",
+          description: "Bitte wähle ein Video aus.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Fehler",
+          description: "Bitte melde dich an, um ein Video hochzuladen.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const fileExt = selectedVideo.name.split('.').pop();
+      const filePath = `${activity.id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('activity-videos')
+        .upload(filePath, selectedVideo);
+
+      if (uploadError) throw uploadError;
+
+      const { error: dbError } = await supabase
+        .from('videos')
+        .insert({
+          activity_id: activity.id,
+          user_id: user.id,
+          video_url: filePath,
+          caption,
+        });
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: "Erfolg",
+        description: "Dein Video wurde erfolgreich hochgeladen.",
+      });
+
+      setSelectedVideo(null);
+      setCaption('');
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      toast({
+        title: "Fehler",
+        description: "Video konnte nicht hochgeladen werden.",
         variant: "destructive",
       });
     }
@@ -177,6 +242,34 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         >
           <ImagePlus className="w-4 h-4" />
           Foto hochladen
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Video hochladen</h3>
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleVideoChange}
+          className="block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-sm file:font-semibold
+            file:bg-primary file:text-white
+            hover:file:bg-primary/90"
+        />
+        <Textarea
+          placeholder="Videobeschreibung (optional)"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+        />
+        <Button 
+          onClick={handleUploadVideo}
+          disabled={!selectedVideo}
+          className="flex items-center gap-2"
+        >
+          <Video className="w-4 h-4" />
+          Video hochladen
         </Button>
       </div>
     </div>
