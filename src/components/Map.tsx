@@ -71,38 +71,52 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
             const root = createRoot(markerEl);
             root.render(<MarkerComponent />);
 
+            // Create popup content element
+            const popupContent = document.createElement('div');
+            popupContent.className = 'p-4';
+            popupContent.innerHTML = `
+              <h3 class="font-bold text-lg mb-2">${activity.title}</h3>
+              <p class="text-sm text-gray-600 mb-2">${activity.type}</p>
+              ${activity.price_range ? `<p class="text-sm mb-1">Preis: ${activity.price_range}</p>` : ''}
+              <div class="flex gap-2 mt-3">
+                <button class="navigation-btn flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-md text-sm hover:bg-accent/80 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Navigation
+                </button>
+                <button class="details-btn flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors">
+                  Details
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
+            `;
+
+            // Add event listeners to buttons
+            const navigationBtn = popupContent.querySelector('.navigation-btn');
+            const detailsBtn = popupContent.querySelector('.details-btn');
+
+            navigationBtn?.addEventListener('click', () => {
+              const encodedAddress = encodeURIComponent(activity.location);
+              window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
+            });
+
+            detailsBtn?.addEventListener('click', () => {
+              if (onSelectActivity) {
+                onSelectActivity(activity);
+              }
+            });
+
             // Create popup with enhanced styling
             const popup = new mapboxgl.Popup({ 
               offset: 25,
               closeButton: true,
               className: 'custom-popup',
               maxWidth: '300px'
-            })
-              .setHTML(`
-                <div class="p-4">
-                  <h3 class="font-bold text-lg mb-2">${activity.title}</h3>
-                  <p class="text-sm text-gray-600 mb-2">${activity.type}</p>
-                  ${activity.price_range ? `<p class="text-sm mb-1">Preis: ${activity.price_range}</p>` : ''}
-                  <div class="flex gap-2 mt-3">
-                    <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location)}', '_blank')" 
-                      class="flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-md text-sm hover:bg-accent/80 transition-colors">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                      </svg>
-                      Navigation
-                    </button>
-                    <button 
-                      onclick="const customEvt = new CustomEvent('openActivityDetail', { detail: '${activity.id}' }); window.dispatchEvent(customEvt);"
-                      class="flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors">
-                      Details
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              `);
+            }).setDOMContent(popupContent);
 
             // Add marker to map with popup
             new mapboxgl.Marker({
@@ -116,30 +130,16 @@ const Map = ({ activities, onSelectActivity }: MapProps) => {
           }
         });
 
-        // Function to handle opening activity detail
-        function handleOpenDetail(event: Event) {
-          const customEvent = event as CustomEvent<string>;
-          const activity = activities.find(a => a.id === customEvent.detail);
-          if (activity && onSelectActivity) {
-            onSelectActivity(activity);
-          }
-        }
-
-        // Add event listener
-        window.addEventListener('openActivityDetail', handleOpenDetail);
-
-        // Cleanup function
-        return () => {
-          window.removeEventListener('openActivityDetail', handleOpenDetail);
-          map.current?.remove();
-        };
-
       } catch (error) {
         console.error('Error initializing map:', error);
       }
     };
 
     initializeMap();
+
+    return () => {
+      map.current?.remove();
+    };
   }, [activities, onSelectActivity]);
 
   return (
