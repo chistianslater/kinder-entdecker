@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Users, Euro, Clock, Tag, Building2, Check, TreePine } from 'lucide-react';
+import { MapPin, Users, Euro, Clock, Tag, Building2, Check } from 'lucide-react';
 import { Activity } from '@/types/activity';
 import WeatherInfo from './WeatherInfo';
 
@@ -18,6 +18,16 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
       className="bg-white hover:shadow-soft transition-all duration-300 cursor-pointer rounded-2xl overflow-hidden border border-accent/10"
       onClick={() => onSelect(activity)}
     >
+      {activity.image_url && (
+        <div className="w-full h-48 relative">
+          <img
+            src={activity.image_url}
+            alt={activity.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      
       <div className="p-6 space-y-4">
         {/* Header */}
         <div className="space-y-2">
