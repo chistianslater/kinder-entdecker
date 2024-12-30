@@ -6,63 +6,55 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const initializeMap = async (token: string) => {
-    if (!mapContainer.current) return;
-    
-    try {
-      console.log('Initializing map with token:', token ? 'Token exists' : 'No token');
-      
-      // Set the access token
-      mapboxgl.accessToken = token;
-
-      // Create map instance
-      mapInstance.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [10.4515, 51.1657], // Center on Germany
-        zoom: 5.5,
-        attributionControl: true,
-      });
-
-      // Add navigation control
-      const navControl = new mapboxgl.NavigationControl({
-        visualizePitch: true
-      });
-      mapInstance.current.addControl(navControl, 'top-right');
-
-      // Handle map load
-      mapInstance.current.on('load', () => {
-        console.log('Map loaded successfully');
-        mapInstance.current?.resize();
-        setIsLoading(false);
-      });
-
-      // Handle map error
-      mapInstance.current.on('error', (e) => {
-        console.error('Map error:', e);
-        setError('Error loading map: ' + e.error.message);
-        setIsLoading(false);
-      });
-
-      setError('');
-    } catch (err) {
-      console.error('Map initialization error:', err);
-      setError('Failed to initialize map. Please try again later.');
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const initializeMap = async (token: string) => {
+      if (!mapContainer.current) return;
+      
+      try {
+        console.log('Initializing map with token:', token ? 'Token exists' : 'No token');
+        
+        mapboxgl.accessToken = token;
+
+        const newMap = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/streets-v12',
+          center: [10.4515, 51.1657], // Center on Germany
+          zoom: 5.5,
+        });
+
+        // Add navigation control
+        newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        // Handle map load
+        newMap.on('load', () => {
+          console.log('Map loaded successfully');
+          setIsLoading(false);
+        });
+
+        // Handle map error
+        newMap.on('error', (e) => {
+          console.error('Map error:', e);
+          setError('Error loading map: ' + e.error.message);
+          setIsLoading(false);
+        });
+
+        map.current = newMap;
+        setError('');
+      } catch (err) {
+        console.error('Map initialization error:', err);
+        setError('Failed to initialize map. Please try again later.');
+        setIsLoading(false);
+      }
+    };
+
     const fetchMapboxToken = async () => {
       try {
         console.log('Fetching Mapbox token...');
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token', {
-          method: 'GET'
-        });
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
         
         if (error) {
           console.error('Supabase function error:', error);
@@ -86,8 +78,8 @@ const Map = () => {
     fetchMapboxToken();
 
     return () => {
-      if (mapInstance.current) {
-        mapInstance.current.remove();
+      if (map.current) {
+        map.current.remove();
       }
     };
   }, []);
@@ -95,7 +87,7 @@ const Map = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
-        <p>Karte wird geladen...</p>
+        <p>Loading map...</p>
       </div>
     );
   }
@@ -114,7 +106,7 @@ const Map = () => {
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div 
         ref={mapContainer} 
-        className="absolute inset-0 rounded-lg shadow-soft"
+        className="absolute inset-0 rounded-lg shadow-md"
       />
     </div>
   );
