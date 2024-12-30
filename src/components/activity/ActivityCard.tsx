@@ -13,20 +13,21 @@ interface ActivityCardProps {
 }
 
 export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: ActivityCardProps) => {
+  // Fallback image if no image_url is provided
+  const imageUrl = activity.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b';
+
   return (
     <Card 
       className="bg-white hover:shadow-soft transition-all duration-300 cursor-pointer rounded-2xl overflow-hidden border border-accent/10"
       onClick={() => onSelect(activity)}
     >
-      {activity.image_url && (
-        <div className="w-full h-48 relative">
-          <img
-            src={activity.image_url}
-            alt={activity.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+      <div className="w-full h-48 relative">
+        <img
+          src={imageUrl}
+          alt={activity.title}
+          className="w-full h-full object-cover"
+        />
+      </div>
       
       <div className="p-6 space-y-4">
         {/* Header */}
