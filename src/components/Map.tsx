@@ -19,15 +19,14 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapProps {
-  center?: L.LatLngExpression;
+  center?: [number, number];
   zoom?: number;
 }
 
 const Map: React.FC<MapProps> = ({ 
-  center = [51.1657, 10.4515] as L.LatLngExpression, // Center of Germany
+  center = [51.1657, 10.4515], // Center of Germany
   zoom = 5.5 
 }) => {
-  // Ensure Leaflet elements are properly cleaned up
   useEffect(() => {
     return () => {
       // Cleanup function
@@ -38,19 +37,19 @@ const Map: React.FC<MapProps> = ({
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div className="absolute inset-0 rounded-lg shadow-md overflow-hidden">
         <MapContainer
-          center={center}
+          center={center as [number, number]}
           zoom={zoom}
           style={{ height: '100%', width: '100%' }}
           zoomControl={false}
-          maxBounds={[
-            [47, -5] as L.LatLngTuple, // Southwest bounds
-            [56, 25] as L.LatLngTuple  // Northeast bounds
+          bounds={[
+            [47, -5], // Southwest bounds
+            [56, 25]  // Northeast bounds
           ]}
         >
           <ZoomControl position="topright" />
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
         </MapContainer>
       </div>
