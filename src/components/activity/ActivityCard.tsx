@@ -20,73 +20,60 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
       className="bg-white hover:shadow-soft transition-all duration-300 cursor-pointer rounded-2xl overflow-hidden border border-accent/10"
       onClick={() => onSelect(activity)}
     >
-      <div className="w-full h-48 relative">
+      <div className="w-full h-64 relative">
+        {/* Image */}
         <img
           src={imageUrl}
           alt={activity.title}
           className="w-full h-full object-cover"
         />
-      </div>
-      
-      <div className="p-6 space-y-4">
-        {/* Header */}
-        <div className="space-y-2">
-          <h3 className="text-2xl font-semibold text-[#94A684]">{activity.title}</h3>
-          <div className="flex flex-wrap gap-2">
+        
+        {/* Weather Overlay - Top Right */}
+        <div className="absolute top-2 right-2 bg-white/90 rounded-lg p-2">
+          <WeatherInfo location={activity.location} />
+        </div>
+
+        {/* Info Overlay - Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+          <h3 className="text-2xl font-semibold mb-2">{activity.title}</h3>
+          <div className="flex flex-wrap gap-2 mb-2">
             {activity.is_business && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#E4E4D0] text-[#94A684]">
-                <Building2 className="w-4 h-4 mr-1" />
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-[#E4E4D0]/90 text-[#94A684]">
+                <Building2 className="w-3 h-3 mr-1" />
                 Business
               </span>
             )}
             {activity.is_verified && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#F5F5F5] text-[#94A684]">
-                <Check className="w-4 h-4 mr-1" />
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-[#F5F5F5]/90 text-[#94A684]">
+                <Check className="w-3 h-3 mr-1" />
                 Verifiziert
               </span>
             )}
           </div>
-          <p className="text-gray-600">{activity.description}</p>
-        </div>
-
-        {/* Main Content */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[#94A684]">
-              <MapPin className="w-5 h-5" />
-              <span className="text-lg">{activity.location}</span>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="flex items-center gap-1">
+              <MapPin className="w-4 h-4" />
+              <span>{activity.location}</span>
             </div>
-            
-            <div className="flex items-center gap-2 text-[#94A684]">
-              <WeatherInfo location={activity.location} />
+            <div className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              <span>{activity.age_range}</span>
             </div>
-
-            <div className="flex items-center gap-2 text-[#94A684]">
-              <Euro className="w-5 h-5" />
-              <span className="text-lg">{activity.price_range}</span>
+            <div className="flex items-center gap-1">
+              <Euro className="w-4 h-4" />
+              <span>{activity.price_range}</span>
             </div>
-
-            <div className="flex items-center gap-2 text-[#94A684]">
-              <Clock className="w-5 h-5" />
-              <span className="text-lg">{activity.opening_hours}</span>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[#94A684]">
-              <Users className="w-5 h-5" />
-              <span className="text-lg">{activity.age_range}</span>
-            </div>
-
-            <div className="flex items-center gap-2 text-[#94A684]">
-              <Tag className="w-5 h-5" />
-              <span className="text-lg">{activity.type}</span>
+            <div className="flex items-center gap-1">
+              <Tag className="w-4 h-4" />
+              <span>{activity.type}</span>
             </div>
           </div>
         </div>
-
+      </div>
+      
+      <div className="p-4">
+        <p className="text-gray-600 text-sm line-clamp-2">{activity.description}</p>
+        
         {/* Claim Button */}
         {showClaimButton && !activity.claimed_by && !activity.is_business && (
           <Button
