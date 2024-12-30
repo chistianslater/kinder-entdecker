@@ -11,15 +11,23 @@ const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
   const { data: weather, isLoading } = useQuery({
     queryKey: ['weather', location],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-weather', {
-        body: { location },
-      });
-      
-      if (error) {
-        console.error('Weather fetch error:', error);
+      try {
+        const { data, error } = await supabase.functions.invoke('get-weather', {
+          body: { location },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (error) {
+          console.error('Weather fetch error:', error);
+          return null;
+        }
+        return data;
+      } catch (error) {
+        console.error('Weather API error:', error);
         return null;
       }
-      return data;
     },
     enabled: !!location,
     retry: 1,
@@ -35,7 +43,7 @@ const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
     );
   }
 
-  if (!weather || !weather.main.temp) {
+  if (!weather || !weather.main?.temp) {
     return null;
   }
 
