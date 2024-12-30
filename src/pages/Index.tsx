@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import ActivityList from '@/components/ActivityList';
 import { Button } from '@/components/ui/button';
-import { TreePine, Users, MapPin, Footprints } from 'lucide-react';
+import { TreePine, Users, MapPin, Footprints, List, Map as MapIcon } from 'lucide-react';
 import Map from '@/components/Map';
 import { useActivities } from '@/hooks/useActivities';
 
+type ViewMode = 'list' | 'map';
+
 const Index = () => {
-  const [view, setView] = useState<'list'>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const { filteredActivities } = useActivities();
 
   return (
@@ -68,9 +70,33 @@ const Index = () => {
           </Button>
         </div>
 
+        <div className="bg-white shadow-soft rounded-2xl p-6 mb-6">
+          <div className="flex justify-end gap-2">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              onClick={() => setViewMode('list')}
+              className="flex items-center gap-2"
+            >
+              <List className="w-4 h-4" />
+              Liste
+            </Button>
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'outline'}
+              onClick={() => setViewMode('map')}
+              className="flex items-center gap-2"
+            >
+              <MapIcon className="w-4 h-4" />
+              Karte
+            </Button>
+          </div>
+        </div>
+
         <div className="space-y-8">
-          <Map activities={filteredActivities} />
-          <ActivityList />
+          {viewMode === 'map' ? (
+            <Map activities={filteredActivities} />
+          ) : (
+            <ActivityList />
+          )}
         </div>
       </main>
     </div>

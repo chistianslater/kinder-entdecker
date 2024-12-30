@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Activity } from '@/types/activity';
 import { supabase } from "@/integrations/supabase/client";
+import { MapPin } from 'lucide-react';
 
 interface MapProps {
   activities: Activity[];
@@ -42,15 +43,15 @@ const Map = ({ activities }: MapProps) => {
             
             // Create custom marker element
             const markerEl = document.createElement('div');
-            markerEl.className = 'w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer transform transition-transform hover:scale-110';
-            markerEl.innerHTML = '🎯';
+            markerEl.className = 'w-10 h-10 bg-primary rounded-full flex items-center justify-center cursor-pointer transform transition-transform hover:scale-110 shadow-lg border-2 border-white';
+            markerEl.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
 
             // Create popup
-            const popup = new mapboxgl.Popup({ offset: 25 })
+            const popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
               .setHTML(`
-                <div class="p-2">
-                  <h3 class="font-bold">${activity.title}</h3>
-                  <p class="text-sm text-gray-600">${activity.type}</p>
+                <div class="p-3">
+                  <h3 class="font-bold text-lg mb-2">${activity.title}</h3>
+                  <p class="text-sm text-gray-600 mb-1">${activity.type}</p>
                   ${activity.price_range ? `<p class="text-sm">Preis: ${activity.price_range}</p>` : ''}
                 </div>
               `);
@@ -76,7 +77,7 @@ const Map = ({ activities }: MapProps) => {
   }, [activities]);
 
   return (
-    <div className="w-full h-[400px] rounded-xl overflow-hidden shadow-lg">
+    <div className="w-full h-[calc(100vh-12rem)] rounded-xl overflow-hidden shadow-lg">
       <div ref={mapContainer} className="w-full h-full" />
     </div>
   );
