@@ -11,23 +11,6 @@ const Map = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Ensure the container exists and has dimensions
-    if (!mapContainer.current) {
-      console.error('Map container ref not found');
-      setError('Kartenbehälter konnte nicht gefunden werden');
-      setIsLoading(false);
-      return;
-    }
-
-    // Wait for container to have dimensions
-    const containerElement = mapContainer.current;
-    if (containerElement.offsetWidth === 0 || containerElement.offsetHeight === 0) {
-      console.error('Map container has no dimensions');
-      setError('Kartenbehälter hat keine Dimensionen');
-      setIsLoading(false);
-      return;
-    }
-
     const initializeMap = async (token: string) => {
       try {
         console.log('Initializing map with token');
@@ -36,7 +19,7 @@ const Map = () => {
 
         // Create new map instance
         const newMap = new mapboxgl.Map({
-          container: containerElement,
+          container: 'map-container', // Using ID instead of ref directly
           style: 'mapbox://styles/mapbox/streets-v12',
           center: [10.4515, 51.1657], // Center on Germany
           zoom: 5.5,
@@ -144,9 +127,10 @@ const Map = () => {
   return (
     <div className="relative w-full h-[calc(100vh-4rem)]">
       <div 
+        id="map-container"
         ref={mapContainer} 
         className="absolute inset-0 rounded-lg shadow-md overflow-hidden"
-        style={{ minHeight: '400px' }} // Ensure minimum height
+        style={{ minHeight: '400px' }}
       />
     </div>
   );
