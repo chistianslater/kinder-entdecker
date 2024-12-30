@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Users, Euro, Clock, Tag, Building2, Check } from 'lucide-react';
 import { Activity } from '@/types/activity';
 import WeatherInfo from './WeatherInfo';
+import { Separator } from '@/components/ui/separator';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -33,47 +34,48 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
           <WeatherInfo location={activity.location} />
         </div>
 
-        {/* Info Overlay - Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-          <h3 className="text-2xl font-semibold mb-2">{activity.title}</h3>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {activity.is_business && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-[#E4E4D0]/90 text-[#94A684]">
-                <Building2 className="w-3 h-3 mr-1" />
-                Business
-              </span>
-            )}
-            {activity.is_verified && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-[#F5F5F5]/90 text-[#94A684]">
-                <Check className="w-3 h-3 mr-1" />
-                Verifiziert
-              </span>
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              <span>{activity.location}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              <span>{activity.age_range}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Euro className="w-4 h-4" />
-              <span>{activity.price_range}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Tag className="w-4 h-4" />
-              <span>{activity.type}</span>
-            </div>
-          </div>
+        {/* Badges Overlay - Bottom */}
+        <div className="absolute bottom-4 left-4 flex gap-2">
+          {activity.is_business && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-white/90 text-[#94A684]">
+              <Building2 className="w-3 h-3 mr-1" />
+              Business
+            </span>
+          )}
+          {activity.is_verified && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-white/90 text-[#94A684]">
+              <Check className="w-3 h-3 mr-1" />
+              Verifiziert
+            </span>
+          )}
         </div>
       </div>
       
       <div className="p-4">
-        <p className="text-gray-600 text-sm line-clamp-2">{activity.description}</p>
+        <h3 className="text-2xl font-semibold text-primary mb-2">{activity.title}</h3>
+        <p className="text-gray-600 text-sm line-clamp-2 mb-4">{activity.description}</p>
         
+        <Separator className="my-4" />
+        
+        <div className="grid grid-cols-2 gap-y-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <MapPin className="w-4 h-4" />
+            <span>{activity.location}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Users className="w-4 h-4" />
+            <span>{activity.age_range}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Euro className="w-4 h-4" />
+            <span>{activity.price_range}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Tag className="w-4 h-4" />
+            <span>{activity.type}</span>
+          </div>
+        </div>
+
         {/* Claim Button */}
         {showClaimButton && !activity.claimed_by && !activity.is_business && (
           <Button
