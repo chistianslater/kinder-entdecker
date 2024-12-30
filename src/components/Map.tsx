@@ -14,15 +14,17 @@ const Map = () => {
     if (!mapContainer.current) return;
     
     try {
+      console.log('Initializing map with token:', token ? 'Token exists' : 'No token');
+      
       // Set the access token
       mapboxgl.accessToken = token;
 
       // Create map instance
       mapInstance.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: 'mapbox://styles/mapbox/streets-v12', // Changed to streets style for better visibility
         center: [10.4515, 51.1657], // Center on Germany
-        zoom: 5,
+        zoom: 5.5,
         attributionControl: true,
       });
 
@@ -33,14 +35,24 @@ const Map = () => {
       mapInstance.current.addControl(navControl, 'top-right');
 
       // Handle map load
-      mapInstance.current.once('load', () => {
+      mapInstance.current.on('load', () => {
+        console.log('Map loaded successfully');
         mapInstance.current?.resize();
+        setIsLoading(false);
+      });
+
+      // Handle map error
+      mapInstance.current.on('error', (e) => {
+        console.error('Map error:', e);
+        setError('Error loading map: ' + e.error.message);
+        setIsLoading(false);
       });
 
       setError('');
     } catch (err) {
       console.error('Map initialization error:', err);
       setError('Failed to initialize map. Please try again later.');
+      setIsLoading(false);
     }
   };
 
@@ -67,7 +79,6 @@ const Map = () => {
       } catch (err) {
         console.error('Error fetching Mapbox token:', err);
         setError('Error loading map. Please try again later.');
-      } finally {
         setIsLoading(false);
       }
     };
@@ -84,7 +95,7 @@ const Map = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-[calc(100vh-4rem)] bg-gray-50 rounded-lg">
-        <p>Loading map...</p>
+        <p>Karte wird geladen...</p>
       </div>
     );
   }
