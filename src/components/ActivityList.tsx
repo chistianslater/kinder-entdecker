@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, Star, Clock, Euro, Users, Tag, Calendar } from 'lucide-react';
+import DetailView from './DetailView';
 
-interface Activity {
+export interface Activity {
   id: number;
   title: string;
   description: string;
@@ -69,10 +70,16 @@ const activities: Activity[] = [
 ];
 
 const ActivityList = () => {
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+
   return (
     <div className="space-y-4 p-4">
       {activities.map((activity) => (
-        <Card key={activity.id} className="p-6 hover:shadow-soft transition-shadow cursor-pointer">
+        <Card 
+          key={activity.id} 
+          className="p-6 hover:shadow-soft transition-shadow cursor-pointer"
+          onClick={() => setSelectedActivity(activity)}
+        >
           <div className="flex flex-col md:flex-row gap-6">
             <img 
               src={activity.image} 
@@ -137,6 +144,12 @@ const ActivityList = () => {
           </div>
         </Card>
       ))}
+
+      <DetailView 
+        activity={selectedActivity}
+        isOpen={selectedActivity !== null}
+        onClose={() => setSelectedActivity(null)}
+      />
     </div>
   );
 };
