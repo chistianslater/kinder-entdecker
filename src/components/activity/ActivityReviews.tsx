@@ -28,8 +28,11 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
       const { data, error } = await supabase
         .from('reviews')
         .select(`
-          *,
-          profiles (
+          id,
+          rating,
+          comment,
+          created_at,
+          profiles:user_id (
             username,
             avatar_url
           )
