@@ -6,19 +6,29 @@ export const useFilteredActivities = (activities: Activity[]) => {
   const [filters, setFilters] = useState<Filters>({});
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
 
+  const mapTypeFilter = (filterType: string): string => {
+    const typeMapping: { [key: string]: string } = {
+      'sports': 'Sport & Bewegung',
+      'nature': 'Natur & Wandern',
+      'culture': 'Kultur & Museum',
+      'creative': 'Kreativ & Basteln',
+      'animals': 'Tiere & Zoo'
+    };
+    return typeMapping[filterType] || filterType;
+  };
+
   useEffect(() => {
     let result = [...activities];
 
-    // Apply filters if they exist
     if (Object.keys(filters).length > 0) {
       console.log('Applying filters:', filters);
 
       // Filter by category (type)
       if (filters.type) {
+        const mappedType = mapTypeFilter(filters.type);
+        console.log('Filtering by type:', mappedType);
         result = result.filter(activity => {
-          const normalizedActivityType = activity.type.toLowerCase();
-          const normalizedFilterType = filters.type.toLowerCase();
-          return normalizedActivityType === normalizedFilterType;
+          return activity.type === mappedType;
         });
       }
 
@@ -59,7 +69,6 @@ export const useFilteredActivities = (activities: Activity[]) => {
           result = result.filter(activity => {
             if (!activity.coordinates) return false;
             
-            // Parse coordinates from the point type
             const coords = activity.coordinates.toString().replace('(', '').replace(')', '').split(',');
             const activityLat = parseFloat(coords[0]);
             const activityLng = parseFloat(coords[1]);
@@ -86,7 +95,6 @@ export const useFilteredActivities = (activities: Activity[]) => {
 
   const handleFiltersChange = (newFilters: Filters) => {
     console.log('New filters:', newFilters);
-    // Remove any undefined or null values from the filters
     const cleanedFilters = Object.fromEntries(
       Object.entries(newFilters).filter(([_, value]) => value != null)
     ) as Filters;
