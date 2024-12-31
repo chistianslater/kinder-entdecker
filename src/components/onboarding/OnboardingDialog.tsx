@@ -14,6 +14,9 @@ export const OnboardingDialog = ({ open, onOpenChange }: OnboardingDialogProps) 
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">Willkommen bei TinyTrails!</DialogTitle>
         </DialogHeader>
+        <p className="text-muted-foreground mb-6">
+          Lassen Sie uns Ihre Präferenzen einrichten, damit wir Ihnen die besten Aktivitäten empfehlen können.
+        </p>
         <OnboardingForm onComplete={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>

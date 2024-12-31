@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -9,12 +9,21 @@ import { InterestsSection } from './form-sections/InterestsSection';
 import { AgeRangesSection } from './form-sections/AgeRangesSection';
 import { DistanceSection } from './form-sections/DistanceSection';
 import { AccessibilitySection } from './form-sections/AccessibilitySection';
+import { Progress } from '@/components/ui/progress';
 
 interface OnboardingFormProps {
   onComplete: () => void;
 }
 
+const steps = [
+  { id: 'interests', title: 'Interessen', component: InterestsSection },
+  { id: 'ages', title: 'Altersgruppen', component: AgeRangesSection },
+  { id: 'distance', title: 'Entfernung', component: DistanceSection },
+  { id: 'accessibility', title: 'Barrierefreiheit', component: AccessibilitySection },
+];
+
 export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
+  const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
   const form = useForm<OnboardingFormData>({
     defaultValues: {
@@ -83,16 +92,49 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
     }
   };
 
+  const CurrentStepComponent = steps[currentStep].component;
+  const progress = ((currentStep + 1) / steps.length) * 100;
+
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <InterestsSection form={form} />
-        <AgeRangesSection form={form} />
-        <DistanceSection form={form} />
-        <AccessibilitySection form={form} />
-        <Button type="submit" className="w-full">
-          Speichern und fortfahren
-        </Button>
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium">
+            Schritt {currentStep + 1}: {steps[currentStep].title}
+          </h3>
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        <CurrentStepComponent form={form} />
+
+        <div className="flex justify-between space-x-4">
+          {currentStep > 0 && (
+            <Button type="button" variant="outline" onClick={prevStep}>
+              Zurück
+            </Button>
+          )}
+          <Button 
+            type="button" 
+            onClick={nextStep}
+            className={currentStep === 0 ? "w-full" : ""}
+          >
+            {currentStep === steps.length - 1 ? "Abschließen" : "Weiter"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
