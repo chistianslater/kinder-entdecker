@@ -9,7 +9,7 @@ export const useActivities = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const { filteredActivities, handleFiltersChange } = useFilteredActivities(activities);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading: loading, error, refetch: fetchActivities } = useQuery({
     queryKey: ['activities'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -28,9 +28,10 @@ export const useActivities = () => {
   }, [data]);
 
   return {
-    activities: filteredActivities,
-    isLoading,
+    filteredActivities,
+    loading,
     error,
     handleFiltersChange,
+    fetchActivities,
   };
 };

@@ -15,6 +15,10 @@ export interface Filters {
   activityType?: string;
   priceRange?: string;
   distance?: string;
+  userLocation?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 interface FilterBarProps {
