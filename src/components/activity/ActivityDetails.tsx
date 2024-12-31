@@ -1,8 +1,9 @@
 import React from 'react';
-import { MapPin, Clock, Euro, Users, Tag, Navigation } from 'lucide-react';
+import { MapPin, Clock, Euro, Users, Tag, Navigation, Camera, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Activity } from '@/types/activity';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
 
 // Array of placeholder images from Unsplash
 const placeholderImages = [
@@ -29,35 +30,58 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   };
 
-  // Generate an array of placeholder images
-  const galleryImages = Array(6).fill(null).map((_, index) => 
-    index === 0 && activity.image_url 
-      ? activity.image_url 
-      : getRandomPlaceholder()
-  );
+  // Generate an array of placeholder images with metadata
+  const galleryImages = Array(6).fill(null).map((_, index) => ({
+    url: index === 0 && activity.image_url ? activity.image_url : getRandomPlaceholder(),
+    isOwner: index === 0, // First image is always from owner
+    photographer: index === 0 ? 'Owner' : `User ${index}`,
+    caption: index === 0 ? 'Featured Image' : `Community Photo ${index}`
+  }));
 
   return (
     <div className="space-y-8">
       {/* Feature Image */}
-      <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg">
-        <img
-          src={galleryImages[0]}
-          alt={activity.title}
-          className="object-cover w-full h-full"
-        />
-      </AspectRatio>
+      <div className="relative">
+        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg">
+          <img
+            src={galleryImages[0].url}
+            alt={activity.title}
+            className="object-cover w-full h-full"
+          />
+        </AspectRatio>
+        <Badge 
+          variant="secondary" 
+          className="absolute top-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm"
+        >
+          <Camera className="w-3 h-3" />
+          Official Photo
+        </Badge>
+      </div>
 
       {/* Image Gallery Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {galleryImages.slice(1).map((image, index) => (
-          <AspectRatio key={index} ratio={1} className="overflow-hidden rounded-lg">
-            <img
-              src={image}
-              alt={`${activity.title} gallery image ${index + 2}`}
-              className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-            />
-          </AspectRatio>
-        ))}
+      <div>
+        <h3 className="text-lg font-semibold text-primary mb-4">Community Gallery</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {galleryImages.slice(1).map((image, index) => (
+            <div key={index} className="group relative">
+              <AspectRatio ratio={1} className="overflow-hidden rounded-lg">
+                <img
+                  src={image.url}
+                  alt={`${activity.title} gallery image ${index + 2}`}
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="w-3 h-3" />
+                    <span>{image.photographer}</span>
+                  </div>
+                  <p className="text-xs opacity-90 mt-1">{image.caption}</p>
+                </div>
+              </AspectRatio>
+            </div>
+          ))}
+        </div>
       </div>
 
       <h3 className="text-lg font-semibold text-primary">Details</h3>
