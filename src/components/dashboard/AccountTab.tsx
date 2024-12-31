@@ -23,9 +23,9 @@ export const AccountTab = () => {
         .from('profiles')
         .select('username, avatar_url')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is the "no rows returned" error
+      if (error) {
         console.error('Error fetching profile:', error);
         return null;
       }
