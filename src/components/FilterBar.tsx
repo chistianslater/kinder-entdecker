@@ -3,6 +3,7 @@ import { usePreferences } from '@/hooks/usePreferences';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PreferencesButton } from './filters/PreferencesButton';
 import { FilterDialog } from './filters/FilterDialog';
+import { SortSelect } from './filters/SortSelect';
 import { Button } from './ui/button';
 import { Filter } from 'lucide-react';
 import { Badge } from './ui/badge';
@@ -15,6 +16,7 @@ export interface Filters {
   distance?: string;
   openingHours?: string;
   minRating?: string;
+  sortBy?: string;
   userLocation?: {
     latitude: number;
     longitude: number;
@@ -77,12 +79,13 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   const getActiveFiltersCount = () => {
-    return Object.values(filters).filter(value => value !== undefined && value !== '').length;
+    const { sortBy, ...otherFilters } = filters;
+    return Object.values(otherFilters).filter(value => value !== undefined && value !== '').length;
   };
 
   return (
     <div className="bg-secondary/10 rounded-2xl p-4 mb-6 animate-fade-in">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <PreferencesButton 
           isActive={isPreferencesActive}
           onClick={handlePreferencesClick}
@@ -103,6 +106,10 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
             </Badge>
           )}
         </Button>
+        <SortSelect
+          value={filters.sortBy}
+          onChange={(value) => handleFilterChange('sortBy', value)}
+        />
       </div>
 
       <FilterDialog
