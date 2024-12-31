@@ -18,7 +18,7 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
         </Badge>
       )}
       {activity.is_verified && (
-        <Badge variant="success" className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200">
+        <Badge variant="default" className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200">
           <CheckCircle2 className="w-4 h-4" />
           Verifiziert
         </Badge>
