@@ -7,8 +7,7 @@ import {
 } from "@/components/ui/sheet";
 import { Activity } from '@/types/activity';
 import { ActivityDetails } from './activity/ActivityDetails';
-import { ActivityReviews } from './activity/ActivityReviews';
-import { MediaUpload } from './activity/MediaUpload';
+import { UserContributions } from './activity/UserContributions';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -31,10 +30,7 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
         <div className="space-y-8 py-4">
           <ActivityDetails activity={activity} />
           <div className="border-t pt-6">
-            <MediaUpload activity={activity} />
-          </div>
-          <div className="border-t pt-6">
-            <ActivityReviews activity={activity} />
+            <UserContributions activity={activity} />
           </div>
         </div>
       </SheetContent>
