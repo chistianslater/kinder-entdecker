@@ -4,11 +4,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { Filters } from '../FilterBar';
 import { supabase } from '@/integrations/supabase/client';
 import LoadingState from '../activity/LoadingState';
+import { OnboardingFormData } from '../onboarding/types';
 
 export const PreferencesTab = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [initialPreferences, setInitialPreferences] = useState<any>(null);
+  const [initialPreferences, setInitialPreferences] = useState<OnboardingFormData | null>(null);
 
   useEffect(() => {
     const loadPreferences = async () => {
@@ -29,7 +30,7 @@ export const PreferencesTab = () => {
           .eq('user_id', user.id)
           .single();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           console.error('Error loading preferences:', error);
           toast({
             title: "Fehler",
@@ -40,7 +41,12 @@ export const PreferencesTab = () => {
         }
 
         if (preferences) {
-          setInitialPreferences(preferences);
+          setInitialPreferences({
+            interests: preferences.interests || [],
+            childAgeRanges: preferences.child_age_ranges || [],
+            maxDistance: preferences.max_distance?.toString() || "10",
+            accessibilityNeeds: preferences.accessibility_needs || [],
+          });
         }
       } catch (error) {
         console.error('Error:', error);
@@ -69,7 +75,7 @@ export const PreferencesTab = () => {
       <OnboardingForm 
         onComplete={() => {}} 
         onFiltersChange={handleFiltersChange}
-        initialPreferences={initialPreferences}
+        initialPreferences={initialPreferences || undefined}
       />
     </div>
   );

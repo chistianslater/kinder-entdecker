@@ -60,7 +60,10 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences
 
       const { error } = await supabase
         .from('user_preferences')
-        .upsert(preferences, { onConflict: 'user_id' });
+        .upsert(preferences, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false 
+        });
 
       if (error) throw error;
 
