@@ -15,6 +15,7 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
+  user_id: string;
   profiles: {
     username: string | null;
     avatar_url: string | null;
@@ -32,7 +33,8 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
           rating,
           comment,
           created_at,
-          profiles (
+          user_id,
+          profiles!user_id (
             username,
             avatar_url
           )
