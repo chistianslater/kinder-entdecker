@@ -53,7 +53,7 @@ const ActivityList = () => {
 
   return (
     <div className="relative">
-      <div className="sticky top-0 z-10 bg-secondary/30 pt-4 pb-2 -mx-4 px-4 shadow-sm">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pt-4 pb-2 -mx-4 px-4 shadow-sm">
         <FilterBar onFiltersChange={handleFiltersChange} />
       </div>
       
