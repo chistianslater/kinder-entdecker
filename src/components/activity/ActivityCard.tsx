@@ -20,11 +20,11 @@ export const ActivityCard = ({
   showClaimButton = false 
 }: ActivityCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-lg">
       <div className="relative">
-        <ActivityBadges activity={activity} className="absolute top-2 left-2 z-10" />
+        <ActivityBadges activity={activity} className="absolute top-2 left-2 right-2 z-10" />
         <div 
-          className="h-48 bg-cover bg-center cursor-pointer" 
+          className="h-48 bg-cover bg-center cursor-pointer rounded-t-lg" 
           style={{ 
             backgroundImage: activity.image_url 
               ? `url(${activity.image_url})` 
@@ -42,35 +42,30 @@ export const ActivityCard = ({
         </h3>
         
         <div className="space-y-2">
-          {/* Location */}
           <div className="flex items-center text-sm text-gray-600">
             <MapPin className="w-4 h-4 mr-2" />
             {activity.location}
           </div>
 
-          {/* Activity Type */}
           <div className="flex items-center text-sm text-gray-600">
             <TreePine className="w-4 h-4 mr-2" />
-            <Badge variant="secondary">{activity.type}</Badge>
+            <Badge variant="secondary" className="rounded-md">{activity.type}</Badge>
           </div>
 
-          {/* Age Range */}
           {activity.age_range && (
             <div className="flex items-center text-sm text-gray-600">
               <Baby className="w-4 h-4 mr-2" />
-              <Badge variant="outline">{activity.age_range} Jahre</Badge>
+              <Badge variant="outline" className="rounded-md">{activity.age_range} Jahre</Badge>
             </div>
           )}
 
-          {/* Price Range */}
           {activity.price_range && (
             <div className="flex items-center text-sm text-gray-600">
               <Euro className="w-4 h-4 mr-2" />
-              <Badge variant="outline">{activity.price_range}</Badge>
+              <Badge variant="outline" className="rounded-md">{activity.price_range}</Badge>
             </div>
           )}
 
-          {/* Opening Hours */}
           {activity.opening_hours && (
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="w-4 h-4 mr-2" />
@@ -84,7 +79,7 @@ export const ActivityCard = ({
         {showClaimButton && onClaim && (
           <Button 
             variant="outline" 
-            className="w-full"
+            className="w-full rounded-md"
             onClick={() => onClaim(activity.id)}
           >
             Als Geschäft beanspruchen

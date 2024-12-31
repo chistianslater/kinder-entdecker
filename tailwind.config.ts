@@ -50,9 +50,9 @@ export default {
         },
       },
       borderRadius: {
-        lg: "2rem",
-        md: "1.5rem",
-        sm: "1rem",
+        lg: "1.25rem",
+        md: "1rem",
+        sm: "0.75rem",
       },
       boxShadow: {
         soft: "0 8px 30px rgba(0, 0, 0, 0.05)",
