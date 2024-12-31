@@ -43,7 +43,6 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         throw reviewsError;
       }
 
-      // Fetch profiles separately and handle potential missing profiles
       const reviewsWithProfiles = await Promise.all(
         reviewsData.map(async (review) => {
           const { data: profileData, error: profileError } = await supabase
@@ -66,6 +65,19 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
       return reviewsWithProfiles as Review[];
     },
   });
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }).map((_, index) => (
+      <Star
+        key={index}
+        className={`w-4 h-4 ${
+          index < rating 
+            ? 'fill-yellow-400 text-yellow-400' 
+            : 'fill-gray-200 text-gray-200'
+        }`}
+      />
+    ));
+  };
 
   return (
     <div className="space-y-6">
@@ -96,9 +108,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
                       {review.profiles?.username || 'Anonymer Benutzer'}
                     </div>
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: review.rating }).map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      ))}
+                      {renderStars(review.rating)}
                     </div>
                   </div>
                 </div>

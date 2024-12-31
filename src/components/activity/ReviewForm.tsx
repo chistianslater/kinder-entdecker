@@ -13,10 +13,10 @@ interface ReviewFormProps {
 
 export const ReviewForm = ({ activity }: ReviewFormProps) => {
   const [rating, setRating] = useState<number>(0);
+  const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [comment, setComment] = useState('');
   const { toast } = useToast();
 
-  // Fetch user profile data
   const { data: profile } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
@@ -78,6 +78,32 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
     }
   };
 
+  const renderStars = () => {
+    return Array.from({ length: 5 }).map((_, index) => {
+      const starValue = index + 1;
+      const isFilled = (hoveredRating || rating) >= starValue;
+      
+      return (
+        <button
+          key={index}
+          type="button"
+          onClick={() => setRating(starValue)}
+          onMouseEnter={() => setHoveredRating(starValue)}
+          onMouseLeave={() => setHoveredRating(0)}
+          className="p-1 transition-colors"
+        >
+          <Star 
+            className={`w-6 h-6 transition-colors ${
+              isFilled 
+                ? 'fill-yellow-400 text-yellow-400' 
+                : 'fill-gray-200 text-gray-200 hover:fill-yellow-200 hover:text-yellow-200'
+            }`}
+          />
+        </button>
+      );
+    });
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Bewertung abgeben</h3>
@@ -91,15 +117,7 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
         </div>
       )}
       <div className="flex space-x-2">
-        {[1, 2, 3, 4, 5].map((value) => (
-          <button
-            key={value}
-            onClick={() => setRating(value)}
-            className={`p-1 transition-colors ${rating >= value ? 'text-yellow-400' : 'text-gray-300'}`}
-          >
-            <Star className="w-6 h-6 fill-current" />
-          </button>
-        ))}
+        {renderStars()}
       </div>
       <Textarea
         placeholder="Schreibe einen Kommentar..."
