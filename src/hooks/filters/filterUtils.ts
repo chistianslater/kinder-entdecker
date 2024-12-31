@@ -67,18 +67,11 @@ export const filterByDistance = (activities: Activity[], filters: Filters) => {
   return activities.filter(activity => {
     if (!activity.coordinates) return false;
     
-    // Parse coordinates from the point type
-    const coords = activity.coordinates.toString().replace('(', '').replace(')', '').split(',');
-    const activityLat = parseFloat(coords[0]);
-    const activityLng = parseFloat(coords[1]);
-    
-    if (isNaN(activityLat) || isNaN(activityLng)) return false;
-    
     const distance = calculateDistance(
       filters.userLocation!.latitude,
       filters.userLocation!.longitude,
-      activityLat,
-      activityLng
+      activity.coordinates.x,
+      activity.coordinates.y
     );
     
     return distance <= maxDistance;

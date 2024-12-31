@@ -3,7 +3,7 @@ export interface Activity {
   title: string;
   description: string | null;
   location: string;
-  coordinates?: unknown;
+  coordinates?: { x: number; y: number } | null;
   type: string;
   age_range: string | null;
   price_range: string | null;

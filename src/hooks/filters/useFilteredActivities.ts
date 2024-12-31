@@ -119,17 +119,19 @@ export const useFilteredActivities = (activities: Activity[]) => {
         case 'distance':
           if (filters.userLocation) {
             filtered.sort((a, b) => {
+              if (!a.coordinates || !b.coordinates) return 0;
+              
               const distanceA = calculateDistance(
                 filters.userLocation!.latitude,
                 filters.userLocation!.longitude,
-                a.coordinates?.x || 0,
-                a.coordinates?.y || 0
+                a.coordinates.x,
+                a.coordinates.y
               );
               const distanceB = calculateDistance(
                 filters.userLocation!.latitude,
                 filters.userLocation!.longitude,
-                b.coordinates?.x || 0,
-                b.coordinates?.y || 0
+                b.coordinates.x,
+                b.coordinates.y
               );
               return distanceA - distanceB;
             });
