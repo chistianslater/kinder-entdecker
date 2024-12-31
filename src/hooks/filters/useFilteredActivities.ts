@@ -69,26 +69,27 @@ export const useFilteredActivities = (activities: Activity[]) => {
           const price = activity.price_range.toLowerCase();
           console.log(`Checking price for ${activity.title}:`, price);
           
-          // Extract minimum and maximum prices from the range
-          const numbers = price.match(/\d+/g);
-          if (!numbers) {
-            // Handle special cases like "kostenlos" or "free"
-            const isFree = price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
-            console.log(`Activity is free: ${isFree}`);
-            return filters.priceRange === 'free' ? isFree : false;
+          // Handle special cases like "kostenlos" or "free"
+          if (price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0') {
+            return filters.priceRange === 'free';
           }
           
-          // Get both minimum and maximum prices if available
+          // Extract numbers from the price range
+          const numbers = price.match(/\d+/g);
+          if (!numbers) return false;
+          
+          // Get both minimum and maximum prices
           const prices = numbers.map(Number);
           const minPrice = Math.min(...prices);
           const maxPrice = Math.max(...prices);
+          
           console.log(`Price range for ${activity.title}: ${minPrice}€ - ${maxPrice}€`);
           
           switch (filters.priceRange) {
             case 'free':
-              return price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
+              return false; // Already handled above
             case 'low':
-              return maxPrice > 0 && maxPrice <= 10;
+              return maxPrice <= 10;
             case 'medium':
               return minPrice > 10 && maxPrice <= 30;
             case 'high':
