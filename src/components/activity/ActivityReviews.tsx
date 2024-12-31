@@ -15,7 +15,7 @@ interface Review {
   profiles: {
     username: string | null;
     avatar_url: string | null;
-  } | null;
+  };
 }
 
 interface ActivityReviewsProps {
@@ -23,7 +23,7 @@ interface ActivityReviewsProps {
 }
 
 export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
-  const { data: reviews, isLoading, refetch } = useQuery<Review[]>({
+  const { data: reviews, isLoading, refetch } = useQuery({
     queryKey: ['reviews', activity.id],
     queryFn: async () => {
       const { data, error } = await supabase
