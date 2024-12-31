@@ -31,7 +31,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         .from('reviews')
         .select(`
           *,
-          profiles:user_id (
+          profiles (
             username,
             avatar_url
           )
