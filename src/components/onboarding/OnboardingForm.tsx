@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { OnboardingFormData } from './types';
 import { InterestsSection } from './form-sections/InterestsSection';
 import { AgeRangesSection } from './form-sections/AgeRangesSection';
@@ -26,6 +26,7 @@ const steps = [
 
 export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const form = useForm<OnboardingFormData>({
     defaultValues: {
@@ -42,7 +43,10 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
         body: { user_id: userId },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error generating recommendations:', error);
+        throw error;
+      }
 
       toast({
         title: "Empfehlungen erstellt",
@@ -60,8 +64,16 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
 
   const onSubmit = async (data: OnboardingFormData) => {
     try {
+      setIsSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) {
+        toast({
+          title: "Fehler",
+          description: "Sie müssen eingeloggt sein, um Präferenzen zu speichern.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       // First check if user preferences already exist
       const { data: existingPrefs, error: fetchError } = await supabase
@@ -71,6 +83,7 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows returned
+        console.error('Error fetching preferences:', fetchError);
         throw fetchError;
       }
 
@@ -99,7 +112,10 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
         error = insertError;
       }
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving preferences:', error);
+        throw error;
+      }
 
       // Apply filters based on preferences
       onFiltersChange({
@@ -123,6 +139,8 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
         description: "Ihre Präferenzen konnten nicht gespeichert werden.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -157,7 +175,12 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
 
         <div className="flex justify-between space-x-4">
           {currentStep > 0 && (
-            <Button type="button" variant="outline" onClick={prevStep}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={prevStep}
+              disabled={isSubmitting}
+            >
               Zurück
             </Button>
           )}
@@ -165,6 +188,7 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
             type="button" 
             onClick={nextStep}
             className={currentStep === 0 ? "w-full" : ""}
+            disabled={isSubmitting}
           >
             {currentStep === steps.length - 1 ? "Abschließen" : "Weiter"}
           </Button>
