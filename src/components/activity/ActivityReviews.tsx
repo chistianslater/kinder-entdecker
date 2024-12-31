@@ -32,10 +32,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
           rating,
           comment,
           created_at,
-          profiles:user_id (
-            username,
-            avatar_url
-          )
+          profiles:profiles!user_id(username, avatar_url)
         `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
