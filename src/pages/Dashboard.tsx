@@ -51,17 +51,22 @@ const Dashboard = () => {
         <div className="mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-[250px] justify-between">
-                <span className="truncate">{getCurrentTabLabel()}</span>
-                <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0 ml-2" />
+              <Button 
+                variant="outline" 
+                className="w-full max-w-xl rounded-full border-gray-200 bg-white py-6 justify-between hover:bg-gray-50"
+              >
+                <span className="truncate text-lg">{getCurrentTabLabel()}</span>
+                <ChevronDown className="h-5 w-5 opacity-50 flex-shrink-0 ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[250px]">
+            <DropdownMenuContent 
+              className="w-full max-w-xl rounded-2xl mt-2 p-2 border-gray-200 bg-white"
+            >
               {menuItems.map((item) => (
                 <DropdownMenuItem
                   key={item.value}
                   onClick={() => setCurrentTab(item.value)}
-                  className="truncate"
+                  className="truncate rounded-xl py-3 px-4 text-lg hover:bg-gray-50"
                 >
                   {item.label}
                 </DropdownMenuItem>
