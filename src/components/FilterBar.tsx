@@ -14,6 +14,7 @@ export interface Filters {
   priceRange?: string;
   distance?: string;
   openingHours?: string;
+  minRating?: string;
   userLocation?: {
     latitude: number;
     longitude: number;

@@ -5,8 +5,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Baby, Euro, MapPin, Clock, TreePine, Star } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
+import { supabase } from '@/integrations/supabase/client';
 
-// Array of placeholder images from Unsplash
 const placeholderImages = [
   'photo-1482938289607-e9573fc25ebb', // river between mountains
   'photo-1509316975850-ff9c5deb0cd9', // pine trees

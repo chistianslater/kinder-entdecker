@@ -71,7 +71,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
           const activityRating = avgRatings[activity.id];
           if (!activityRating) return false;
           const average = activityRating.sum / activityRating.count;
-          return average >= parseInt(filters.minRating);
+          return average >= parseInt(filters.minRating!);
         });
       }
       console.log('After rating filter:', filtered.length);
