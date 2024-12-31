@@ -18,65 +18,85 @@ export const useFilteredActivities = (activities: Activity[]) => {
   };
 
   useEffect(() => {
+    console.log('Starting filtering with activities:', activities.length);
+    console.log('Current filters:', filters);
+
     let result = [...activities];
 
     if (Object.keys(filters).length > 0) {
-      console.log('Applying filters:', filters);
-
       // Filter by category (type)
       if (filters.type) {
         const mappedType = mapTypeFilter(filters.type);
         console.log('Filtering by type:', mappedType);
         result = result.filter(activity => {
-          const activityType = activity.type?.trim();
-          const filterType = mappedType?.trim();
-          return activityType === filterType;
+          const match = activity.type === mappedType;
+          console.log(`Activity ${activity.title} type: ${activity.type}, mapped type: ${mappedType}, match: ${match}`);
+          return match;
         });
+        console.log('After type filter:', result.length);
       }
 
       // Filter by age range
       if (filters.ageRange && filters.ageRange !== 'all') {
+        console.log('Filtering by age range:', filters.ageRange);
         result = result.filter(activity => {
-          if (!activity.age_range) return false;
-          return activity.age_range === filters.ageRange;
+          const match = activity.age_range === filters.ageRange;
+          console.log(`Activity ${activity.title} age range: ${activity.age_range}, filter: ${filters.ageRange}, match: ${match}`);
+          return match;
         });
+        console.log('After age filter:', result.length);
       }
 
       // Filter by activity type (indoor/outdoor)
       if (filters.activityType && filters.activityType !== 'both') {
+        console.log('Filtering by activity type:', filters.activityType);
         result = result.filter(activity => {
           const location = activity.location.toLowerCase();
+          let match = false;
           if (filters.activityType === 'indoor') {
-            return location.includes('indoor') || location.includes('drinnen');
+            match = location.includes('indoor') || location.includes('drinnen');
           } else {
-            return location.includes('outdoor') || location.includes('draußen');
+            match = location.includes('outdoor') || location.includes('draußen');
           }
+          console.log(`Activity ${activity.title} location: ${location}, match: ${match}`);
+          return match;
         });
+        console.log('After activity type filter:', result.length);
       }
 
       // Filter by price range
       if (filters.priceRange) {
+        console.log('Filtering by price range:', filters.priceRange);
         result = result.filter(activity => {
           if (!activity.price_range) return false;
           const price = activity.price_range.toLowerCase();
+          let match = false;
           
           switch (filters.priceRange) {
             case 'free':
-              return price.includes('kostenlos') || price.includes('free');
+              match = price.includes('kostenlos') || price.includes('free');
+              break;
             case 'low':
-              return price.includes('günstig') || price.includes('bis 10€');
+              match = price.includes('günstig') || price.includes('bis 10€');
+              break;
             case 'medium':
-              return price.includes('10-30€');
+              match = price.includes('10-30€');
+              break;
             case 'high':
-              return price.includes('30€+');
+              match = price.includes('30€+');
+              break;
             default:
-              return true;
+              match = true;
           }
+          console.log(`Activity ${activity.title} price: ${price}, match: ${match}`);
+          return match;
         });
+        console.log('After price filter:', result.length);
       }
 
       // Filter by distance if user location is available
       if (filters.distance && filters.distance !== 'all' && filters.userLocation) {
+        console.log('Filtering by distance:', filters.distance);
         const maxDistance = parseInt(filters.distance);
         if (!isNaN(maxDistance)) {
           result = result.filter(activity => {
@@ -95,25 +115,22 @@ export const useFilteredActivities = (activities: Activity[]) => {
               activityLng
             );
             
-            return distance <= maxDistance;
+            const match = distance <= maxDistance;
+            console.log(`Activity ${activity.title} distance: ${distance}km, max: ${maxDistance}km, match: ${match}`);
+            return match;
           });
+          console.log('After distance filter:', result.length);
         }
       }
-
-      console.log('Filtered activities:', result);
-      setFilteredActivities(result);
-    } else {
-      setFilteredActivities(activities);
     }
+
+    console.log('Final filtered activities:', result);
+    setFilteredActivities(result);
   }, [activities, filters]);
 
   const handleFiltersChange = (newFilters: Filters) => {
-    console.log('New filters:', newFilters);
-    const cleanedFilters = Object.fromEntries(
-      Object.entries(newFilters).filter(([_, value]) => value != null)
-    ) as Filters;
-    
-    setFilters(cleanedFilters);
+    console.log('Setting new filters:', newFilters);
+    setFilters(newFilters);
   };
 
   return {
