@@ -87,6 +87,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     }
   };
 
+  const navigateToDashboard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate('/dashboard');
+  };
+
   const getActiveFiltersCount = () => {
     return Object.values(filters).filter(value => value !== undefined && value !== '').length;
   };
@@ -134,11 +139,8 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
             <Heart className="w-4 h-4" />
             {!isMobile && "Für Uns"}
             <SlidersHorizontal 
-              className="w-4 h-4 cursor-pointer" 
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate('/dashboard');
-              }}
+              className="w-4 h-4 cursor-pointer hover:text-primary" 
+              onClick={navigateToDashboard}
             />
           </Button>
         </div>
