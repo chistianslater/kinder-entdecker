@@ -25,15 +25,15 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#94A684", // Sage green
+          DEFAULT: "#94A684",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#E4E4D0", // Soft beige
+          DEFAULT: "#E4E4D0",
           foreground: "#333333",
         },
         accent: {
-          DEFAULT: "#AEC3AE", // Muted green
+          DEFAULT: "#AEC3AE",
           foreground: "#333333",
         },
         muted: {
@@ -44,6 +44,10 @@ export default {
           DEFAULT: "#FF4444",
           foreground: "#FFFFFF",
         },
+        popover: {
+          DEFAULT: "white",
+          foreground: "#333333",
+        },
       },
       borderRadius: {
         lg: "2rem",
@@ -52,6 +56,9 @@ export default {
       },
       boxShadow: {
         soft: "0 8px 30px rgba(0, 0, 0, 0.05)",
+      },
+      zIndex: {
+        dropdown: "1000",
       },
     },
   },
