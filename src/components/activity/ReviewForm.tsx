@@ -1,7 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { TreePine, MessageSquare, Pencil, X } from 'lucide-react';
+import { TreePine, MessageSquare, Pencil, ImagePlus, Video } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
@@ -23,6 +23,9 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState(existingReview?.comment || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [mediaType, setMediaType] = useState<'photo' | 'video'>('photo');
+  const [caption, setCaption] = useState('');
   const { toast } = useToast();
 
   const { data: userReview } = useQuery({
@@ -41,8 +44,14 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
       if (error) throw error;
       return data;
     },
-    enabled: !existingReview, // Only fetch if we're not in edit mode
+    enabled: !existingReview,
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +77,8 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         return;
       }
 
-      const { error } = await supabase
+      // Submit review
+      const { error: reviewError } = await supabase
         .from('reviews')
         .upsert({
           id: existingReview?.id,
@@ -78,7 +88,36 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
           comment: comment.trim() || null,
         });
 
-      if (error) throw error;
+      if (reviewError) throw reviewError;
+
+      // Handle media upload if a file is selected
+      if (selectedFile) {
+        const fileExt = selectedFile.name.split('.').pop();
+        const filePath = `${activity.id}/${Math.random()}.${fileExt}`;
+        const bucket = mediaType === 'photo' ? 'activity-photos' : 'activity-videos';
+
+        const { error: uploadError } = await supabase.storage
+          .from(bucket)
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const insertData = {
+          activity_id: activity.id,
+          user_id: user.id,
+          caption,
+          ...(mediaType === 'photo' 
+            ? { image_url: filePath }
+            : { video_url: filePath }
+          )
+        };
+
+        const { error: mediaError } = await supabase
+          .from(mediaType === 'photo' ? 'photos' : 'videos')
+          .insert(insertData);
+
+        if (mediaError) throw mediaError;
+      }
 
       toast({
         title: "Erfolg",
@@ -90,6 +129,8 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
       if (!existingReview) {
         setComment('');
         setRating(0);
+        setSelectedFile(null);
+        setCaption('');
       }
       onSuccess?.();
       onCancelEdit?.();
@@ -152,6 +193,50 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         onChange={(e) => setComment(e.target.value)}
         className="min-h-[100px]"
       />
+      
+      <div className="space-y-4 border-t pt-4">
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant={mediaType === 'photo' ? 'default' : 'outline'}
+            onClick={() => setMediaType('photo')}
+            className="flex items-center gap-2"
+          >
+            <ImagePlus className="w-4 h-4" />
+            Foto
+          </Button>
+          <Button
+            type="button"
+            variant={mediaType === 'video' ? 'default' : 'outline'}
+            onClick={() => setMediaType('video')}
+            className="flex items-center gap-2"
+          >
+            <Video className="w-4 h-4" />
+            Video
+          </Button>
+        </div>
+        
+        <input
+          type="file"
+          accept={mediaType === 'photo' ? 'image/*' : 'video/*'}
+          onChange={handleFileChange}
+          className="block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-sm file:font-semibold
+            file:bg-primary file:text-white
+            hover:file:bg-primary/90"
+        />
+        
+        {selectedFile && (
+          <Textarea
+            placeholder={`${mediaType === 'photo' ? 'Bildunterschrift' : 'Videobeschreibung'} (optional)`}
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+          />
+        )}
+      </div>
+
       <div className="flex gap-2">
         <Button 
           type="submit" 
