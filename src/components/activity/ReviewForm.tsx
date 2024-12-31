@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Star, MessageSquare } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
+import { useQuery } from '@tanstack/react-query';
 
 interface ReviewFormProps {
   activity: Activity;
@@ -14,6 +15,23 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState('');
   const { toast } = useToast();
+
+  // Fetch user profile data
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      return data;
+    },
+  });
 
   const handleSubmitReview = async () => {
     try {
@@ -58,14 +76,23 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Bewertung abgeben</h3>
+      {profile?.username ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Bewerten als: {profile.username}</span>
+        </div>
+      ) : (
+        <div className="text-sm text-muted-foreground">
+          Setze deinen Benutzernamen in den Account-Einstellungen
+        </div>
+      )}
       <div className="flex space-x-2">
         {[1, 2, 3, 4, 5].map((value) => (
           <button
             key={value}
             onClick={() => setRating(value)}
-            className={`p-1 ${rating >= value ? 'text-yellow-400' : 'text-gray-300'}`}
+            className={`p-1 transition-colors ${rating >= value ? 'text-yellow-400' : 'text-gray-300'}`}
           >
-            <Star className="w-6 h-6" />
+            <Star className="w-6 h-6 fill-current" />
           </button>
         ))}
       </div>
