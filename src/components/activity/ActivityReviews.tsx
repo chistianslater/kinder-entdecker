@@ -3,7 +3,7 @@ import { Activity } from '@/types/activity';
 import { ReviewForm } from './ReviewForm';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
-import { Star, User } from 'lucide-react';
+import { Medal, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ActivityReviewsProps {
@@ -66,13 +66,13 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
     },
   });
 
-  const renderStars = (rating: number) => {
+  const renderMedals = (rating: number) => {
     return Array.from({ length: 5 }).map((_, index) => (
-      <Star
+      <Medal
         key={index}
         className={`w-4 h-4 ${
           index < rating 
-            ? 'fill-yellow-400 text-yellow-400' 
+            ? 'fill-primary text-primary' 
             : 'fill-gray-200 text-gray-200'
         }`}
       />
@@ -108,7 +108,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
                       {review.profiles?.username || 'Anonymer Benutzer'}
                     </div>
                     <div className="flex items-center gap-1">
-                      {renderStars(review.rating)}
+                      {renderMedals(review.rating)}
                     </div>
                   </div>
                 </div>

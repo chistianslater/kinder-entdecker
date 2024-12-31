@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, MessageSquare } from 'lucide-react';
+import { Medal, MessageSquare } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
@@ -78,25 +78,25 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
     }
   };
 
-  const renderStars = () => {
+  const renderMedals = () => {
     return Array.from({ length: 5 }).map((_, index) => {
-      const starValue = index + 1;
-      const isFilled = (hoveredRating || rating) >= starValue;
+      const medalValue = index + 1;
+      const isFilled = (hoveredRating || rating) >= medalValue;
       
       return (
         <button
           key={index}
           type="button"
-          onClick={() => setRating(starValue)}
-          onMouseEnter={() => setHoveredRating(starValue)}
+          onClick={() => setRating(medalValue)}
+          onMouseEnter={() => setHoveredRating(medalValue)}
           onMouseLeave={() => setHoveredRating(0)}
           className="p-1 transition-colors"
         >
-          <Star 
+          <Medal 
             className={`w-6 h-6 transition-colors ${
               isFilled 
-                ? 'fill-yellow-400 text-yellow-400' 
-                : 'fill-gray-200 text-gray-200 hover:fill-yellow-200 hover:text-yellow-200'
+                ? 'fill-primary text-primary' 
+                : 'fill-gray-200 text-gray-200 hover:fill-primary/50 hover:text-primary/50'
             }`}
           />
         </button>
@@ -117,7 +117,7 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
         </div>
       )}
       <div className="flex space-x-2">
-        {renderStars()}
+        {renderMedals()}
       </div>
       <Textarea
         placeholder="Schreibe einen Kommentar..."
