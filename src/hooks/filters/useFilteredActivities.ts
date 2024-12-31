@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Activity } from '@/types/activity';
 import { Filters } from '@/components/FilterBar';
 import { filterByType, filterByAgeRange, filterByPrice, filterByDistance } from './filterUtils';
