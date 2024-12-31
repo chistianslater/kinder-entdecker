@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { TypeFilter } from './filters/TypeFilter';
 import { AgeFilter } from './filters/AgeFilter';
 import { PriceFilter } from './filters/PriceFilter';
 import { CategoryFilter } from './filters/CategoryFilter';
 import { DistanceFilter } from './filters/DistanceFilter';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { Heart, SlidersHorizontal } from 'lucide-react';
+import { usePreferences } from '@/hooks/usePreferences';
 
 export type Filters = {
   type?: string;
@@ -24,58 +22,12 @@ interface FilterBarProps {
 
 const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const { applyUserPreferences } = usePreferences({ onFiltersChange, setFilters });
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFiltersChange(newFilters);
-  };
-
-  const applyUserPreferences = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Nicht eingeloggt",
-          description: "Bitte melden Sie sich an, um Ihre Präferenzen zu laden.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { data: preferences, error } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      if (preferences) {
-        const newFilters: Filters = {
-          type: preferences.interests?.[0], // Using first interest as type
-          ageRange: preferences.child_age_ranges?.[0], // Using first age range
-          distance: preferences.max_distance?.toString(),
-        };
-
-        setFilters(newFilters);
-        onFiltersChange(newFilters);
-
-        toast({
-          title: "Präferenzen geladen",
-          description: "Ihre persönlichen Einstellungen wurden geladen.",
-        });
-      }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-      toast({
-        title: "Fehler",
-        description: "Ihre Präferenzen konnten nicht geladen werden.",
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -86,8 +38,9 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           className="flex items-center gap-2 min-w-[140px] bg-white hover:bg-secondary/80 border-accent"
           onClick={applyUserPreferences}
         >
-          <Settings className="w-4 h-4" />
+          <Heart className="w-4 h-4" />
           Für Uns
+          <SlidersHorizontal className="w-4 h-4" />
         </Button>
         <DistanceFilter
           value={filters.distance}
