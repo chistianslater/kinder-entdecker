@@ -68,7 +68,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
           const price = activity.price_range.toLowerCase();
           console.log(`Checking price for ${activity.title}:`, price);
           
-          // Extract the highest number from the price range
+          // Extract all numbers from the price range
           const numbers = price.match(/\d+/g);
           const highestPrice = numbers ? Math.max(...numbers.map(Number)) : 0;
           console.log(`Highest price found: ${highestPrice}€`);
@@ -83,7 +83,8 @@ export const useFilteredActivities = (activities: Activity[]) => {
             case 'medium':
               return !isFree && highestPrice > 10 && highestPrice <= 30;
             case 'high':
-              return !isFree && highestPrice > 30;
+              // Only show activities that are explicitly priced above 30€
+              return highestPrice > 30;
             default:
               return true;
           }
