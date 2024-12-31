@@ -48,9 +48,9 @@ export const AccountSection = () => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Mein Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/settings')}>
+        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Einstellungen</span>
+          <span>Dashboard</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
