@@ -19,15 +19,14 @@ export const AgeFilter = ({ value, onChange }: AgeFilterProps) => {
   const isMobile = useIsMobile();
   
   return (
-    <div className={isMobile ? "space-y-3" : ""}>
+    <div className={isMobile ? "space-y-3 w-full" : ""}>
       {isMobile && <Label className="text-base">Altersgruppe</Label>}
-      <Select
-        value={value}
-        onValueChange={onChange}
-      >
-        <SelectTrigger className={`bg-white hover:bg-secondary/80 border-accent rounded-xl ${isMobile ? 'w-full' : 'min-w-[100px] md:min-w-[140px]'}`}>
-          <Baby className="w-4 h-4 mr-2" />
-          <SelectValue placeholder={isMobile ? "Wähle Alter" : "Altersgruppe"} />
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className={`bg-white hover:bg-secondary/80 border-accent ${isMobile ? 'w-full' : 'w-[180px]'}`}>
+          <div className="flex items-center gap-2">
+            <Baby className="h-4 w-4" />
+            <SelectValue placeholder="Altersgruppe" />
+          </div>
         </SelectTrigger>
         <SelectContent className="bg-white border border-accent shadow-md">
           <SelectItem value="0-2">0-2 Jahre</SelectItem>
