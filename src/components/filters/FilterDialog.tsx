@@ -37,7 +37,7 @@ export const FilterDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] animate-scale-in">
         <DialogHeader>
           <DialogTitle>Filter Activities</DialogTitle>
         </DialogHeader>
@@ -74,12 +74,14 @@ export const FilterDialog = ({
             type="button"
             variant="outline"
             onClick={handleReset}
+            className="transition-all duration-300 hover:scale-105"
           >
             Reset Filters
           </Button>
           <Button 
             type="button"
             onClick={() => onOpenChange(false)}
+            className="transition-all duration-300 hover:scale-105"
           >
             Apply Filters
           </Button>

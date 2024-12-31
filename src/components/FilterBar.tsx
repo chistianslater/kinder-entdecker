@@ -80,7 +80,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   return (
-    <div className="bg-secondary/10 rounded-2xl p-4 mb-6">
+    <div className="bg-secondary/10 rounded-2xl p-4 mb-6 animate-fade-in">
       <div className="flex items-center gap-3">
         <PreferencesButton 
           isActive={isPreferencesActive}
@@ -88,13 +88,16 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
         />
         <Button
           variant="outline"
-          className="flex items-center gap-2 bg-white hover:bg-secondary/80 border-accent"
+          className="flex items-center gap-2 bg-white hover:bg-secondary/80 border-accent transition-all duration-300 hover:scale-105"
           onClick={() => setShowFilterDialog(true)}
         >
           <Filter className="h-4 w-4" />
           <span>Filter</span>
           {getActiveFiltersCount() > 0 && (
-            <Badge variant="default" className="ml-2">
+            <Badge 
+              variant="default" 
+              className="ml-2 animate-scale-in"
+            >
               {getActiveFiltersCount()}
             </Badge>
           )}
