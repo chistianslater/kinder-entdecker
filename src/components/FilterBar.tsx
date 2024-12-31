@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { CategoryFilter } from "./filters/CategoryFilter";
 import { AgeFilter } from "./filters/AgeFilter";
@@ -30,6 +30,28 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [isPreferencesActive, setIsPreferencesActive] = useState(false);
   const { applyUserPreferences } = usePreferences({ onFiltersChange, setFilters });
   const navigate = useNavigate();
+
+  // Get user location when distance filter is used
+  useEffect(() => {
+    if (filters.distance && filters.distance !== 'all' && !filters.userLocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newFilters = {
+            ...filters,
+            userLocation: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+          };
+          setFilters(newFilters);
+          onFiltersChange(newFilters);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        }
+      );
+    }
+  }, [filters.distance]);
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     const newFilters = { ...filters, [key]: value };
