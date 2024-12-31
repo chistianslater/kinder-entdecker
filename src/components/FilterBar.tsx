@@ -28,7 +28,10 @@ interface FilterBarProps {
 const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
   const [isPreferencesActive, setIsPreferencesActive] = useState(false);
-  const { applyUserPreferences } = usePreferences({ onFiltersChange, setFilters });
+  const { applyUserPreferences } = usePreferences({ 
+    onFiltersChange, 
+    setFilters 
+  });
   const navigate = useNavigate();
 
   // Get user location when distance filter is used
@@ -54,6 +57,12 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   }, [filters.distance]);
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
+    // If a regular filter is changed while preferences are active,
+    // deactivate preferences mode
+    if (isPreferencesActive) {
+      setIsPreferencesActive(false);
+    }
+    
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFiltersChange(newFilters);
@@ -61,10 +70,12 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
 
   const handlePreferencesClick = () => {
     if (isPreferencesActive) {
+      // Clear all filters when deactivating preferences
       setFilters({});
       onFiltersChange({});
       setIsPreferencesActive(false);
     } else {
+      // Apply user preferences
       applyUserPreferences();
       setIsPreferencesActive(true);
     }

@@ -23,9 +23,9 @@ export const usePreferences = ({ onFiltersChange, setFilters }: UsePreferencesPr
         .from('user_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      if (error) {
         toast({
           title: "Error loading preferences",
           description: error.message,
@@ -43,13 +43,24 @@ export const usePreferences = ({ onFiltersChange, setFilters }: UsePreferencesPr
     try {
       setLoading(true);
       if (preferences) {
+        // Map user preferences to filter values
         const newFilters: Filters = {
           type: preferences.interests?.[0],
           ageRange: preferences.child_age_ranges?.[0],
           distance: preferences.max_distance?.toString(),
+          activityType: 'both', // Default value
+          priceRange: 'all', // Default value
         };
+        
+        // Apply filters
         setFilters(newFilters);
         onFiltersChange(newFilters);
+      } else {
+        toast({
+          title: "No preferences found",
+          description: "Please set up your preferences in the dashboard first.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error applying preferences:', error);
