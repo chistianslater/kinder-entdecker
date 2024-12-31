@@ -10,29 +10,36 @@ export const useFilteredActivities = (activities: Activity[]) => {
   useEffect(() => {
     let result = [...activities];
 
-    if (Object.keys(filters).length === 0) {
+    // Only apply filters if there are any active filters
+    if (Object.keys(filters).length > 0) {
+      if (filters.type) {
+        result = filterByType(result, filters.type);
+      }
+      if (filters.ageRange) {
+        result = filterByAgeRange(result, filters.ageRange);
+      }
+      if (filters.priceRange) {
+        result = filterByPrice(result, filters.priceRange);
+      }
+      if (filters.activityType && filters.activityType !== 'both') {
+        result = result.filter(activity => activity.type === filters.activityType);
+      }
+      if (filters.distance && filters.distance !== 'all') {
+        result = filterByDistance(result, filters);
+      }
+      setFilteredActivities(result);
+    } else {
       setFilteredActivities([]);
-      return;
     }
-
-    if (filters.type) {
-      result = filterByType(result, filters.type);
-    }
-    if (filters.ageRange) {
-      result = filterByAgeRange(result, filters.ageRange);
-    }
-    if (filters.priceRange) {
-      result = filterByPrice(result, filters.priceRange);
-    }
-    if (filters.distance) {
-      result = filterByDistance(result, filters);
-    }
-
-    setFilteredActivities(result);
   }, [activities, filters]);
 
   const handleFiltersChange = (newFilters: Filters) => {
-    setFilters(newFilters);
+    // Remove any undefined or null values from the filters
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(newFilters).filter(([_, value]) => value != null)
+    ) as Filters;
+    
+    setFilters(cleanedFilters);
   };
 
   return {

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,19 +33,34 @@ export const usePreferences = ({ onFiltersChange, setFilters }: UsePreferencesPr
       if (error) throw error;
 
       if (preferences) {
+        // Map preferences to filters more comprehensively
         const newFilters: Filters = {
-          type: preferences.interests?.[0], // Using first interest as type
-          ageRange: preferences.child_age_ranges?.[0], // Using first age range
+          type: preferences.interests?.[0],
+          ageRange: preferences.child_age_ranges?.[0],
           distance: preferences.max_distance?.toString(),
+          activityType: 'both', // Default to both if not specified
+          userLocation: null // Will be set by geolocation if needed
         };
 
-        setFilters(newFilters);
-        onFiltersChange(newFilters);
+        // Only include filters that have values
+        const cleanedFilters = Object.fromEntries(
+          Object.entries(newFilters).filter(([_, value]) => value != null)
+        ) as Filters;
+
+        setFilters(cleanedFilters);
+        onFiltersChange(cleanedFilters);
 
         toast({
           title: "Präferenzen geladen",
           description: "Ihre persönlichen Einstellungen wurden geladen.",
         });
+      } else {
+        toast({
+          title: "Keine Präferenzen gefunden",
+          description: "Bitte richten Sie zuerst Ihre Präferenzen ein.",
+          variant: "destructive",
+        });
+        navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error loading preferences:', error);
