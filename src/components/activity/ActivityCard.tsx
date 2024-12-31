@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Baby, Euro, MapPin, Clock, TreePine } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
+import { ActivityBadges } from './ActivityBadges';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -36,6 +37,8 @@ export const ActivityCard = ({
         >
           {activity.title}
         </h3>
+
+        <ActivityBadges activity={activity} className="mb-4" />
         
         <div className="space-y-2">
           {/* Location */}
