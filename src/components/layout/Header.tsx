@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AccountSection from './AccountSection';
+import { AccountSection } from './AccountSection';
 import ViewToggle from './ViewToggle';
 
 const Header = () => {
