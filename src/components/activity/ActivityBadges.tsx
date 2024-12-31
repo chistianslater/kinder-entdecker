@@ -10,9 +10,9 @@ interface ActivityBadgesProps {
 export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => {
   return (
     <div className={`flex items-center justify-between w-full ${className || ''}`}>
-      <div className="px-4">
+      <div>
         {activity.is_business && (
-          <Badge variant="secondary" className="flex items-center gap-1 rounded-md">
+          <Badge variant="secondary" className="flex items-center gap-1 rounded-md ml-4">
             <Building2 className="w-4 h-4" />
             Unternehmensbeitrag
           </Badge>
