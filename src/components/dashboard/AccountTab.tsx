@@ -21,11 +21,16 @@ export const AccountTab = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('username, avatar_url')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
 
       if (data?.username) setUsername(data.username);
       return data;
