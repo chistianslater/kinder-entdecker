@@ -14,11 +14,13 @@ export const useActivities = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('activities')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data as Activity[];
     },
+    initialData: [], // Set initial data to empty array
   });
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export const useActivities = () => {
   }, [data]);
 
   return {
-    filteredActivities,
+    filteredActivities: filteredActivities.length > 0 ? filteredActivities : activities, // Return all activities if no filters applied
     loading,
     error,
     handleFiltersChange,

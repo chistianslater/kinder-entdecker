@@ -1,35 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Activity } from '@/types/activity';
 import { Filters } from '@/components/FilterBar';
-import { filterByType } from './filterUtils';
-import { filterByAgeRange } from './filterUtils';
-import { filterByPrice } from './filterUtils';
-import { filterByDistance } from './filterUtils';
+import { filterByType, filterByAgeRange, filterByPrice, filterByDistance } from './filterUtils';
 
 export const useFilteredActivities = (activities: Activity[]) => {
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>(activities);
+  const [filters, setFilters] = useState<Filters>({});
+  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
 
-  const handleFiltersChange = (filters: Filters) => {
-    let filtered = [...activities];
+  useEffect(() => {
+    let result = [...activities];
 
-    // Apply type filter
-    filtered = filterByType(filtered, filters.type);
-
-    // Apply age range filter
-    filtered = filterByAgeRange(filtered, filters.ageRange);
-
-    // Apply price filter
-    filtered = filterByPrice(filtered, filters.priceRange);
-
-    // Apply activity type filter
-    if (filters.activityType && filters.activityType !== 'both') {
-      filtered = filtered.filter(activity => activity.type === filters.activityType);
+    if (Object.keys(filters).length === 0) {
+      setFilteredActivities([]);
+      return;
     }
 
-    // Apply distance filter
-    filtered = filterByDistance(filtered, filters);
+    if (filters.type) {
+      result = filterByType(result, filters.type);
+    }
+    if (filters.ageRange) {
+      result = filterByAgeRange(result, filters.ageRange);
+    }
+    if (filters.priceRange) {
+      result = filterByPrice(result, filters.priceRange);
+    }
+    if (filters.distance) {
+      result = filterByDistance(result, filters);
+    }
 
-    setFilteredActivities(filtered);
+    setFilteredActivities(result);
+  }, [activities, filters]);
+
+  const handleFiltersChange = (newFilters: Filters) => {
+    setFilters(newFilters);
   };
 
   return {
