@@ -28,15 +28,12 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reviews')
-        .select(`
-          *,
-          user:profiles(username, avatar_url)
-        `)
+        .select('*, user:profiles!reviews_user_id_fkey(username, avatar_url)')
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Review[];
+      return (data || []) as Review[];
     },
   });
 
