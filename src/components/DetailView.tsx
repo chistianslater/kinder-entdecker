@@ -21,12 +21,12 @@ interface DetailViewProps {
 
 const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
   const [limit, setLimit] = useState(5);
-  
-  if (!activity) return null;
 
-  const { data: events } = useQuery({
-    queryKey: ['activity-events', activity.id, limit],
+  const { data: events = [] } = useQuery({
+    queryKey: ['activity-events', activity?.id, limit],
     queryFn: async () => {
+      if (!activity?.id) return [];
+      
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -38,6 +38,7 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
       if (error) throw error;
       return data || [];
     },
+    enabled: !!activity?.id,
   });
 
   const handleLoadMore = () => {
@@ -45,9 +46,12 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
   };
 
   const handleNavigate = () => {
+    if (!activity) return;
     const encodedAddress = encodeURIComponent(activity.location);
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   };
+
+  if (!activity) return null;
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -89,7 +93,7 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
             Upcoming Events
           </h3>
           
-          {events && events.length > 0 ? (
+          {events.length > 0 ? (
             <>
               <div className="space-y-3">
                 {events.map((event) => (
