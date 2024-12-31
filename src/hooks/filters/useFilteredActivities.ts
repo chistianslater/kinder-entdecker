@@ -28,7 +28,9 @@ export const useFilteredActivities = (activities: Activity[]) => {
         const mappedType = mapTypeFilter(filters.type);
         console.log('Filtering by type:', mappedType);
         result = result.filter(activity => {
-          return activity.type === mappedType;
+          const activityType = activity.type?.trim();
+          const filterType = mappedType?.trim();
+          return activityType === filterType;
         });
       }
 
@@ -40,22 +42,33 @@ export const useFilteredActivities = (activities: Activity[]) => {
         });
       }
 
+      // Filter by activity type (indoor/outdoor)
+      if (filters.activityType && filters.activityType !== 'both') {
+        result = result.filter(activity => {
+          const location = activity.location.toLowerCase();
+          if (filters.activityType === 'indoor') {
+            return location.includes('indoor') || location.includes('drinnen');
+          } else {
+            return location.includes('outdoor') || location.includes('draußen');
+          }
+        });
+      }
+
       // Filter by price range
       if (filters.priceRange) {
         result = result.filter(activity => {
           if (!activity.price_range) return false;
+          const price = activity.price_range.toLowerCase();
           
           switch (filters.priceRange) {
             case 'free':
-              return activity.price_range.toLowerCase().includes('kostenlos') || 
-                     activity.price_range.toLowerCase().includes('free');
+              return price.includes('kostenlos') || price.includes('free');
             case 'low':
-              return activity.price_range.toLowerCase().includes('günstig') || 
-                     activity.price_range.toLowerCase().includes('bis 10€');
+              return price.includes('günstig') || price.includes('bis 10€');
             case 'medium':
-              return activity.price_range.toLowerCase().includes('10-30€');
+              return price.includes('10-30€');
             case 'high':
-              return activity.price_range.toLowerCase().includes('30€+');
+              return price.includes('30€+');
             default:
               return true;
           }
@@ -87,6 +100,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
         }
       }
 
+      console.log('Filtered activities:', result);
       setFilteredActivities(result);
     } else {
       setFilteredActivities(activities);
