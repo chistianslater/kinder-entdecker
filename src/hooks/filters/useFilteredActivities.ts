@@ -6,15 +6,12 @@ export const useFilteredActivities = (activities: Activity[]) => {
   const [filters, setFilters] = useState<Filters>({});
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
 
-  const mapTypeFilter = (filterType: string): string => {
-    const typeMapping: { [key: string]: string } = {
-      'sports': 'Sport & Bewegung',
-      'nature': 'Natur & Wandern',
-      'culture': 'Kultur & Museum',
-      'creative': 'Kreativ & Basteln',
-      'animals': 'Tiere & Zoo'
-    };
-    return typeMapping[filterType] || filterType;
+  const typeMapping: { [key: string]: string } = {
+    'sports': 'Sport & Bewegung',
+    'nature': 'Natur & Wandern',
+    'culture': 'Kultur & Museum',
+    'creative': 'Kreativ & Basteln',
+    'animals': 'Tiere & Zoo'
   };
 
   useEffect(() => {
@@ -26,11 +23,11 @@ export const useFilteredActivities = (activities: Activity[]) => {
     if (Object.keys(filters).length > 0) {
       // Filter by category (type)
       if (filters.type) {
-        const mappedType = mapTypeFilter(filters.type);
+        const mappedType = typeMapping[filters.type];
         console.log('Filtering by type:', mappedType);
         result = result.filter(activity => {
           const match = activity.type === mappedType;
-          console.log(`Activity ${activity.title} type: ${activity.type}, mapped type: ${mappedType}, match: ${match}`);
+          console.log(`Activity ${activity.title} type: ${activity.type}, expected type: ${mappedType}, match: ${match}`);
           return match;
         });
         console.log('After type filter:', result.length);
@@ -38,65 +35,44 @@ export const useFilteredActivities = (activities: Activity[]) => {
 
       // Filter by age range
       if (filters.ageRange && filters.ageRange !== 'all') {
-        console.log('Filtering by age range:', filters.ageRange);
-        result = result.filter(activity => {
-          const match = activity.age_range === filters.ageRange;
-          console.log(`Activity ${activity.title} age range: ${activity.age_range}, filter: ${filters.ageRange}, match: ${match}`);
-          return match;
-        });
-        console.log('After age filter:', result.length);
+        result = result.filter(activity => activity.age_range === filters.ageRange);
       }
 
       // Filter by activity type (indoor/outdoor)
       if (filters.activityType && filters.activityType !== 'both') {
-        console.log('Filtering by activity type:', filters.activityType);
         result = result.filter(activity => {
           const location = activity.location.toLowerCase();
-          let match = false;
           if (filters.activityType === 'indoor') {
-            match = location.includes('indoor') || location.includes('drinnen');
+            return location.includes('indoor') || location.includes('drinnen');
           } else {
-            match = location.includes('outdoor') || location.includes('draußen');
+            return location.includes('outdoor') || location.includes('draußen');
           }
-          console.log(`Activity ${activity.title} location: ${location}, match: ${match}`);
-          return match;
         });
-        console.log('After activity type filter:', result.length);
       }
 
       // Filter by price range
       if (filters.priceRange) {
-        console.log('Filtering by price range:', filters.priceRange);
         result = result.filter(activity => {
           if (!activity.price_range) return false;
           const price = activity.price_range.toLowerCase();
-          let match = false;
           
           switch (filters.priceRange) {
             case 'free':
-              match = price.includes('kostenlos') || price.includes('free');
-              break;
+              return price.includes('kostenlos') || price.includes('free');
             case 'low':
-              match = price.includes('günstig') || price.includes('bis 10€');
-              break;
+              return price.includes('günstig') || price.includes('bis 10€');
             case 'medium':
-              match = price.includes('10-30€');
-              break;
+              return price.includes('10-30€');
             case 'high':
-              match = price.includes('30€+');
-              break;
+              return price.includes('30€+');
             default:
-              match = true;
+              return true;
           }
-          console.log(`Activity ${activity.title} price: ${price}, match: ${match}`);
-          return match;
         });
-        console.log('After price filter:', result.length);
       }
 
       // Filter by distance if user location is available
       if (filters.distance && filters.distance !== 'all' && filters.userLocation) {
-        console.log('Filtering by distance:', filters.distance);
         const maxDistance = parseInt(filters.distance);
         if (!isNaN(maxDistance)) {
           result = result.filter(activity => {
@@ -115,11 +91,8 @@ export const useFilteredActivities = (activities: Activity[]) => {
               activityLng
             );
             
-            const match = distance <= maxDistance;
-            console.log(`Activity ${activity.title} distance: ${distance}km, max: ${maxDistance}km, match: ${match}`);
-            return match;
+            return distance <= maxDistance;
           });
-          console.log('After distance filter:', result.length);
         }
       }
     }
