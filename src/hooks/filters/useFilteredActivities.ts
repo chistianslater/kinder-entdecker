@@ -93,10 +93,10 @@ export const useFilteredActivities = (activities: Activity[]) => {
             case 'low':
               return maxPrice <= 10;
             case 'medium':
-              return maxPrice > 10 && maxPrice <= 30;
+              return maxPrice > 10 && maxPrice <= 20;
             case 'high':
-              // For high/expensive, we consider it expensive if ANY price in the range is above 30€
-              return minPrice > 30 || maxPrice > 30;
+              // For high/expensive, consider anything above 20€ as expensive for family activities
+              return maxPrice > 20;
             default:
               return true;
           }

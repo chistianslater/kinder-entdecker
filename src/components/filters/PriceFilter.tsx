@@ -26,8 +26,8 @@ export const PriceFilter = ({ value, onChange }: PriceFilterProps) => {
       <SelectContent className="bg-white border border-accent shadow-md">
         <SelectItem value="free">Kostenlos</SelectItem>
         <SelectItem value="low">Günstig (bis 10€)</SelectItem>
-        <SelectItem value="medium">Mittel (10-30€)</SelectItem>
-        <SelectItem value="high">Teuer (30€+)</SelectItem>
+        <SelectItem value="medium">Mittel (10-20€)</SelectItem>
+        <SelectItem value="high">Teuer (über 20€)</SelectItem>
       </SelectContent>
     </Select>
   );
