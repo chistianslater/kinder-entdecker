@@ -85,6 +85,44 @@ export const filterByDistance = (activities: Activity[], filters: Filters) => {
   });
 };
 
+export const filterByOpeningHours = (activities: Activity[], openingHours?: string) => {
+  if (!openingHours || openingHours === 'all') return activities;
+  
+  const now = new Date();
+  const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
+  const currentTime = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+  return activities.filter(activity => {
+    if (!activity.opening_hours) {
+      return openingHours === 'closed';
+    }
+
+    // Parse opening hours string (assuming format like "Mo-Fr: 9:00-17:00")
+    const isOpen = activity.opening_hours.toLowerCase().split('\n').some(schedule => {
+      const [days, hours] = schedule.split(':').map(s => s.trim());
+      if (!hours) return false;
+
+      // Check if current day is in the schedule
+      const isDayIncluded = days.split(',').some(dayRange => {
+        const [start, end] = dayRange.split('-').map(d => d.trim());
+        const daysOfWeek = ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag', 'sonntag'];
+        const startIdx = daysOfWeek.indexOf(start.toLowerCase());
+        const endIdx = end ? daysOfWeek.indexOf(end.toLowerCase()) : startIdx;
+        const currentIdx = daysOfWeek.indexOf(currentDay);
+        return currentIdx >= startIdx && currentIdx <= endIdx;
+      });
+
+      if (!isDayIncluded) return false;
+
+      // Check if current time is within opening hours
+      const [openTime, closeTime] = hours.split('-').map(t => t.trim());
+      return currentTime >= openTime && currentTime <= closeTime;
+    });
+
+    return openingHours === 'open' ? isOpen : !isOpen;
+  });
+};
+
 const calculateDistance = (
   lat1: number,
   lon1: number,

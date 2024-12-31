@@ -39,6 +39,39 @@ export const ActivityCard = ({
   onClaim,
   showClaimButton = false 
 }: ActivityCardProps) => {
+  const isCurrentlyOpen = () => {
+    if (!activity.opening_hours) return null;
+
+    const now = new Date();
+    const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
+    const currentTime = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+    const isOpen = activity.opening_hours.toLowerCase().split('\n').some(schedule => {
+      const [days, hours] = schedule.split(':').map(s => s.trim());
+      if (!hours) return false;
+
+      // Check if current day is in the schedule
+      const isDayIncluded = days.split(',').some(dayRange => {
+        const [start, end] = dayRange.split('-').map(d => d.trim());
+        const daysOfWeek = ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag', 'sonntag'];
+        const startIdx = daysOfWeek.indexOf(start.toLowerCase());
+        const endIdx = end ? daysOfWeek.indexOf(end.toLowerCase()) : startIdx;
+        const currentIdx = daysOfWeek.indexOf(currentDay);
+        return currentIdx >= startIdx && currentIdx <= endIdx;
+      });
+
+      if (!isDayIncluded) return false;
+
+      // Check if current time is within opening hours
+      const [openTime, closeTime] = hours.split('-').map(t => t.trim());
+      return currentTime >= openTime && currentTime <= closeTime;
+    });
+
+    return isOpen;
+  };
+
+  const openStatus = isCurrentlyOpen();
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-lg">
       <div className="relative">
@@ -87,9 +120,19 @@ export const ActivityCard = ({
           )}
 
           {activity.opening_hours && (
-            <div className="flex items-center text-sm text-gray-600">
-              <Clock className="w-4 h-4 mr-2" />
-              {activity.opening_hours}
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <div className="flex items-center">
+                <Clock className="w-4 h-4 mr-2" />
+                {activity.opening_hours}
+              </div>
+              {openStatus !== null && (
+                <Badge 
+                  variant={openStatus ? "success" : "destructive"}
+                  className="ml-2"
+                >
+                  {openStatus ? "Geöffnet" : "Geschlossen"}
+                </Badge>
+              )}
             </div>
           )}
         </div>

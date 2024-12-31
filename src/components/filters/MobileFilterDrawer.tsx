@@ -12,6 +12,7 @@ import { AgeFilter } from "./AgeFilter";
 import { TypeFilter } from "./TypeFilter";
 import { PriceFilter } from "./PriceFilter";
 import { DistanceFilter } from "./DistanceFilter";
+import { OpeningHoursFilter } from "./OpeningHoursFilter";
 import { Filters } from '../FilterBar';
 
 interface MobileFilterDrawerProps {
@@ -46,6 +47,10 @@ export const MobileFilterDrawer = ({ filters, onFilterChange, onClose }: MobileF
         <DistanceFilter
           value={filters.distance}
           onChange={(value) => onFilterChange('distance', value)}
+        />
+        <OpeningHoursFilter
+          value={filters.openingHours}
+          onChange={(value) => onFilterChange('openingHours', value)}
         />
       </div>
       <DrawerFooter>
