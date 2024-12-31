@@ -6,6 +6,26 @@ import { Baby, Euro, MapPin, Clock, TreePine } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
 
+// Array of placeholder images from Unsplash
+const placeholderImages = [
+  'photo-1482938289607-e9573fc25ebb', // river between mountains
+  'photo-1509316975850-ff9c5deb0cd9', // pine trees
+  'photo-1513836279014-a89f7a76ae86', // trees at daytime
+  'photo-1518495973542-4542c06a5843', // sun through trees
+  'photo-1469474968028-56623f02e42e', // mountain with sun rays
+  'photo-1470813740244-df37b8c1edcb', // starry night
+  'photo-1470071459604-3b5ec3a7fe05', // foggy mountain
+  'photo-1500375592092-40eb2168fd21', // ocean wave
+  'photo-1458668383970-8ddd3927deed', // mountain alps
+  'photo-1504893524553-b855bce32c67', // river and rocks
+];
+
+// Function to get a random placeholder image
+const getRandomPlaceholder = () => {
+  const randomIndex = Math.floor(Math.random() * placeholderImages.length);
+  return `https://images.unsplash.com/${placeholderImages[randomIndex]}?auto=format&fit=crop&w=800&q=80`;
+};
+
 interface ActivityCardProps {
   activity: Activity;
   onSelect: (activity: Activity) => void;
@@ -28,7 +48,7 @@ export const ActivityCard = ({
           style={{ 
             backgroundImage: activity.image_url 
               ? `url(${activity.image_url})` 
-              : 'url(/placeholder.svg)' 
+              : `url(${getRandomPlaceholder()})` 
           }}
           onClick={() => onSelect(activity)}
         />
