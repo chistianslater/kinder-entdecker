@@ -4,7 +4,7 @@ import { Filters } from '@/components/FilterBar';
 export const filterByType = (activities: Activity[], type?: string) => {
   if (!type) return activities;
   return activities.filter(activity => 
-    activity.type.toLowerCase().includes(type.toLowerCase())
+    activity.type.toLowerCase() === type.toLowerCase()
   );
 };
 
@@ -14,8 +14,22 @@ export const filterByAgeRange = (activities: Activity[], ageRange?: string) => {
 };
 
 export const filterByPrice = (activities: Activity[], priceRange?: string) => {
-  if (!priceRange || priceRange === 'all') return activities;
-  return activities.filter(activity => activity.price_range === priceRange);
+  if (!priceRange) return activities;
+  
+  return activities.filter(activity => {
+    switch (priceRange) {
+      case 'free':
+        return activity.price_range === 'free' || activity.price_range === 'kostenlos';
+      case 'low':
+        return activity.price_range === 'low' || activity.price_range?.includes('bis 10€');
+      case 'medium':
+        return activity.price_range === 'medium' || activity.price_range?.includes('10-30€');
+      case 'high':
+        return activity.price_range === 'high' || activity.price_range?.includes('30€+');
+      default:
+        return true;
+    }
+  });
 };
 
 export const filterByDistance = (activities: Activity[], filters: Filters) => {
@@ -29,11 +43,18 @@ export const filterByDistance = (activities: Activity[], filters: Filters) => {
   return activities.filter(activity => {
     if (!activity.coordinates) return false;
     
+    // Parse coordinates from the point type
+    const coords = activity.coordinates.toString().replace('(', '').replace(')', '').split(',');
+    const activityLat = parseFloat(coords[0]);
+    const activityLng = parseFloat(coords[1]);
+    
+    if (isNaN(activityLat) || isNaN(activityLng)) return false;
+    
     const distance = calculateDistance(
       filters.userLocation!.latitude,
       filters.userLocation!.longitude,
-      activity.coordinates[0],
-      activity.coordinates[1]
+      activityLat,
+      activityLng
     );
     
     return distance <= maxDistance;

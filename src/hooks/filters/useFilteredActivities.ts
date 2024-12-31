@@ -10,23 +10,60 @@ export const useFilteredActivities = (activities: Activity[]) => {
   useEffect(() => {
     let result = [...activities];
 
-    // Only apply filters if there are any active filters
+    // Apply filters if they exist
     if (Object.keys(filters).length > 0) {
+      // Filter by category (type)
       if (filters.type) {
-        result = filterByType(result, filters.type);
+        result = result.filter(activity => 
+          activity.type.toLowerCase() === filters.type.toLowerCase()
+        );
       }
-      if (filters.ageRange) {
-        result = filterByAgeRange(result, filters.ageRange);
+
+      // Filter by age range
+      if (filters.ageRange && filters.ageRange !== 'all') {
+        result = result.filter(activity => 
+          activity.age_range === filters.ageRange
+        );
       }
-      if (filters.priceRange) {
-        result = filterByPrice(result, filters.priceRange);
-      }
+
+      // Filter by activity type (indoor/outdoor)
       if (filters.activityType && filters.activityType !== 'both') {
-        result = result.filter(activity => activity.type === filters.activityType);
+        result = result.filter(activity => 
+          activity.type.toLowerCase().includes(filters.activityType.toLowerCase())
+        );
       }
-      if (filters.distance && filters.distance !== 'all') {
+
+      // Filter by price range
+      if (filters.priceRange) {
+        switch (filters.priceRange) {
+          case 'free':
+            result = result.filter(activity => 
+              activity.price_range === 'free' || activity.price_range === 'kostenlos'
+            );
+            break;
+          case 'low':
+            result = result.filter(activity => 
+              activity.price_range === 'low' || activity.price_range?.includes('bis 10€')
+            );
+            break;
+          case 'medium':
+            result = result.filter(activity => 
+              activity.price_range === 'medium' || activity.price_range?.includes('10-30€')
+            );
+            break;
+          case 'high':
+            result = result.filter(activity => 
+              activity.price_range === 'high' || activity.price_range?.includes('30€+')
+            );
+            break;
+        }
+      }
+
+      // Filter by distance if user location is available
+      if (filters.distance && filters.distance !== 'all' && filters.userLocation) {
         result = filterByDistance(result, filters);
       }
+
       setFilteredActivities(result);
     } else {
       setFilteredActivities([]);
@@ -34,6 +71,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
   }, [activities, filters]);
 
   const handleFiltersChange = (newFilters: Filters) => {
+    console.log('Applying filters:', newFilters);
     // Remove any undefined or null values from the filters
     const cleanedFilters = Object.fromEntries(
       Object.entries(newFilters).filter(([_, value]) => value != null)
