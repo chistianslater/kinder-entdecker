@@ -51,12 +51,37 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
     },
   });
 
+  const generateRecommendations = async (userId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('generate-recommendations', {
+        body: { user_id: userId },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Empfehlungen erstellt",
+        description: "Wir haben personalisierte Empfehlungen für Sie generiert.",
+      });
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      toast({
+        title: "Fehler",
+        description: "Empfehlungen konnten nicht generiert werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const onSubmit = async (data: OnboardingFormData) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { error } = await supabase
         .from('user_preferences')
         .upsert({
-          user_id: (await supabase.auth.getUser()).data.user?.id,
+          user_id: user.id,
           interests: data.interests,
           child_age_ranges: data.childAgeRanges,
           max_distance: parseInt(data.maxDistance),
@@ -66,9 +91,12 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
 
       if (error) throw error;
 
+      // Generate recommendations after saving preferences
+      await generateRecommendations(user.id);
+
       toast({
         title: "Einstellungen gespeichert",
-        description: "Deine Präferenzen wurden erfolgreich gespeichert.",
+        description: "Ihre Präferenzen wurden erfolgreich gespeichert.",
       });
 
       onComplete();
@@ -76,7 +104,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
       console.error('Error saving preferences:', error);
       toast({
         title: "Fehler",
-        description: "Deine Präferenzen konnten nicht gespeichert werden.",
+        description: "Ihre Präferenzen konnten nicht gespeichert werden.",
         variant: "destructive",
       });
     }
