@@ -65,26 +65,34 @@ export const useFilteredActivities = (activities: Activity[]) => {
         console.log('Filtering by price range:', filters.priceRange);
         result = result.filter(activity => {
           if (!activity.price_range) return false;
+          
           const price = activity.price_range.toLowerCase();
           console.log(`Checking price for ${activity.title}:`, price);
           
-          // Extract all numbers from the price range
+          // Extract minimum and maximum prices from the range
           const numbers = price.match(/\d+/g);
-          const highestPrice = numbers ? Math.max(...numbers.map(Number)) : 0;
-          console.log(`Highest price found: ${highestPrice}€`);
+          if (!numbers) {
+            // Handle special cases like "kostenlos" or "free"
+            const isFree = price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
+            console.log(`Activity is free: ${isFree}`);
+            return filters.priceRange === 'free' ? isFree : false;
+          }
           
-          const isFree = price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
+          // Get both minimum and maximum prices if available
+          const prices = numbers.map(Number);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          console.log(`Price range for ${activity.title}: ${minPrice}€ - ${maxPrice}€`);
           
           switch (filters.priceRange) {
             case 'free':
-              return isFree;
+              return price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
             case 'low':
-              return !isFree && highestPrice > 0 && highestPrice <= 10;
+              return maxPrice > 0 && maxPrice <= 10;
             case 'medium':
-              return !isFree && highestPrice > 10 && highestPrice <= 30;
+              return minPrice > 10 && maxPrice <= 30;
             case 'high':
-              // Only show activities that are explicitly priced above 30€
-              return highestPrice > 30;
+              return minPrice > 30;
             default:
               return true;
           }
