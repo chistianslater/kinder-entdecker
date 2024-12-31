@@ -82,7 +82,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
 
   return (
     <div className="bg-secondary/10 rounded-2xl p-4 mb-6">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 w-full">
         <div className="flex-shrink-0">
           <PreferencesButton 
             isActive={isPreferencesActive}
@@ -104,10 +104,12 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
             />
           </Drawer>
         ) : (
-          <DesktopFilters 
-            filters={filters}
-            onFilterChange={handleFilterChange}
-          />
+          <div className="flex-grow">
+            <DesktopFilters 
+              filters={filters}
+              onFilterChange={handleFilterChange}
+            />
+          </div>
         )}
       </div>
     </div>
