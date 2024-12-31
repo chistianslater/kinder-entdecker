@@ -18,7 +18,6 @@ export const AccountTab = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
-      // Try to get the existing profile
       const { data, error } = await supabase
         .from('profiles')
         .select('username, avatar_url')
@@ -30,7 +29,6 @@ export const AccountTab = () => {
         return null;
       }
 
-      // If we have data, update the username state
       if (data?.username) {
         setUsername(data.username);
       }

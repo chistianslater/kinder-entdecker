@@ -26,26 +26,24 @@ export const AccountAvatar = ({ avatarUrl, onAvatarUpdate }: AccountAvatarProps)
       setUploading(true);
 
       const fileExt = file.name.split('.').pop();
-      // Create a folder structure with user ID as the first folder
       const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
 
-      // Upload the file to storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // Update the profile with the new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
+        .upsert({ 
+          id: user.id,
+          avatar_url: publicUrl 
+        });
 
       if (updateError) throw updateError;
 

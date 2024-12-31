@@ -19,29 +19,14 @@ export const UsernameSection = ({ username, setUsername, onUpdate }: UsernameSec
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // First, check if the profile exists
-      const { data: existingProfile } = await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
+        .upsert({ 
+          id: user.id,
+          username 
+        });
 
-      if (!existingProfile) {
-        // Create profile if it doesn't exist
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert([{ id: user.id, username }]);
-
-        if (insertError) throw insertError;
-      } else {
-        // Update existing profile
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ username })
-          .eq('id', user.id);
-
-        if (updateError) throw updateError;
-      }
+      if (updateError) throw updateError;
 
       toast({
         title: "Erfolg",
