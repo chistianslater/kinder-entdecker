@@ -35,7 +35,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
           // Extract numbers from age ranges for comparison
           const [activityMin, activityMax] = activity.age_range
             .split('-')
-            .map(num => parseInt(num));
+            .map(num => parseInt(num.replace(' Jahre', '')));
           const [filterMin, filterMax] = filters.ageRange
             .split('-')
             .map(num => parseInt(num));
@@ -59,14 +59,16 @@ export const useFilteredActivities = (activities: Activity[]) => {
           
           switch (filters.priceRange) {
             case 'free':
-              return price.includes('kostenlos') || price.includes('free');
+              return price.includes('kostenlos') || price.includes('free') || price === '0€';
             case 'low':
+              if (price.includes('kostenlos') || price.includes('free') || price === '0€') return false;
               return (
                 price.includes('bis 10€') || 
                 (price.includes('€') && 
                   parseInt(price.match(/\d+/)?.[0] || '999') <= 10)
               );
             case 'medium':
+              if (price.includes('kostenlos') || price.includes('free') || price === '0€') return false;
               return (
                 price.includes('10-30€') || 
                 (price.includes('€') && 
@@ -74,6 +76,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
                   parseInt(price.match(/\d+/)?.[0] || '999') <= 30)
               );
             case 'high':
+              if (price.includes('kostenlos') || price.includes('free') || price === '0€') return false;
               return (
                 price.includes('30€+') || 
                 (price.includes('€') && 
@@ -108,9 +111,12 @@ export const useFilteredActivities = (activities: Activity[]) => {
             const coords = activity.coordinates.toString()
               .replace('(', '')
               .replace(')', '')
-              .split(',');
-            const activityLat = parseFloat(coords[0]);
-            const activityLng = parseFloat(coords[1]);
+              .split(',')
+              .map(coord => parseFloat(coord.trim()));
+            
+            if (coords.length !== 2) return false;
+            
+            const [activityLng, activityLat] = coords;
             
             if (isNaN(activityLat) || isNaN(activityLng)) return false;
             
@@ -121,6 +127,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
               activityLng
             );
             
+            console.log(`Distance for ${activity.title}: ${distance}km`);
             return distance <= maxDistance;
           });
         }
