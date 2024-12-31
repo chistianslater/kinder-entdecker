@@ -127,8 +127,11 @@ export const ActivityCard = ({
               </div>
               {openStatus !== null && (
                 <Badge 
-                  variant={openStatus ? "secondary" : "destructive"}
-                  className="ml-2"
+                  className={`ml-2 ${
+                    openStatus 
+                      ? "bg-[#F2FCE2] text-green-700 hover:bg-[#F2FCE2]" 
+                      : "bg-[#FFDEE2] text-red-700 hover:bg-[#FFDEE2]"
+                  }`}
                 >
                   {openStatus ? "Geöffnet" : "Geschlossen"}
                 </Badge>
