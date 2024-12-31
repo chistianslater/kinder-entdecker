@@ -4,6 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Activity } from '@/types/activity';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 // Array of placeholder images from Unsplash
 const placeholderImages = [
@@ -40,48 +47,41 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
   return (
     <div className="space-y-8">
-      {/* Feature Image */}
+      {/* Feature Image Carousel */}
       <div className="relative">
-        <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg">
-          <img
-            src={galleryImages[0].url}
-            alt={activity.title}
-            className="object-cover w-full h-full"
-          />
-        </AspectRatio>
-        <Badge 
-          variant="secondary" 
-          className="absolute top-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm"
-        >
-          <Camera className="w-3 h-3" />
-          Official Photo
-        </Badge>
-      </div>
-
-      {/* Image Gallery Grid */}
-      <div>
-        <h3 className="text-lg font-semibold text-primary mb-4">Community Gallery</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {galleryImages.slice(1).map((image, index) => (
-            <div key={index} className="group relative">
-              <AspectRatio ratio={1} className="overflow-hidden rounded-lg">
-                <img
-                  src={image.url}
-                  alt={`${activity.title} gallery image ${index + 2}`}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <div className="flex items-center gap-2 text-sm">
-                    <User className="w-3 h-3" />
-                    <span>{image.photographer}</span>
+        <Carousel className="w-full">
+          <CarouselContent>
+            {galleryImages.map((image, index) => (
+              <CarouselItem key={index}>
+                <div className="relative">
+                  <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg">
+                    <img
+                      src={image.url}
+                      alt={`${activity.title} - ${image.caption}`}
+                      className="object-cover w-full h-full"
+                    />
+                  </AspectRatio>
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute top-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm"
+                  >
+                    <Camera className="w-3 h-3" />
+                    {image.isOwner ? 'Official Photo' : 'Community Photo'}
+                  </Badge>
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                    <div className="flex items-center gap-2 text-white">
+                      <User className="w-4 h-4" />
+                      <span className="text-sm font-medium">{image.photographer}</span>
+                    </div>
+                    <p className="text-xs text-white/90 mt-1">{image.caption}</p>
                   </div>
-                  <p className="text-xs opacity-90 mt-1">{image.caption}</p>
                 </div>
-              </AspectRatio>
-            </div>
-          ))}
-        </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-4" />
+          <CarouselNext className="right-4" />
+        </Carousel>
       </div>
 
       <h3 className="text-lg font-semibold text-primary">Details</h3>
