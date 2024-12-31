@@ -74,16 +74,15 @@ export const useFilteredActivities = (activities: Activity[]) => {
             return filters.priceRange === 'free';
           }
           
-          // Extract numbers from the price range
+          // Extract all numbers from the price range
           const numbers = price.match(/\d+/g);
           if (!numbers) return false;
           
-          // Get both minimum and maximum prices
+          // Convert all found numbers to actual numbers
           const prices = numbers.map(Number);
-          const minPrice = Math.min(...prices);
           const maxPrice = Math.max(...prices);
           
-          console.log(`Price range for ${activity.title}: ${minPrice}€ - ${maxPrice}€`);
+          console.log(`Price for ${activity.title}: ${maxPrice}€`);
           
           switch (filters.priceRange) {
             case 'free':
@@ -91,9 +90,9 @@ export const useFilteredActivities = (activities: Activity[]) => {
             case 'low':
               return maxPrice <= 10;
             case 'medium':
-              return minPrice >= 10 && maxPrice <= 30;
+              return maxPrice > 10 && maxPrice <= 30;
             case 'high':
-              return minPrice >= 30; // Changed this line to check if minimum price is >= 30€
+              return maxPrice > 30;
             default:
               return true;
           }
