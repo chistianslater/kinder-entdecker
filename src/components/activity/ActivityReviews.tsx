@@ -26,7 +26,6 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['reviews', activity.id],
     queryFn: async () => {
-      // First, get the reviews with user_ids
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select(`
@@ -44,7 +43,6 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         throw reviewsError;
       }
 
-      // Then, for each review, fetch the associated profile
       const reviewsWithProfiles = await Promise.all(
         reviewsData.map(async (review) => {
           const { data: profileData } = await supabase
