@@ -13,12 +13,12 @@ interface ActivityReviewsProps {
 interface Review {
   id: string;
   rating: number;
-  comment: string;
+  comment: string | null;
   created_at: string;
   profiles: {
     username: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
@@ -32,12 +32,18 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
           rating,
           comment,
           created_at,
-          profiles:user_id(username, avatar_url)
+          profiles (
+            username,
+            avatar_url
+          )
         `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        throw error;
+      }
       return data as Review[];
     },
   });
@@ -58,7 +64,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
               <div key={review.id} className="border rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-2">
                   <Avatar className="h-8 w-8">
-                    {review.profiles.avatar_url ? (
+                    {review.profiles?.avatar_url ? (
                       <AvatarImage src={review.profiles.avatar_url} />
                     ) : (
                       <AvatarFallback>
@@ -68,7 +74,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
                   </Avatar>
                   <div>
                     <div className="font-medium">
-                      {review.profiles.username || 'Anonymer Benutzer'}
+                      {review.profiles?.username || 'Anonymer Benutzer'}
                     </div>
                     <div className="flex items-center gap-1">
                       {Array.from({ length: review.rating }).map((_, i) => (
