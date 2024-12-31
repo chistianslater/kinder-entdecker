@@ -39,6 +39,7 @@ interface FilterBarProps {
 const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
   const [isPreferencesActive, setIsPreferencesActive] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { applyUserPreferences } = usePreferences({ 
     onFiltersChange, 
     setFilters 
@@ -127,9 +128,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
         </div>
 
         {isMobile ? (
-          <Drawer>
+          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
             <DrawerTrigger asChild>
-              <MobileFilterButton activeFiltersCount={getActiveFiltersCount()} />
+              <div onClick={() => setIsDrawerOpen(true)}>
+                <MobileFilterButton activeFiltersCount={getActiveFiltersCount()} />
+              </div>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
@@ -140,7 +143,9 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
               </div>
               <DrawerFooter>
                 <DrawerClose asChild>
-                  <Button variant="outline">Schließen</Button>
+                  <Button variant="outline" onClick={() => setIsDrawerOpen(false)}>
+                    Schließen
+                  </Button>
                 </DrawerClose>
               </DrawerFooter>
             </DrawerContent>
