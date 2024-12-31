@@ -43,6 +43,8 @@ export const usePreferences = ({ onFiltersChange, setFilters }: UsePreferencesPr
     try {
       setLoading(true);
       if (preferences) {
+        console.log('Applying preferences:', preferences);
+        
         // Map user preferences to filter values
         const newFilters: Filters = {
           type: preferences.interests?.[0],
@@ -51,6 +53,8 @@ export const usePreferences = ({ onFiltersChange, setFilters }: UsePreferencesPr
           activityType: 'both', // Default value
           priceRange: 'all', // Default value
         };
+        
+        console.log('New filters from preferences:', newFilters);
         
         // Apply filters
         setFilters(newFilters);

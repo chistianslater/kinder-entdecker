@@ -13,8 +13,16 @@ export const filterByAgeRange = (activities: Activity[], ageRange?: string) => {
   return activities.filter(activity => activity.age_range === ageRange);
 };
 
+export const filterByActivityType = (activities: Activity[], activityType?: string) => {
+  if (!activityType || activityType === 'both') return activities;
+  return activities.filter(activity => {
+    // Implement indoor/outdoor filtering logic here
+    return activity.type.toLowerCase().includes(activityType.toLowerCase());
+  });
+};
+
 export const filterByPrice = (activities: Activity[], priceRange?: string) => {
-  if (!priceRange) return activities;
+  if (!priceRange || priceRange === 'all') return activities;
   
   return activities.filter(activity => {
     switch (priceRange) {
