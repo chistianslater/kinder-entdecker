@@ -18,7 +18,7 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [session, setSession] = useState<any>(null);
-  const { filteredActivities } = useActivities();
+  const { filteredActivities, handleFiltersChange } = useActivities();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -95,6 +95,7 @@ const Index = () => {
         <OnboardingDialog 
           open={showOnboarding} 
           onOpenChange={setShowOnboarding}
+          onFiltersChange={handleFiltersChange}
         />
       </>
     );
