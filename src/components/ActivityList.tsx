@@ -51,14 +51,11 @@ const ActivityList = () => {
     return <LoadingState />;
   }
 
-  // Show EmptyState if we have activities but none match the filters
-  const shouldShowEmptyState = activities.length > 0 && filteredActivities.length === 0;
-
   return (
     <div className="space-y-4 p-4">
       <FilterBar onFiltersChange={handleFiltersChange} />
       
-      {shouldShowEmptyState ? (
+      {filteredActivities.length === 0 ? (
         <EmptyState />
       ) : (
         <ActivityListContent

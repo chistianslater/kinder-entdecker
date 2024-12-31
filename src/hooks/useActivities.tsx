@@ -49,7 +49,7 @@ export const useActivities = () => {
 
   return {
     activities,
-    filteredActivities: filteredActivities.length > 0 ? filteredActivities : activities,
+    filteredActivities,
     loading,
     error,
     handleFiltersChange,
