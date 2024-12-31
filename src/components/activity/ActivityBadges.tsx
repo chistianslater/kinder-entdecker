@@ -13,13 +13,13 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
       {activity.is_business && (
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
           <Building2 className="w-4 h-4 mr-1" />
-          Business
+          Unternehmensbeitrag
         </span>
       )}
       {activity.is_verified && (
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
           <Check className="w-4 h-4 mr-1" />
-          Verifiziert
+          Autorisiert
         </span>
       )}
     </div>
