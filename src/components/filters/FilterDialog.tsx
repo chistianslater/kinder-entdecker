@@ -30,9 +30,24 @@ export const FilterDialog = ({
   onFilterChange 
 }: FilterDialogProps) => {
   const handleReset = () => {
-    Object.keys(filters).forEach((key) => {
-      onFilterChange(key as keyof Filters, '');
+    // Reset each filter type explicitly
+    const filterKeys: (keyof Filters)[] = [
+      'type',
+      'ageRange',
+      'activityType',
+      'priceRange',
+      'distance',
+      'openingHours',
+      'minRating',
+      'sortBy',
+      'userLocation'
+    ];
+
+    filterKeys.forEach((key) => {
+      onFilterChange(key, '');
     });
+
+    console.log('Filters reset');
     onOpenChange(false);
   };
 
