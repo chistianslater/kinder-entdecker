@@ -47,15 +47,23 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
       // Then, for each review, fetch the associated profile
       const reviewsWithProfiles = await Promise.all(
         reviewsData.map(async (review) => {
-          const { data: profileData } = await supabase
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('username, avatar_url')
             .eq('id', review.user_id)
             .maybeSingle();
 
+          if (profileError) {
+            console.error('Error fetching profile:', profileError);
+            return {
+              ...review,
+              profiles: null
+            };
+          }
+
           return {
             ...review,
-            profiles: profileData
+            profiles: profileData || null
           };
         })
       );
