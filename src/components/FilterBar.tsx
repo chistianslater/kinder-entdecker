@@ -1,24 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { CategoryFilter } from "./filters/CategoryFilter";
-import { AgeFilter } from "./filters/AgeFilter";
-import { TypeFilter } from "./filters/TypeFilter";
-import { PriceFilter } from "./filters/PriceFilter";
-import { DistanceFilter } from "./filters/DistanceFilter";
+import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
 import { usePreferences } from '@/hooks/usePreferences';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PreferencesButton } from './filters/PreferencesButton';
 import { MobileFilterButton } from './filters/MobileFilterButton';
 import { DesktopFilters } from './filters/DesktopFilters';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+import { MobileFilterDrawer } from './filters/MobileFilterDrawer';
 
 export interface Filters {
   type?: string;
@@ -92,31 +79,6 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     return Object.values(filters).filter(value => value !== undefined && value !== '').length;
   };
 
-  const renderMobileFilters = () => (
-    <div className="space-y-4">
-      <CategoryFilter
-        value={filters.type}
-        onChange={(value) => handleFilterChange('type', value)}
-      />
-      <AgeFilter
-        value={filters.ageRange}
-        onChange={(value) => handleFilterChange('ageRange', value)}
-      />
-      <TypeFilter
-        value={filters.activityType}
-        onChange={(value) => handleFilterChange('activityType', value)}
-      />
-      <PriceFilter
-        value={filters.priceRange}
-        onChange={(value) => handleFilterChange('priceRange', value)}
-      />
-      <DistanceFilter
-        value={filters.distance}
-        onChange={(value) => handleFilterChange('distance', value)}
-      />
-    </div>
-  );
-
   return (
     <div className="bg-white shadow-soft rounded-2xl p-4 mb-6">
       <div className="flex gap-2 items-center">
@@ -134,21 +96,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
                 <MobileFilterButton activeFiltersCount={getActiveFiltersCount()} />
               </div>
             </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>Filter</DrawerTitle>
-              </DrawerHeader>
-              <div className="p-4">
-                {renderMobileFilters()}
-              </div>
-              <DrawerFooter>
-                <DrawerClose asChild>
-                  <Button variant="outline" onClick={() => setIsDrawerOpen(false)}>
-                    Schließen
-                  </Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
+            <MobileFilterDrawer 
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClose={() => setIsDrawerOpen(false)}
+            />
           </Drawer>
         ) : (
           <DesktopFilters 
