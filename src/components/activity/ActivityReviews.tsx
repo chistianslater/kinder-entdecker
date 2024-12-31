@@ -4,11 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
 import { TreePine, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Activity } from '@/types/activity';
 
 interface ActivityReviewsProps {
-  activity: {
-    id: string;
-  };
+  activity: Pick<Activity, 'id'>;
 }
 
 interface Review {
@@ -17,6 +16,7 @@ interface Review {
   comment: string | null;
   created_at: string;
   user_id: string;
+  activity_id: string;
   profiles: {
     username: string | null;
     avatar_url: string | null;
@@ -24,7 +24,7 @@ interface Review {
 }
 
 export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
-  const { data: reviews, isLoading, refetch } = useQuery({
+  const { data: reviews, isLoading, refetch } = useQuery<Review[]>({
     queryKey: ['reviews', activity.id],
     queryFn: async () => {
       const { data, error } = await supabase
