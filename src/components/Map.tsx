@@ -36,18 +36,10 @@ const Map = ({ activities }: MapProps) => {
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         activities.forEach((activity) => {
-          if (activity.coordinates && typeof activity.coordinates === 'string') {
-            const coordsMatch = activity.coordinates.match(/\(([-\d.]+),([-\d.]+)\)/);
+          if (activity.coordinates) {
+            const { x, y } = activity.coordinates;
             
-            if (!coordsMatch) {
-              console.warn('Invalid coordinates format for activity:', activity);
-              return;
-            }
-
-            const longitude = parseFloat(coordsMatch[1]);
-            const latitude = parseFloat(coordsMatch[2]);
-
-            if (isNaN(longitude) || isNaN(latitude)) {
+            if (isNaN(x) || isNaN(y)) {
               console.warn('Invalid coordinates values for activity:', activity);
               return;
             }
@@ -76,7 +68,7 @@ const Map = ({ activities }: MapProps) => {
               anchor: 'bottom',
               scale: 1
             })
-              .setLngLat([longitude, latitude])
+              .setLngLat([x, y])
               .setPopup(popup)
               .addTo(map.current);
           }
