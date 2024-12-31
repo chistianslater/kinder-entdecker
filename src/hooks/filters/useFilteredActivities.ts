@@ -68,22 +68,22 @@ export const useFilteredActivities = (activities: Activity[]) => {
           const price = activity.price_range.toLowerCase();
           console.log(`Checking price for ${activity.title}:`, price);
           
+          // Extract the highest number from the price range
+          const numbers = price.match(/\d+/g);
+          const highestPrice = numbers ? Math.max(...numbers.map(Number)) : 0;
+          console.log(`Highest price found: ${highestPrice}€`);
+          
           const isFree = price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
-          const priceMatch = price.match(/\d+/);
-          const priceNumber = priceMatch ? parseInt(priceMatch[0]) : 0;
           
           switch (filters.priceRange) {
             case 'free':
               return isFree;
             case 'low':
-              if (isFree) return false;
-              return priceNumber > 0 && priceNumber <= 10;
+              return !isFree && highestPrice > 0 && highestPrice <= 10;
             case 'medium':
-              if (isFree) return false;
-              return priceNumber > 10 && priceNumber <= 30;
+              return !isFree && highestPrice > 10 && highestPrice <= 30;
             case 'high':
-              if (isFree) return false;
-              return priceNumber > 30;
+              return !isFree && highestPrice > 30;
             default:
               return true;
           }
