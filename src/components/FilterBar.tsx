@@ -94,7 +94,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           <Filter className="h-4 w-4" />
           <span>Filter</span>
           {getActiveFiltersCount() > 0 && (
-            <Badge variant="primary" className="ml-2">
+            <Badge variant="default" className="ml-2">
               {getActiveFiltersCount()}
             </Badge>
           )}
