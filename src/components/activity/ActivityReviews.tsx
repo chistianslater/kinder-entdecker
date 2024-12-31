@@ -43,13 +43,18 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         throw reviewsError;
       }
 
+      // Fetch profiles separately and handle potential missing profiles
       const reviewsWithProfiles = await Promise.all(
         reviewsData.map(async (review) => {
-          const { data: profileData } = await supabase
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('username, avatar_url')
             .eq('id', review.user_id)
             .maybeSingle();
+
+          if (profileError) {
+            console.error('Error fetching profile:', profileError);
+          }
 
           return {
             ...review,
