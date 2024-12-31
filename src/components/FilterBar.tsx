@@ -13,6 +13,7 @@ export interface Filters {
   activityType?: string;
   priceRange?: string;
   distance?: string;
+  openingHours?: string;
   userLocation?: {
     latitude: number;
     longitude: number;

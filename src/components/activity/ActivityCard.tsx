@@ -127,7 +127,7 @@ export const ActivityCard = ({
               </div>
               {openStatus !== null && (
                 <Badge 
-                  variant={openStatus ? "success" : "destructive"}
+                  variant={openStatus ? "secondary" : "destructive"}
                   className="ml-2"
                 >
                   {openStatus ? "Geöffnet" : "Geschlossen"}
