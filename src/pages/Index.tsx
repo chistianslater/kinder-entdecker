@@ -1,16 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ActivityList from '@/components/ActivityList';
 import Map from '@/components/Map';
 import EventView from '@/components/EventView';
 import Header from '@/components/layout/Header';
 import ViewToggle from '@/components/layout/ViewToggle';
 import { useActivities } from '@/hooks/useActivities';
+import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 type ViewMode = 'list' | 'map' | 'events';
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { filteredActivities } = useActivities();
+
+  useEffect(() => {
+    const checkUserPreferences = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: preferences } = await supabase
+          .from('user_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!preferences) {
+          setShowOnboarding(true);
+        }
+      }
+    };
+
+    checkUserPreferences();
+  }, []);
 
   const renderContent = () => {
     switch (viewMode) {
@@ -32,6 +55,10 @@ const Index = () => {
           {renderContent()}
         </div>
       </main>
+      <OnboardingDialog 
+        open={showOnboarding} 
+        onOpenChange={setShowOnboarding}
+      />
     </div>
   );
 };

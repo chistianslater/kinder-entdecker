@@ -72,6 +72,41 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_recommendations: {
+        Row: {
+          activity_id: string | null
+          created_at: string | null
+          id: string
+          reason: string | null
+          score: number | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_id?: string | null
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          score?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_id?: string | null
+          created_at?: string | null
+          id?: string
+          reason?: string | null
+          score?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendations_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_profiles: {
         Row: {
           business_name: string
@@ -221,6 +256,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_preferences: {
+        Row: {
+          accessibility_needs: string[] | null
+          child_age_ranges: string[] | null
+          created_at: string | null
+          id: string
+          interests: string[] | null
+          max_distance: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessibility_needs?: string[] | null
+          child_age_ranges?: string[] | null
+          created_at?: string | null
+          id?: string
+          interests?: string[] | null
+          max_distance?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessibility_needs?: string[] | null
+          child_age_ranges?: string[] | null
+          created_at?: string | null
+          id?: string
+          interests?: string[] | null
+          max_distance?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       videos: {
         Row: {
