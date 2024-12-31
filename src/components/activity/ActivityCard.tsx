@@ -1,13 +1,10 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Users, Euro, Clock, Tag, Building2, Check, Calendar } from 'lucide-react';
+import { MapPin, Users, Euro, Tag, Building2, Check } from 'lucide-react';
 import { Activity } from '@/types/activity';
 import WeatherInfo from './WeatherInfo';
 import { Separator } from '@/components/ui/separator';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
 
 interface ActivityCardProps {
   activity: Activity;
@@ -18,22 +15,6 @@ interface ActivityCardProps {
 
 export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: ActivityCardProps) => {
   const imageUrl = activity.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b';
-
-  const { data: events } = useQuery({
-    queryKey: ['events', activity.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('activity_id', activity.id)
-        .gte('start_time', new Date().toISOString())
-        .order('start_time')
-        .limit(3);
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
 
   return (
     <Card 
@@ -91,41 +72,6 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
             <span>{activity.type}</span>
           </div>
         </div>
-
-        {events && events.length > 0 && (
-          <>
-            <Separator className="my-4" />
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Upcoming Events
-              </h4>
-              <div className="space-y-2">
-                {events.map((event) => (
-                  <div 
-                    key={event.id} 
-                    className="bg-accent/5 rounded-lg p-2 text-sm"
-                  >
-                    <div className="font-medium">{event.title}</div>
-                    <div className="text-muted-foreground">
-                      {format(new Date(event.start_time), 'MMM d, h:mm a')}
-                    </div>
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-primary">
-                        {event.price ? `€${event.price}` : 'Free'}
-                      </span>
-                      {event.max_participants && (
-                        <span className="text-muted-foreground text-xs">
-                          Max: {event.max_participants} participants
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
 
         {showClaimButton && !activity.claimed_by && !activity.is_business && (
           <Button
