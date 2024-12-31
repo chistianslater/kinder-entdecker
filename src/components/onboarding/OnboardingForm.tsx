@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,25 +8,24 @@ import { InterestsSection } from './form-sections/InterestsSection';
 import { AgeRangesSection } from './form-sections/AgeRangesSection';
 import { DistanceSection } from './form-sections/DistanceSection';
 import { AccessibilitySection } from './form-sections/AccessibilitySection';
-import { Progress } from '@/components/ui/progress';
-import { Filters } from '../FilterBar';
+import { useForm } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
 
 interface OnboardingFormProps {
-  onComplete: () => void;
-  onFiltersChange: (filters: Filters) => void;
+  onComplete?: () => void;
+  onFiltersChange: (filters: {
+    type?: string;
+    ageRange?: string;
+    distance?: string;
+  }) => void;
 }
 
-const steps = [
-  { id: 'interests', title: 'Interessen', component: InterestsSection },
-  { id: 'ages', title: 'Altersgruppen', component: AgeRangesSection },
-  { id: 'distance', title: 'Entfernung', component: DistanceSection },
-  { id: 'accessibility', title: 'Barrierefreiheit', component: AccessibilitySection },
-];
-
 export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
+  const isDashboard = location.pathname === '/dashboard';
+  
   const form = useForm<OnboardingFormData>({
     defaultValues: {
       interests: [],
@@ -50,13 +48,13 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
 
       toast({
         title: "Empfehlungen erstellt",
-        description: "Wir haben personalisierte Empfehlungen für Sie generiert.",
+        description: "Ihre personalisierten Empfehlungen wurden erstellt.",
       });
     } catch (error) {
       console.error('Error generating recommendations:', error);
       toast({
         title: "Fehler",
-        description: "Empfehlungen konnten nicht generiert werden.",
+        description: "Empfehlungen konnten nicht erstellt werden.",
         variant: "destructive",
       });
     }
@@ -78,7 +76,7 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
       // First check if user preferences already exist
       const { data: existingPrefs, error: fetchError } = await supabase
         .from('user_preferences')
-        .select('id')
+        .select('*')
         .eq('user_id', user.id)
         .single();
 
@@ -87,28 +85,31 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
         throw fetchError;
       }
 
-      const preferencesData = {
-        user_id: user.id,
-        interests: data.interests,
-        child_age_ranges: data.childAgeRanges,
-        max_distance: parseInt(data.maxDistance),
-        accessibility_needs: data.accessibilityNeeds,
-        updated_at: new Date().toISOString(),
-      };
-
       let error;
       if (existingPrefs) {
         // Update existing preferences
         const { error: updateError } = await supabase
           .from('user_preferences')
-          .update(preferencesData)
+          .update({
+            interests: data.interests,
+            child_age_ranges: data.childAgeRanges,
+            max_distance: parseInt(data.maxDistance),
+            accessibility_needs: data.accessibilityNeeds,
+            updated_at: new Date().toISOString(),
+          })
           .eq('user_id', user.id);
         error = updateError;
       } else {
         // Insert new preferences
         const { error: insertError } = await supabase
           .from('user_preferences')
-          .insert([preferencesData]);
+          .insert({
+            user_id: user.id,
+            interests: data.interests,
+            child_age_ranges: data.childAgeRanges,
+            max_distance: parseInt(data.maxDistance),
+            accessibility_needs: data.accessibilityNeeds,
+          });
         error = insertError;
       }
 
@@ -119,21 +120,21 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
 
       // Apply filters based on preferences
       onFiltersChange({
-        type: data.interests[0], // Using first interest as type
-        ageRange: data.childAgeRanges[0], // Using first age range
+        type: data.interests[0],
+        ageRange: data.childAgeRanges[0],
         distance: data.maxDistance,
       });
 
       await generateRecommendations(user.id);
 
       toast({
-        title: "Einstellungen gespeichert",
+        title: "Erfolgreich gespeichert",
         description: "Ihre Präferenzen wurden erfolgreich gespeichert.",
       });
 
-      onComplete();
+      if (onComplete) onComplete();
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error('Error:', error);
       toast({
         title: "Fehler",
         description: "Ihre Präferenzen konnten nicht gespeichert werden.",
@@ -144,55 +145,23 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
     }
   };
 
-  const CurrentStepComponent = steps[currentStep].component;
-  const progress = ((currentStep + 1) / steps.length) * 100;
-
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      form.handleSubmit(onSubmit)();
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-        <div className="space-y-2">
-          <h3 className="text-lg font-medium">
-            Schritt {currentStep + 1}: {steps[currentStep].title}
-          </h3>
-          <Progress value={progress} className="h-2" />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-6">
+          <InterestsSection form={form} />
+          <AgeRangesSection form={form} />
+          <DistanceSection form={form} />
+          <AccessibilitySection form={form} />
         </div>
 
-        <CurrentStepComponent form={form} />
-
-        <div className="flex justify-between space-x-4">
-          {currentStep > 0 && (
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={prevStep}
-              disabled={isSubmitting}
-            >
-              Zurück
-            </Button>
-          )}
-          <Button 
-            type="button" 
-            onClick={nextStep}
-            className={currentStep === 0 ? "w-full" : ""}
-            disabled={isSubmitting}
-          >
-            {currentStep === steps.length - 1 ? "Abschließen" : "Weiter"}
-          </Button>
-        </div>
+        <Button 
+          type="submit" 
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Wird gespeichert..." : "Präferenzen speichern"}
+        </Button>
       </form>
     </Form>
   );
