@@ -26,28 +26,41 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['reviews', activity.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, get the reviews with user_ids
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select(`
           id,
           rating,
           comment,
           created_at,
-          user_id,
-          profiles!user_id (
-            username,
-            avatar_url
-          )
+          user_id
         `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching reviews:', error);
-        throw error;
+      if (reviewsError) {
+        console.error('Error fetching reviews:', reviewsError);
+        throw reviewsError;
       }
 
-      return data as unknown as Review[];
+      // Then, for each review, fetch the associated profile
+      const reviewsWithProfiles = await Promise.all(
+        reviewsData.map(async (review) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('username, avatar_url')
+            .eq('id', review.user_id)
+            .maybeSingle();
+
+          return {
+            ...review,
+            profiles: profileData
+          };
+        })
+      );
+
+      return reviewsWithProfiles as Review[];
     },
   });
 
