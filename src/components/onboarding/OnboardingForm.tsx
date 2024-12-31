@@ -10,9 +10,11 @@ import { AgeRangesSection } from './form-sections/AgeRangesSection';
 import { DistanceSection } from './form-sections/DistanceSection';
 import { AccessibilitySection } from './form-sections/AccessibilitySection';
 import { Progress } from '@/components/ui/progress';
+import { Filters } from '../FilterBar';
 
 interface OnboardingFormProps {
   onComplete: () => void;
+  onFiltersChange: (filters: Filters) => void;
 }
 
 const steps = [
@@ -22,7 +24,7 @@ const steps = [
   { id: 'accessibility', title: 'Barrierefreiheit', component: AccessibilitySection },
 ];
 
-export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
+export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
   const form = useForm<OnboardingFormData>({
@@ -73,6 +75,13 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
         });
 
       if (error) throw error;
+
+      // Apply filters based on preferences
+      onFiltersChange({
+        type: data.interests[0], // Using first interest as type
+        ageRange: data.childAgeRanges[0], // Using first age range
+        distance: data.maxDistance,
+      });
 
       await generateRecommendations(user.id);
 
