@@ -91,9 +91,9 @@ export const useFilteredActivities = (activities: Activity[]) => {
             case 'low':
               return maxPrice <= 10;
             case 'medium':
-              return minPrice > 10 && maxPrice <= 30;
+              return minPrice >= 10 && maxPrice <= 30;
             case 'high':
-              return minPrice > 30;
+              return minPrice >= 30; // Changed this line to check if minimum price is >= 30€
             default:
               return true;
           }
