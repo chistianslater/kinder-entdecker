@@ -5,9 +5,10 @@ import { PriceFilter } from './filters/PriceFilter';
 import { CategoryFilter } from './filters/CategoryFilter';
 import { DistanceFilter } from './filters/DistanceFilter';
 import { Button } from '@/components/ui/button';
-import { Heart } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export type Filters = {
   type?: string;
@@ -24,6 +25,7 @@ interface FilterBarProps {
 const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -63,7 +65,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
 
         toast({
           title: "Präferenzen geladen",
-          description: "Ihre persönlichen TinyTrails wurden geladen.",
+          description: "Ihre persönlichen Einstellungen wurden geladen.",
         });
       }
     } catch (error) {
@@ -84,8 +86,8 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           className="flex items-center gap-2 min-w-[140px] bg-white hover:bg-secondary/80 border-accent"
           onClick={applyUserPreferences}
         >
-          <Heart className="w-4 h-4" />
-          Mein TinyTrails
+          <Settings className="w-4 h-4" />
+          Für Uns
         </Button>
         <DistanceFilter
           value={filters.distance}
