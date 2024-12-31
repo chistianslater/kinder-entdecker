@@ -51,7 +51,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
             .from('profiles')
             .select('username, avatar_url')
             .eq('id', review.user_id)
-            .single();
+            .maybeSingle();
 
           return {
             ...review,
