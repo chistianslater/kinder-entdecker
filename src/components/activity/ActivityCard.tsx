@@ -19,8 +19,8 @@ interface ActivityCardProps {
 export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: ActivityCardProps) => {
   const imageUrl = activity.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b';
 
-  const { data: nextEvent } = useQuery({
-    queryKey: ['next-event', activity.id],
+  const { data: events } = useQuery({
+    queryKey: ['events', activity.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
@@ -28,10 +28,10 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
         .eq('activity_id', activity.id)
         .gte('start_time', new Date().toISOString())
         .order('start_time')
-        .limit(1);
+        .limit(3);
 
       if (error) throw error;
-      return data?.[0] || null;
+      return data || [];
     },
   });
 
@@ -41,19 +41,16 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
       onClick={() => onSelect(activity)}
     >
       <div className="w-full h-64 relative">
-        {/* Image */}
         <img
           src={imageUrl}
           alt={activity.title}
           className="w-full h-full object-cover"
         />
         
-        {/* Weather Overlay - Top Right */}
         <div className="absolute top-2 right-2 bg-white/90 rounded-lg px-2 py-1">
           <WeatherInfo location={activity.location} />
         </div>
 
-        {/* Badges Overlay - Bottom */}
         <div className="absolute bottom-4 left-4 flex gap-2">
           {activity.is_business && (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-white/90 text-[#94A684]">
@@ -95,12 +92,37 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
           </div>
         </div>
 
-        {nextEvent && (
+        {events && events.length > 0 && (
           <>
             <Separator className="my-4" />
-            <div className="flex items-center gap-2 text-sm text-primary">
-              <Calendar className="w-4 h-4" />
-              <span>Next event: {format(new Date(nextEvent.start_time), 'MMM d, h:mm a')}</span>
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Upcoming Events
+              </h4>
+              <div className="space-y-2">
+                {events.map((event) => (
+                  <div 
+                    key={event.id} 
+                    className="bg-accent/5 rounded-lg p-2 text-sm"
+                  >
+                    <div className="font-medium">{event.title}</div>
+                    <div className="text-muted-foreground">
+                      {format(new Date(event.start_time), 'MMM d, h:mm a')}
+                    </div>
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="text-primary">
+                        {event.price ? `€${event.price}` : 'Free'}
+                      </span>
+                      {event.max_participants && (
+                        <span className="text-muted-foreground text-xs">
+                          Max: {event.max_participants} participants
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         )}
