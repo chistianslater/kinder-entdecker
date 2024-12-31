@@ -26,29 +26,38 @@ export const useFilteredActivities = (activities: Activity[]) => {
 
       // Filter by age range
       if (filters.ageRange && filters.ageRange !== 'all') {
+        console.log('Filtering by age range:', filters.ageRange);
         result = result.filter(activity => {
           if (!activity.age_range) return false;
           
           // Handle "Alle Altersgruppen" as a special case
-          if (activity.age_range === 'Alle Altersgruppen') return true;
+          if (activity.age_range.toLowerCase().includes('alle')) return true;
           
-          // Extract numbers from age ranges for comparison
-          const [activityMin, activityMax] = activity.age_range
-            .split('-')
-            .map(num => parseInt(num.replace(' Jahre', '')));
-          const [filterMin, filterMax] = filters.ageRange
-            .split('-')
-            .map(num => parseInt(num));
+          // Extract numbers from the filter range (e.g., "3-5" -> [3, 5])
+          const [filterMin, filterMax] = filters.ageRange.split('-').map(Number);
           
-          return (
-            !isNaN(activityMin) && 
-            !isNaN(activityMax) && 
-            !isNaN(filterMin) && 
-            !isNaN(filterMax) &&
-            activityMin <= filterMax && 
-            activityMax >= filterMin
-          );
+          // Extract numbers from activity age range
+          const activityAgeMatch = activity.age_range.match(/\d+/g);
+          if (!activityAgeMatch) return false;
+          
+          // If activity has a single number (e.g., "ab 3 Jahre"), treat it as minimum age
+          if (activityAgeMatch.length === 1) {
+            const activityAge = Number(activityAgeMatch[0]);
+            return activityAge >= filterMin && activityAge <= filterMax;
+          }
+          
+          // If activity has a range (e.g., "3-5 Jahre"), check for overlap
+          if (activityAgeMatch.length >= 2) {
+            const activityMin = Number(activityAgeMatch[0]);
+            const activityMax = Number(activityAgeMatch[1]);
+            
+            // Check if ranges overlap
+            return !(activityMax < filterMin || activityMin > filterMax);
+          }
+          
+          return false;
         });
+        console.log('After age filter:', result.length);
       }
 
       // Filter by price range
@@ -60,7 +69,8 @@ export const useFilteredActivities = (activities: Activity[]) => {
           console.log(`Checking price for ${activity.title}:`, price);
           
           const isFree = price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
-          const priceNumber = parseInt(price.match(/\d+/)?.[0] || '0');
+          const priceMatch = price.match(/\d+/);
+          const priceNumber = priceMatch ? parseInt(priceMatch[0]) : 0;
           
           switch (filters.priceRange) {
             case 'free':
