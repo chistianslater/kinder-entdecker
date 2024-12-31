@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import ActivityList from '@/components/ActivityList';
 import { Button } from '@/components/ui/button';
-import { TreePine, Users, MapPin, Footprints, List, Map as MapIcon } from 'lucide-react';
+import { TreePine, Users, MapPin, Footprints, List, Map as MapIcon, Calendar } from 'lucide-react';
 import Map from '@/components/Map';
+import EventView from '@/components/EventView';
 import { useActivities } from '@/hooks/useActivities';
 
-type ViewMode = 'list' | 'map';
+type ViewMode = 'list' | 'map' | 'events';
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -88,12 +89,22 @@ const Index = () => {
               <MapIcon className="w-4 h-4" />
               Karte
             </Button>
+            <Button
+              variant={viewMode === 'events' ? 'default' : 'outline'}
+              onClick={() => setViewMode('events')}
+              className="flex items-center gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              Events
+            </Button>
           </div>
         </div>
 
         <div className="space-y-8">
           {viewMode === 'map' ? (
             <Map activities={filteredActivities} />
+          ) : viewMode === 'events' ? (
+            <EventView />
           ) : (
             <ActivityList />
           )}
