@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
 import { usePreferences } from '@/hooks/usePreferences';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PreferencesButton } from './filters/PreferencesButton';
-import { MobileFilterButton } from './filters/MobileFilterButton';
-import { DesktopFilters } from './filters/DesktopFilters';
-import { MobileFilterDrawer } from './filters/MobileFilterDrawer';
+import { FilterDialog } from './filters/FilterDialog';
+import { Button } from './ui/button';
+import { Filter } from 'lucide-react';
+import { Badge } from './ui/badge';
 
 export interface Filters {
   type?: string;
@@ -27,12 +27,11 @@ interface FilterBarProps {
 const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
   const [isPreferencesActive, setIsPreferencesActive] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showFilterDialog, setShowFilterDialog] = useState(false);
   const { applyUserPreferences } = usePreferences({ 
     onFiltersChange, 
     setFilters 
   });
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (filters.distance && filters.distance !== 'all' && !filters.userLocation) {
@@ -82,36 +81,32 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
 
   return (
     <div className="bg-secondary/10 rounded-2xl p-4 mb-6">
-      <div className="flex items-center gap-3 w-full">
-        <div className="flex-shrink-0">
-          <PreferencesButton 
-            isActive={isPreferencesActive}
-            onClick={handlePreferencesClick}
-          />
-        </div>
-
-        {isMobile ? (
-          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-            <DrawerTrigger asChild>
-              <div onClick={() => setIsDrawerOpen(true)}>
-                <MobileFilterButton activeFiltersCount={getActiveFiltersCount()} />
-              </div>
-            </DrawerTrigger>
-            <MobileFilterDrawer 
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onClose={() => setIsDrawerOpen(false)}
-            />
-          </Drawer>
-        ) : (
-          <div className="flex-grow">
-            <DesktopFilters 
-              filters={filters}
-              onFilterChange={handleFilterChange}
-            />
-          </div>
-        )}
+      <div className="flex items-center gap-3">
+        <PreferencesButton 
+          isActive={isPreferencesActive}
+          onClick={handlePreferencesClick}
+        />
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 bg-white hover:bg-secondary/80 border-accent"
+          onClick={() => setShowFilterDialog(true)}
+        >
+          <Filter className="h-4 w-4" />
+          <span>Filter</span>
+          {getActiveFiltersCount() > 0 && (
+            <Badge variant="primary" className="ml-2">
+              {getActiveFiltersCount()}
+            </Badge>
+          )}
+        </Button>
       </div>
+
+      <FilterDialog
+        open={showFilterDialog}
+        onOpenChange={setShowFilterDialog}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+      />
     </div>
   );
 };
