@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapPin, Clock, Euro, Users, Tag, Navigation, Camera, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Activity } from '@/types/activity';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Carousel,
   CarouselContent,
@@ -31,19 +32,78 @@ interface ActivityDetailsProps {
   activity: Activity;
 }
 
+interface Photo {
+  id: string;
+  image_url: string;
+  caption: string;
+  user_id: string;
+}
+
 export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
+  const [photos, setPhotos] = useState<Photo[]>([]);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      const { data, error } = await supabase
+        .from('photos')
+        .select('*')
+        .eq('activity_id', activity.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching photos:', error);
+        return;
+      }
+
+      if (data) {
+        // Get public URLs for each photo
+        const photosWithUrls = await Promise.all(data.map(async (photo) => {
+          const { data: publicUrl } = supabase
+            .storage
+            .from('activity-photos')
+            .getPublicUrl(photo.image_url);
+          
+          return {
+            ...photo,
+            image_url: publicUrl.publicUrl
+          };
+        }));
+        setPhotos(photosWithUrls);
+      }
+    };
+
+    fetchPhotos();
+  }, [activity.id]);
+
   const handleNavigate = () => {
     const encodedAddress = encodeURIComponent(activity.location);
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   };
 
-  // Generate an array of placeholder images with metadata
-  const galleryImages = Array(6).fill(null).map((_, index) => ({
-    url: index === 0 && activity.image_url ? activity.image_url : getRandomPlaceholder(),
-    isOwner: index === 0, // First image is always from owner
-    photographer: index === 0 ? 'Owner' : `User ${index}`,
-    caption: index === 0 ? 'Featured Image' : `Community Photo ${index}`
-  }));
+  // Combine activity's main image with uploaded photos
+  const galleryImages = [
+    // Add main activity image if it exists
+    ...(activity.image_url ? [{
+      url: activity.image_url,
+      isOwner: true,
+      photographer: 'Owner',
+      caption: 'Featured Image'
+    }] : []),
+    // Add uploaded photos
+    ...photos.map(photo => ({
+      url: photo.image_url,
+      isOwner: false,
+      photographer: 'Community Member',
+      caption: photo.caption || 'Community Photo'
+    })),
+    // Add placeholder images only if there are no real images
+    ...(activity.image_url || photos.length > 0 ? [] : Array(6).fill(null).map((_, index) => ({
+      url: getRandomPlaceholder(),
+      isOwner: false,
+      photographer: `User ${index}`,
+      caption: `Community Photo ${index}`
+    })))
+  ];
 
   return (
     <div className="space-y-8">
