@@ -26,7 +26,8 @@ export const AccountAvatar = ({ avatarUrl, onAvatarUpdate }: AccountAvatarProps)
       setUploading(true);
 
       const fileExt = file.name.split('.').pop();
-      const filePath = `${user.id}-${Math.random()}.${fileExt}`;
+      // Create a folder structure with user ID as the first folder
+      const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
 
       // Upload the file to storage
       const { error: uploadError } = await supabase.storage
