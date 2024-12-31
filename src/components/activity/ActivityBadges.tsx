@@ -1,6 +1,7 @@
 import React from 'react';
-import { Building2, Check } from 'lucide-react';
+import { Building2, CheckCircle2 } from 'lucide-react';
 import { Activity } from '@/types/activity';
+import { Badge } from "@/components/ui/badge";
 
 interface ActivityBadgesProps {
   activity: Activity;
@@ -11,16 +12,16 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
   return (
     <div className={`flex items-center gap-2 ${className || ''}`}>
       {activity.is_business && (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-          <Building2 className="w-4 h-4 mr-1" />
+        <Badge variant="secondary" className="flex items-center gap-1">
+          <Building2 className="w-4 h-4" />
           Unternehmensbeitrag
-        </span>
+        </Badge>
       )}
       {activity.is_verified && (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-          <Check className="w-4 h-4 mr-1" />
-          Autorisiert
-        </span>
+        <Badge variant="success" className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200">
+          <CheckCircle2 className="w-4 h-4" />
+          Verifiziert
+        </Badge>
       )}
     </div>
   );
