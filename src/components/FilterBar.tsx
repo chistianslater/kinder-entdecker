@@ -81,8 +81,8 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   return (
-    <div className="bg-white shadow-soft rounded-2xl p-4 mb-6">
-      <div className="flex flex-wrap gap-2 items-start justify-start">
+    <div className="bg-secondary/10 rounded-2xl p-4 mb-6">
+      <div className="flex flex-wrap gap-3 items-start justify-start">
         <div className="flex-shrink-0">
           <PreferencesButton 
             isActive={isPreferencesActive}
