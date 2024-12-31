@@ -1,13 +1,13 @@
 import React from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
-import { X } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Activity } from '@/types/activity';
-import { Button } from '@/components/ui/button';
-import { ActivityReviews } from './activity/ActivityReviews';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ActivityBadges } from './activity/ActivityBadges';
 import { ActivityDetails } from './activity/ActivityDetails';
+import { ActivityBadges } from './activity/ActivityBadges';
 import { ActivityLinks } from './activity/ActivityLinks';
+import { ActivityReviews } from './activity/ActivityReviews';
+import { MediaUpload } from './activity/MediaUpload';
+import { Separator } from './ui/separator';
+import { EventCalendar } from './EventCalendar';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -19,71 +19,62 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
   if (!activity) return null;
 
   const handleNavigate = () => {
-    try {
-      const encodedAddress = encodeURIComponent(activity.location);
-      const navigationUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-      window.open(navigationUrl, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
+    const encodedAddress = encodeURIComponent(activity.location);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent>
-        <ScrollArea className="h-[95vh]">
-          <div className="container max-w-2xl mx-auto">
-            <DrawerHeader className="text-left relative">
-              <DrawerTitle className="text-2xl font-bold text-primary pr-12">{activity.title}</DrawerTitle>
-              <DrawerClose className="absolute right-4 top-4">
-                <Button variant="ghost" size="icon">
-                  <X className="h-4 w-4" />
-                </Button>
-              </DrawerClose>
-            </DrawerHeader>
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent className="w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="text-2xl font-bold text-primary">{activity.title}</SheetTitle>
+        </SheetHeader>
 
-            <div className="px-4 pb-8 space-y-6">
-              {activity.image_url && (
-                <div className="relative h-64 rounded-xl overflow-hidden">
-                  <img
-                    src={activity.image_url}
-                    alt={activity.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
-              )}
+        <div className="mt-6">
+          <img
+            src={activity.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b'}
+            alt={activity.title}
+            className="w-full h-64 object-cover rounded-xl"
+          />
+        </div>
 
-              <ActivityBadges 
-                isBusiness={activity.is_business} 
-                isVerified={activity.is_verified} 
-              />
+        <ActivityBadges activity={activity} className="mt-4" />
 
-              {activity.description && (
-                <p className="text-muted-foreground leading-relaxed">{activity.description}</p>
-              )}
+        <div className="mt-6">
+          <p className="text-gray-600">{activity.description}</p>
+        </div>
 
-              <ActivityDetails
-                location={activity.location}
-                openingHours={activity.opening_hours}
-                priceRange={activity.price_range}
-                ageRange={activity.age_range}
-                type={activity.type}
-                onNavigate={handleNavigate}
-              />
+        <Separator className="my-6" />
 
-              <ActivityLinks
-                websiteUrl={activity.website_url}
-                ticketUrl={activity.ticket_url}
-              />
+        <ActivityDetails
+          location={activity.location}
+          openingHours={activity.opening_hours || 'Not specified'}
+          priceRange={activity.price_range || 'Not specified'}
+          ageRange={activity.age_range || 'Not specified'}
+          type={activity.type}
+          onNavigate={handleNavigate}
+        />
 
-              <div className="pt-6 border-t">
-                <ActivityReviews activity={activity} />
-              </div>
-            </div>
-          </div>
-        </ScrollArea>
-      </DrawerContent>
-    </Drawer>
+        <Separator className="my-6" />
+
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-primary">Events</h3>
+          <EventCalendar activityId={activity.id} />
+        </div>
+
+        <Separator className="my-6" />
+
+        <ActivityLinks activity={activity} />
+
+        <Separator className="my-6" />
+
+        <ActivityReviews activityId={activity.id} />
+
+        <Separator className="my-6" />
+
+        <MediaUpload activityId={activity.id} />
+      </SheetContent>
+    </Sheet>
   );
 };
 

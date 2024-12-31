@@ -105,6 +105,53 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          activity_id: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_time: string
+          id: string
+          max_participants: number | null
+          price: number | null
+          start_time: string
+          title: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_time: string
+          id?: string
+          max_participants?: number | null
+          price?: number | null
+          start_time: string
+          title: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_time?: string
+          id?: string
+          max_participants?: number | null
+          price?: number | null
+          start_time?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photos: {
         Row: {
           activity_id: string
