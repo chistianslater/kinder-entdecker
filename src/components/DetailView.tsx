@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Activity } from '@/types/activity';
 import { ActivityDetails } from './activity/ActivityDetails';
@@ -8,9 +8,10 @@ import { ActivityReviews } from './activity/ActivityReviews';
 import { MediaUpload } from './activity/MediaUpload';
 import { Separator } from './ui/separator';
 import { format } from 'date-fns';
-import { Calendar, Users, Euro } from 'lucide-react';
+import { Calendar, Users, Euro, ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from './ui/button';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -19,10 +20,12 @@ interface DetailViewProps {
 }
 
 const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
+  const [limit, setLimit] = useState(5);
+  
   if (!activity) return null;
 
   const { data: events } = useQuery({
-    queryKey: ['activity-events', activity.id],
+    queryKey: ['activity-events', activity.id, limit],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
@@ -30,12 +33,16 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
         .eq('activity_id', activity.id)
         .gte('start_time', new Date().toISOString())
         .order('start_time')
-        .limit(5);
+        .limit(limit);
 
       if (error) throw error;
       return data || [];
     },
   });
+
+  const handleLoadMore = () => {
+    setLimit(prevLimit => prevLimit + 5);
+  };
 
   const handleNavigate = () => {
     const encodedAddress = encodeURIComponent(activity.location);
@@ -83,33 +90,45 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
           </h3>
           
           {events && events.length > 0 ? (
-            <div className="space-y-3">
-              {events.map((event) => (
-                <div 
-                  key={event.id}
-                  className="bg-accent/10 rounded-lg p-4 space-y-2"
-                >
-                  <h4 className="font-medium">{event.title}</h4>
-                  <p className="text-sm text-muted-foreground">{event.description}</p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {format(new Date(event.start_time), 'MMM d, h:mm a')}
-                    </span>
-                    {event.max_participants && (
+            <>
+              <div className="space-y-3">
+                {events.map((event) => (
+                  <div 
+                    key={event.id}
+                    className="bg-accent/10 rounded-lg p-4 space-y-2"
+                  >
+                    <h4 className="font-medium">{event.title}</h4>
+                    <p className="text-sm text-muted-foreground">{event.description}</p>
+                    <div className="flex items-center gap-4 text-sm">
                       <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        Max {event.max_participants} participants
+                        <Calendar className="w-4 h-4" />
+                        {format(new Date(event.start_time), 'MMM d, h:mm a')}
                       </span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Euro className="w-4 h-4" />
-                      {event.price ? `€${event.price}` : 'Free'}
-                    </span>
+                      {event.max_participants && (
+                        <span className="flex items-center gap-1">
+                          <Users className="w-4 h-4" />
+                          Max {event.max_participants} participants
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Euro className="w-4 h-4" />
+                        {event.price ? `€${event.price}` : 'Free'}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {events.length >= limit && (
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={handleLoadMore}
+                >
+                  <ChevronDown className="w-4 h-4 mr-2" />
+                  Load More Events
+                </Button>
+              )}
+            </>
           ) : (
             <p className="text-muted-foreground text-sm">No upcoming events scheduled</p>
           )}
