@@ -16,6 +16,7 @@ const ActivityList = () => {
   const { userBusinessProfile } = useBusinessProfile();
   const { 
     filteredActivities, 
+    activities,
     loading, 
     handleFiltersChange,
     fetchActivities 
@@ -50,11 +51,14 @@ const ActivityList = () => {
     return <LoadingState />;
   }
 
+  // Show EmptyState if we have activities but none match the filters
+  const shouldShowEmptyState = activities.length > 0 && filteredActivities.length === 0;
+
   return (
     <div className="space-y-4 p-4">
       <FilterBar onFiltersChange={handleFiltersChange} />
       
-      {filteredActivities.length === 0 ? (
+      {shouldShowEmptyState ? (
         <EmptyState />
       ) : (
         <ActivityListContent

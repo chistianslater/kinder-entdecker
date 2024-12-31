@@ -48,6 +48,7 @@ export const useActivities = () => {
   }, [data]);
 
   return {
+    activities,
     filteredActivities: filteredActivities.length > 0 ? filteredActivities : activities,
     loading,
     error,
