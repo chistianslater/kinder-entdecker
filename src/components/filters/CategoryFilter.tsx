@@ -17,15 +17,15 @@ interface CategoryFilterProps {
 export const CategoryFilter = ({ value, onChange }: CategoryFilterProps) => {
   const getDisplayText = (value: string | undefined) => {
     switch (value) {
-      case 'sports':
-        return 'Sport & Bewegung';
-      case 'nature':
+      case 'Natur & Wandern':
         return 'Natur & Wandern';
-      case 'culture':
+      case 'Sport & Bewegung':
+        return 'Sport & Bewegung';
+      case 'Kultur & Museum':
         return 'Kultur & Museum';
-      case 'creative':
+      case 'Kreativ & Basteln':
         return 'Kreativ & Basteln';
-      case 'animals':
+      case 'Tiere & Zoo':
         return 'Tiere & Zoo';
       default:
         return 'Kategorie';
@@ -49,23 +49,23 @@ export const CategoryFilter = ({ value, onChange }: CategoryFilterProps) => {
           onValueChange={onChange}
         >
           <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="sports" id="sports" />
+            <RadioGroupItem value="Sport & Bewegung" id="sports" />
             <Label htmlFor="sports">Sport & Bewegung</Label>
           </div>
           <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="nature" id="nature" />
+            <RadioGroupItem value="Natur & Wandern" id="nature" />
             <Label htmlFor="nature">Natur & Wandern</Label>
           </div>
           <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="culture" id="culture" />
+            <RadioGroupItem value="Kultur & Museum" id="culture" />
             <Label htmlFor="culture">Kultur & Museum</Label>
           </div>
           <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="creative" id="creative" />
+            <RadioGroupItem value="Kreativ & Basteln" id="creative" />
             <Label htmlFor="creative">Kreativ & Basteln</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="animals" id="animals" />
+            <RadioGroupItem value="Tiere & Zoo" id="animals" />
             <Label htmlFor="animals">Tiere & Zoo</Label>
           </div>
         </RadioGroup>

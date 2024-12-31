@@ -6,14 +6,6 @@ export const useFilteredActivities = (activities: Activity[]) => {
   const [filters, setFilters] = useState<Filters>({});
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
 
-  const typeMapping: { [key: string]: string } = {
-    'sports': 'Sport & Bewegung',
-    'nature': 'Natur & Wandern',
-    'culture': 'Kultur & Museum',
-    'creative': 'Kreativ & Basteln',
-    'animals': 'Tiere & Zoo'
-  };
-
   useEffect(() => {
     console.log('Starting filtering with activities:', activities.length);
     console.log('Current filters:', filters);
@@ -21,13 +13,12 @@ export const useFilteredActivities = (activities: Activity[]) => {
     let result = [...activities];
 
     if (Object.keys(filters).length > 0) {
-      // Filter by category (type)
+      // Filter by type
       if (filters.type) {
-        const mappedType = typeMapping[filters.type];
-        console.log('Filtering by type:', mappedType);
+        console.log('Filtering by type:', filters.type);
         result = result.filter(activity => {
-          const match = activity.type === mappedType;
-          console.log(`Activity ${activity.title} type: ${activity.type}, expected type: ${mappedType}, match: ${match}`);
+          const match = activity.type === filters.type;
+          console.log(`Activity ${activity.title} type: ${activity.type}, expected type: ${filters.type}, match: ${match}`);
           return match;
         });
         console.log('After type filter:', result.length);
