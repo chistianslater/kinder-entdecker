@@ -44,7 +44,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return (data || []) as Review[];
+      return data as Review[];
     },
   });
 
