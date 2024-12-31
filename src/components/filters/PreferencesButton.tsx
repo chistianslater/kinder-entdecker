@@ -29,7 +29,7 @@ export const PreferencesButton = ({ isActive, onClick }: PreferencesButtonProps)
       onClick={onClick}
     >
       <span className="flex items-center gap-2">
-        <Heart className="w-4 h-4" />
+        <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
         {!isMobile && "Für Uns"}
       </span>
       <span 
