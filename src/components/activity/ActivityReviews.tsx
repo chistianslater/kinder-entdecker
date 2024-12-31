@@ -29,8 +29,16 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
       const { data, error } = await supabase
         .from('reviews')
         .select(`
-          *,
-          profiles!reviews_user_id_fkey(username, avatar_url)
+          id,
+          activity_id,
+          user_id,
+          rating,
+          comment,
+          created_at,
+          profiles (
+            username,
+            avatar_url
+          )
         `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
