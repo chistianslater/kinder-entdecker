@@ -30,13 +30,13 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
         {activity.is_verified && (
           <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
             <Check className="w-3 h-3" />
-            Verified
+            Autorisiert
           </div>
         )}
         {activity.is_business && (
           <div className="absolute top-2 left-2 bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
             <Building2 className="w-3 h-3" />
-            Business
+            Unternehmensbeitrag
           </div>
         )}
       </div>
