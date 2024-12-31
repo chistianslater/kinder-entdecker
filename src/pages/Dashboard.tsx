@@ -4,10 +4,12 @@ import { PreferencesTab } from '@/components/dashboard/PreferencesTab';
 import { ReviewsTab } from '@/components/dashboard/ReviewsTab';
 import { VisitedPlacesTab } from '@/components/dashboard/VisitedPlacesTab';
 import { AccountTab } from '@/components/dashboard/AccountTab';
+import Header from '@/components/layout/Header';
 
 const Dashboard = () => {
   return (
     <div className="min-h-screen bg-secondary/30">
+      <Header />
       <main className="container mx-auto py-8 px-4">
         <h1 className="text-3xl font-bold mb-6">Mein Dashboard</h1>
         
