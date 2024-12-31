@@ -8,7 +8,7 @@ import { ActivityReviews } from './activity/ActivityReviews';
 import { MediaUpload } from './activity/MediaUpload';
 import { Separator } from './ui/separator';
 import { format } from 'date-fns';
-import { Calendar, Users, Euro, ChevronDown } from 'lucide-react';
+import { Calendar, Users, Euro, ChevronDown, Ticket } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from './ui/button';
@@ -119,6 +119,17 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
                         {event.price ? `€${event.price}` : 'Free'}
                       </span>
                     </div>
+                    {activity.ticket_url && (
+                      <Button 
+                        variant="default" 
+                        size="sm" 
+                        className="mt-2"
+                        onClick={() => window.open(activity.ticket_url, '_blank', 'noopener,noreferrer')}
+                      >
+                        <Ticket className="w-4 h-4 mr-2" />
+                        Book Ticket
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
