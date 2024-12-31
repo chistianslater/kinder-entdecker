@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 interface ActivityCardProps {
   activity: Activity;
   onSelect: (activity: Activity) => void;
-  onClaim?: (activityId: string) => void;
+  onClaim: (activityId: string) => void;
   showClaimButton: boolean;
 }
 
@@ -18,72 +18,77 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
 
   return (
     <Card 
-      className="bg-white hover:shadow-soft transition-all duration-300 cursor-pointer rounded-2xl overflow-hidden border border-accent/10"
+      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
       onClick={() => onSelect(activity)}
     >
-      <div className="w-full h-64 relative">
+      <div className="relative">
         <img
           src={imageUrl}
           alt={activity.title}
-          className="w-full h-full object-cover"
+          className="w-full h-48 object-cover"
         />
-        
-        <div className="absolute top-2 right-2 bg-white/90 rounded-lg px-2 py-1">
-          <WeatherInfo location={activity.location} />
+        {activity.is_verified && (
+          <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+            <Check className="w-3 h-3" />
+            Verified
+          </div>
+        )}
+        {activity.is_business && (
+          <div className="absolute top-2 left-2 bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+            <Building2 className="w-3 h-3" />
+            Business
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 space-y-4">
+        <div>
+          <h3 className="font-semibold text-lg text-primary mb-1">{activity.title}</h3>
+          <p className="text-muted-foreground text-sm line-clamp-2">{activity.description}</p>
         </div>
 
-        <div className="absolute bottom-4 left-4 flex gap-2">
-          {activity.is_business && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-white/90 text-[#94A684]">
-              <Building2 className="w-3 h-3 mr-1" />
-              Business
-            </span>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <MapPin className="w-4 h-4 shrink-0" />
+            <span className="truncate">{activity.location}</span>
+          </div>
+
+          {activity.age_range && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Users className="w-4 h-4 shrink-0" />
+              <span>{activity.age_range}</span>
+            </div>
           )}
-          {activity.is_verified && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-white/90 text-[#94A684]">
-              <Check className="w-3 h-3 mr-1" />
-              Verifiziert
-            </span>
+
+          {activity.price_range && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Euro className="w-4 h-4 shrink-0" />
+              <span>{activity.price_range}</span>
+            </div>
           )}
-        </div>
-      </div>
-      
-      <div className="p-4">
-        <h3 className="text-2xl font-semibold text-primary mb-2">{activity.title}</h3>
-        <p className="text-gray-600 text-sm line-clamp-2 mb-4">{activity.description}</p>
-        
-        <Separator className="my-4" />
-        
-        <div className="grid grid-cols-2 gap-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" />
-            <span>{activity.location}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            <span>{activity.age_range}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Euro className="w-4 h-4" />
-            <span>{activity.price_range}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Tag className="w-4 h-4" />
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Tag className="w-4 h-4 shrink-0" />
             <span>{activity.type}</span>
           </div>
+        </div>
+
+        <Separator />
+
+        <div>
+          <WeatherInfo location={activity.location} />
         </div>
 
         {showClaimButton && !activity.claimed_by && !activity.is_business && (
           <Button
             variant="outline"
+            className="w-full mt-4"
             onClick={(e) => {
               e.stopPropagation();
-              onClaim?.(activity.id);
+              onClaim(activity.id);
             }}
-            className="w-full mt-4 bg-[#E4E4D0] hover:bg-[#AEC3AE] text-[#94A684] border-[#94A684] flex items-center justify-center gap-2"
           >
-            <Building2 className="w-4 h-4" />
-            Als Unternehmen beanspruchen
+            Claim Business
           </Button>
         )}
       </div>
