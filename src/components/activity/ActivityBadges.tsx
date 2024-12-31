@@ -9,8 +9,8 @@ interface ActivityBadgesProps {
 
 export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => {
   return (
-    <div className={`flex items-center justify-between w-full px-2 ${className || ''}`}>
-      <div>
+    <div className={`flex items-center justify-between w-full ${className || ''}`}>
+      <div className="px-4">
         {activity.is_business && (
           <Badge variant="secondary" className="flex items-center gap-1 rounded-md">
             <Building2 className="w-4 h-4" />
@@ -18,7 +18,7 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
           </Badge>
         )}
       </div>
-      <div>
+      <div className="px-4">
         {activity.is_verified && (
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
