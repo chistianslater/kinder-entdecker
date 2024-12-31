@@ -15,11 +15,11 @@ interface Review {
   user: {
     username: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 interface ActivityReviewsProps {
-  activity: Pick<Activity, 'id'>;
+  activity: Activity;
 }
 
 export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
@@ -30,13 +30,13 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         .from('reviews')
         .select(`
           *,
-          user:profiles!reviews_user_id_fkey(username, avatar_url)
+          user:profiles(username, avatar_url)
         `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Review[];
     },
   });
 
