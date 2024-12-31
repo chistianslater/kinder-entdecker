@@ -23,7 +23,7 @@ interface MobileFilterDrawerProps {
 
 export const MobileFilterDrawer = ({ filters, onFilterChange, onClose }: MobileFilterDrawerProps) => {
   return (
-    <DrawerContent>
+    <DrawerContent className="sm:max-w-[540px]">
       <DrawerHeader>
         <DrawerTitle>Filter</DrawerTitle>
       </DrawerHeader>
