@@ -5,11 +5,19 @@ import { AgeFilter } from "./filters/AgeFilter";
 import { TypeFilter } from "./filters/TypeFilter";
 import { PriceFilter } from "./filters/PriceFilter";
 import { DistanceFilter } from "./filters/DistanceFilter";
-import { Heart, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, SlidersHorizontal, Filter } from "lucide-react";
 import { usePreferences } from '@/hooks/usePreferences';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 export interface Filters {
   type?: string;
@@ -37,7 +45,6 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  // Get user location when distance filter is used
   useEffect(() => {
     if (filters.distance && filters.distance !== 'all' && !filters.userLocation) {
       navigator.geolocation.getCurrentPosition(
@@ -80,55 +87,100 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     }
   };
 
+  const getActiveFiltersCount = () => {
+    return Object.values(filters).filter(value => value !== undefined && value !== '').length;
+  };
+
+  const renderFilters = () => (
+    <div className="space-y-4">
+      <CategoryFilter
+        value={filters.type}
+        onChange={(value) => handleFilterChange('type', value)}
+      />
+      <AgeFilter
+        value={filters.ageRange}
+        onChange={(value) => handleFilterChange('ageRange', value)}
+      />
+      <TypeFilter
+        value={filters.activityType}
+        onChange={(value) => handleFilterChange('activityType', value)}
+      />
+      <PriceFilter
+        value={filters.priceRange}
+        onChange={(value) => handleFilterChange('priceRange', value)}
+      />
+      <DistanceFilter
+        value={filters.distance}
+        onChange={(value) => handleFilterChange('distance', value)}
+      />
+    </div>
+  );
+
+  const activeFiltersCount = getActiveFiltersCount();
+
   return (
     <div className="bg-white shadow-soft rounded-2xl p-4 mb-6">
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex gap-2 items-center">
-          <div className="flex-shrink-0">
-            <Button
-              variant={isPreferencesActive ? "default" : "outline"}
-              className={`flex items-center gap-2 min-w-[120px] ${
-                isPreferencesActive 
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                  : "bg-white hover:bg-secondary/80 border-accent"
-              }`}
-              onClick={handlePreferencesClick}
-            >
-              <Heart className="w-4 h-4" />
-              {!isMobile && "Für Uns"}
-              <SlidersHorizontal 
-                className="w-4 h-4 cursor-pointer" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate('/dashboard');
-                }}
-              />
-            </Button>
-          </div>
-
-          <CategoryFilter
-            value={filters.type}
-            onChange={(value) => handleFilterChange('type', value)}
-          />
-          <AgeFilter
-            value={filters.ageRange}
-            onChange={(value) => handleFilterChange('ageRange', value)}
-          />
-          <TypeFilter
-            value={filters.activityType}
-            onChange={(value) => handleFilterChange('activityType', value)}
-          />
-          <PriceFilter
-            value={filters.priceRange}
-            onChange={(value) => handleFilterChange('priceRange', value)}
-          />
-          <DistanceFilter
-            value={filters.distance}
-            onChange={(value) => handleFilterChange('distance', value)}
-          />
+      <div className="flex gap-2 items-center">
+        <div className="flex-shrink-0">
+          <Button
+            variant={isPreferencesActive ? "default" : "outline"}
+            className={`flex items-center gap-2 min-w-[120px] ${
+              isPreferencesActive 
+                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                : "bg-white hover:bg-secondary/80 border-accent"
+            }`}
+            onClick={handlePreferencesClick}
+          >
+            <Heart className="w-4 h-4" />
+            {!isMobile && "Für Uns"}
+            <SlidersHorizontal 
+              className="w-4 h-4 cursor-pointer" 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/dashboard');
+              }}
+            />
+          </Button>
         </div>
-        <ScrollBar orientation="horizontal" className="hidden" />
-      </ScrollArea>
+
+        {isMobile ? (
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="flex-1 flex items-center justify-between bg-white hover:bg-secondary/80 border-accent"
+              >
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>Filter</span>
+                </div>
+                {activeFiltersCount > 0 && (
+                  <span className="bg-primary text-white px-2 py-0.5 rounded-full text-sm">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Filter</DrawerTitle>
+              </DrawerHeader>
+              <div className="p-4">
+                {renderFilters()}
+              </div>
+              <DrawerFooter>
+                <DrawerClose asChild>
+                  <Button variant="outline">Schließen</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        ) : (
+          <div className="flex gap-2">
+            {renderFilters()}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Label } from "@/components/ui/label";
 
 interface AgeFilterProps {
   value?: string;
@@ -18,21 +19,24 @@ export const AgeFilter = ({ value, onChange }: AgeFilterProps) => {
   const isMobile = useIsMobile();
   
   return (
-    <Select
-      value={value}
-      onValueChange={onChange}
-    >
-      <SelectTrigger className="bg-white hover:bg-secondary/80 border-accent rounded-xl min-w-[100px] md:min-w-[140px]">
-        <Baby className="w-4 h-4 mr-2" />
-        <SelectValue placeholder={isMobile ? "Alter" : "Altersgruppe"} />
-      </SelectTrigger>
-      <SelectContent className="bg-white border border-accent shadow-md">
-        <SelectItem value="0-2">0-2 Jahre</SelectItem>
-        <SelectItem value="3-5">3-5 Jahre</SelectItem>
-        <SelectItem value="6-8">6-8 Jahre</SelectItem>
-        <SelectItem value="9-12">9-12 Jahre</SelectItem>
-        <SelectItem value="all">Alle Alter</SelectItem>
-      </SelectContent>
-    </Select>
+    <div className={isMobile ? "space-y-3" : ""}>
+      {isMobile && <Label className="text-base">Altersgruppe</Label>}
+      <Select
+        value={value}
+        onValueChange={onChange}
+      >
+        <SelectTrigger className={`bg-white hover:bg-secondary/80 border-accent rounded-xl ${isMobile ? 'w-full' : 'min-w-[100px] md:min-w-[140px]'}`}>
+          <Baby className="w-4 h-4 mr-2" />
+          <SelectValue placeholder={isMobile ? "Wähle Alter" : "Altersgruppe"} />
+        </SelectTrigger>
+        <SelectContent className="bg-white border border-accent shadow-md">
+          <SelectItem value="0-2">0-2 Jahre</SelectItem>
+          <SelectItem value="3-5">3-5 Jahre</SelectItem>
+          <SelectItem value="6-8">6-8 Jahre</SelectItem>
+          <SelectItem value="9-12">9-12 Jahre</SelectItem>
+          <SelectItem value="all">Alle Alter</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
