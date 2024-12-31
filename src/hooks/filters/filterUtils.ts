@@ -3,6 +3,8 @@ import { Filters } from '@/components/FilterBar';
 
 export const filterByType = (activities: Activity[], type?: string) => {
   if (!type) return activities;
+  console.log('Filtering by type:', type);
+  console.log('Available types:', activities.map(a => a.type));
   return activities.filter(activity => 
     activity.type.toLowerCase() === type.toLowerCase()
   );
@@ -10,30 +12,40 @@ export const filterByType = (activities: Activity[], type?: string) => {
 
 export const filterByAgeRange = (activities: Activity[], ageRange?: string) => {
   if (!ageRange || ageRange === 'all') return activities;
+  console.log('Filtering by age range:', ageRange);
+  console.log('Available age ranges:', activities.map(a => a.age_range));
   return activities.filter(activity => activity.age_range === ageRange);
 };
 
 export const filterByActivityType = (activities: Activity[], activityType?: string) => {
   if (!activityType || activityType === 'both') return activities;
+  console.log('Filtering by activity type:', activityType);
   return activities.filter(activity => {
-    // Implement indoor/outdoor filtering logic here
-    return activity.type.toLowerCase().includes(activityType.toLowerCase());
+    if (!activity.type) return false;
+    const type = activity.type.toLowerCase();
+    const searchType = activityType.toLowerCase();
+    return type === searchType || type.includes(searchType);
   });
 };
 
 export const filterByPrice = (activities: Activity[], priceRange?: string) => {
   if (!priceRange || priceRange === 'all') return activities;
+  console.log('Filtering by price range:', priceRange);
+  console.log('Available price ranges:', activities.map(a => a.price_range));
   
   return activities.filter(activity => {
-    switch (priceRange) {
+    if (!activity.price_range) return false;
+    const price = activity.price_range.toLowerCase();
+    
+    switch (priceRange.toLowerCase()) {
       case 'free':
-        return activity.price_range === 'free' || activity.price_range === 'kostenlos';
+        return price === 'free' || price === 'kostenlos';
       case 'low':
-        return activity.price_range === 'low' || activity.price_range?.includes('bis 10€');
+        return price === 'low' || price.includes('bis 10€');
       case 'medium':
-        return activity.price_range === 'medium' || activity.price_range?.includes('10-30€');
+        return price === 'medium' || price.includes('10-30€');
       case 'high':
-        return activity.price_range === 'high' || activity.price_range?.includes('30€+');
+        return price === 'high' || price.includes('30€+');
       default:
         return true;
     }
@@ -44,6 +56,10 @@ export const filterByDistance = (activities: Activity[], filters: Filters) => {
   if (!filters.distance || filters.distance === 'all' || !filters.userLocation) {
     return activities;
   }
+
+  console.log('Filtering by distance:', filters.distance);
+  console.log('User location:', filters.userLocation);
+  console.log('Available coordinates:', activities.map(a => a.coordinates));
 
   const maxDistance = parseInt(filters.distance);
   if (isNaN(maxDistance)) return activities;
