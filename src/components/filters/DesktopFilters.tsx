@@ -14,7 +14,7 @@ interface DesktopFiltersProps {
 
 export const DesktopFilters = ({ filters, onFilterChange }: DesktopFiltersProps) => {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2 flex-1">
       <CategoryFilter
         value={filters.type}
         onChange={(value) => onFilterChange('type', value)}
