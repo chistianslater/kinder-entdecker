@@ -5,10 +5,11 @@ import { UseFormReturn } from 'react-hook-form';
 import { OnboardingFormData } from '../types';
 
 const interests = [
-  { id: 'nature', label: 'Natur (Wälder, Parks)' },
-  { id: 'adventure', label: 'Abenteuer (Spielplätze, Kletterparks)' },
-  { id: 'culture', label: 'Kultur (Museen, Indoor-Spiele)' },
-  { id: 'relaxation', label: 'Entspannung (Picknickplätze)' },
+  { id: 'nature', label: 'Natur & Wandern' },
+  { id: 'sports', label: 'Sport & Bewegung' },
+  { id: 'culture', label: 'Kultur & Museum' },
+  { id: 'creative', label: 'Kreativ & Basteln' },
+  { id: 'animals', label: 'Tiere & Zoo' },
 ];
 
 interface InterestsSectionProps {
@@ -22,7 +23,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
       name="interests"
       render={() => (
         <FormItem>
-          <FormLabel>Welche Art von Ausflügen bevorzugen Sie?</FormLabel>
+          <FormLabel>Welche Art von Aktivitäten interessieren Sie?</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {interests.map((item) => (
               <FormField

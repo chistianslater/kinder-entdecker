@@ -9,7 +9,6 @@ const ageRanges = [
   { id: '3-5', label: '3-5 Jahre' },
   { id: '6-8', label: '6-8 Jahre' },
   { id: '9-12', label: '9-12 Jahre' },
-  { id: '13+', label: '13+ Jahre' },
 ];
 
 interface AgeRangesSectionProps {
@@ -23,7 +22,7 @@ export const AgeRangesSection = ({ form }: AgeRangesSectionProps) => {
       name="childAgeRanges"
       render={() => (
         <FormItem>
-          <FormLabel>Alter der Kinder</FormLabel>
+          <FormLabel>Für welche Altersgruppen suchen Sie Aktivitäten?</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {ageRanges.map((item) => (
               <FormField

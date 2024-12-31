@@ -27,7 +27,7 @@ export const DistanceSection = ({ form }: DistanceSectionProps) => {
               <SelectItem value="10">10 km</SelectItem>
               <SelectItem value="20">20 km</SelectItem>
               <SelectItem value="50">50 km</SelectItem>
-              <SelectItem value="0">Keine Begrenzung</SelectItem>
+              <SelectItem value="all">Alle anzeigen</SelectItem>
             </SelectContent>
           </Select>
         </FormItem>
