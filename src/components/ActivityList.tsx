@@ -52,19 +52,23 @@ const ActivityList = () => {
   }
 
   return (
-    <div className="space-y-4 p-4">
-      <FilterBar onFiltersChange={handleFiltersChange} />
+    <div className="relative">
+      <div className="sticky top-0 z-10 bg-secondary/30 pt-4 pb-2 -mx-4 px-4 shadow-sm">
+        <FilterBar onFiltersChange={handleFiltersChange} />
+      </div>
       
-      {filteredActivities.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <ActivityListContent
-          activities={filteredActivities}
-          onSelect={setSelectedActivity}
-          onClaim={handleClaimActivity}
-          showClaimButton={!!userBusinessProfile}
-        />
-      )}
+      <div className="mt-4">
+        {filteredActivities.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <ActivityListContent
+            activities={filteredActivities}
+            onSelect={setSelectedActivity}
+            onClaim={handleClaimActivity}
+            showClaimButton={!!userBusinessProfile}
+          />
+        )}
+      </div>
 
       <DetailView 
         activity={selectedActivity}
