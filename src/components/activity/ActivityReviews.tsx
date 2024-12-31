@@ -1,13 +1,14 @@
 import React from 'react';
-import { Activity } from '@/types/activity';
 import { ReviewForm } from './ReviewForm';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from "@/integrations/supabase/client";
-import { Medal, User } from 'lucide-react';
+import { TreePine, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ActivityReviewsProps {
-  activity: Activity;
+  activity: {
+    id: string;
+  };
 }
 
 interface Review {
@@ -23,102 +24,82 @@ interface Review {
 }
 
 export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
-  const { data: reviews, isLoading } = useQuery({
+  const { data: reviews, isLoading, refetch } = useQuery({
     queryKey: ['reviews', activity.id],
     queryFn: async () => {
-      const { data: reviewsData, error: reviewsError } = await supabase
+      const { data, error } = await supabase
         .from('reviews')
         .select(`
-          id,
-          rating,
-          comment,
-          created_at,
-          user_id
+          *,
+          profiles:user_id (
+            username,
+            avatar_url
+          )
         `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
 
-      if (reviewsError) {
-        console.error('Error fetching reviews:', reviewsError);
-        throw reviewsError;
+      if (error) {
+        throw error;
       }
 
-      const reviewsWithProfiles = await Promise.all(
-        reviewsData.map(async (review) => {
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('id', review.user_id)
-            .maybeSingle();
-
-          if (profileError) {
-            console.error('Error fetching profile:', profileError);
-          }
-
-          return {
-            ...review,
-            profiles: profileData || null
-          };
-        })
-      );
-
-      return reviewsWithProfiles as Review[];
+      return data;
     },
   });
 
-  const renderMedals = (rating: number) => {
+  const renderTrees = (rating: number) => {
     return Array.from({ length: 5 }).map((_, index) => (
-      <Medal
+      <TreePine
         key={index}
-        className={`w-4 h-4 ${
+        className={`w-5 h-5 ${
           index < rating 
             ? 'fill-primary text-primary' 
-            : 'fill-gray-200 text-gray-200'
+            : 'fill-muted text-muted hover:fill-primary/20 hover:text-primary/20'
         }`}
       />
     ));
   };
 
+  if (isLoading) {
+    return <div>Lädt Bewertungen...</div>;
+  }
+
   return (
     <div className="space-y-6">
-      <ReviewForm activity={activity} />
+      <h3 className="text-lg font-semibold">Bewertungen</h3>
       
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold mb-4">Bewertungen</h3>
-        {isLoading ? (
-          <div>Lädt...</div>
-        ) : reviews?.length === 0 ? (
-          <div className="text-muted-foreground">Noch keine Bewertungen</div>
-        ) : (
-          <div className="space-y-4">
-            {reviews?.map((review) => (
-              <div key={review.id} className="border rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar className="h-8 w-8">
-                    {review.profiles?.avatar_url ? (
-                      <AvatarImage src={review.profiles.avatar_url} />
-                    ) : (
-                      <AvatarFallback>
-                        <User className="h-4 w-4" />
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div>
+      <ReviewForm activity={activity} onSuccess={refetch} />
+
+      <div className="space-y-4 mt-6">
+        {reviews?.map((review) => (
+          <div key={review.id} className="bg-accent/10 rounded-lg p-4">
+            <div className="flex items-start gap-4">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={review.profiles?.avatar_url || ''} />
+                <AvatarFallback>
+                  <User className="w-5 h-5" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
                     <div className="font-medium">
                       {review.profiles?.username || 'Anonymer Benutzer'}
                     </div>
-                    <div className="flex items-center gap-1">
-                      {renderMedals(review.rating)}
+                    <div className="flex items-center gap-0.5">
+                      {renderTrees(review.rating)}
                     </div>
                   </div>
                 </div>
                 {review.comment && (
-                  <p className="text-muted-foreground mt-2">{review.comment}</p>
+                  <p className="mt-2 text-muted-foreground">
+                    {review.comment}
+                  </p>
                 )}
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

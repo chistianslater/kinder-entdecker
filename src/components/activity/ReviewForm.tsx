@@ -1,50 +1,61 @@
-import React, { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Medal, MessageSquare } from 'lucide-react';
+import { TreePine, MessageSquare } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 interface ReviewFormProps {
   activity: Activity;
+  onSuccess?: () => void;
 }
 
-export const ReviewForm = ({ activity }: ReviewFormProps) => {
-  const [rating, setRating] = useState<number>(0);
-  const [hoveredRating, setHoveredRating] = useState<number>(0);
+export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile'],
+  const { data: existingReview } = useQuery({
+    queryKey: ['userReview', activity.id],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
       const { data, error } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', user.id)
+        .from('reviews')
+        .select('*')
+        .eq('activity_id', activity.id)
+        .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-
+      if (error) throw error;
       return data;
     },
   });
 
-  const handleSubmitReview = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rating) {
+      toast({
+        title: "Bewertung erforderlich",
+        description: "Bitte gib eine Bewertung ab.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      setIsSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (!user) {
         toast({
-          title: "Fehler",
-          description: "Bitte melde dich an, um eine Bewertung abzugeben.",
+          title: "Nicht eingeloggt",
+          description: "Bitte logge dich ein, um eine Bewertung abzugeben.",
           variant: "destructive",
         });
         return;
@@ -52,22 +63,23 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
 
       const { error } = await supabase
         .from('reviews')
-        .insert({
+        .upsert({
           activity_id: activity.id,
           user_id: user.id,
           rating,
-          comment,
+          comment: comment.trim() || null,
         });
 
       if (error) throw error;
 
       toast({
         title: "Erfolg",
-        description: "Deine Bewertung wurde erfolgreich gespeichert.",
+        description: "Deine Bewertung wurde gespeichert.",
       });
 
-      setRating(0);
       setComment('');
+      setRating(0);
+      onSuccess?.();
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
@@ -75,28 +87,30 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
         description: "Bewertung konnte nicht gespeichert werden.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const renderMedals = () => {
+  const renderTrees = () => {
     return Array.from({ length: 5 }).map((_, index) => {
-      const medalValue = index + 1;
-      const isFilled = (hoveredRating || rating) >= medalValue;
+      const treeValue = index + 1;
+      const isFilled = (hoveredRating || rating) >= treeValue;
       
       return (
         <button
           key={index}
           type="button"
-          onClick={() => setRating(medalValue)}
-          onMouseEnter={() => setHoveredRating(medalValue)}
+          onClick={() => setRating(treeValue)}
+          onMouseEnter={() => setHoveredRating(treeValue)}
           onMouseLeave={() => setHoveredRating(0)}
-          className="p-1 transition-colors"
+          className="p-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
         >
-          <Medal 
+          <TreePine 
             className={`w-6 h-6 transition-colors ${
               isFilled 
                 ? 'fill-primary text-primary' 
-                : 'fill-gray-200 text-gray-200 hover:fill-primary/50 hover:text-primary/50'
+                : 'fill-muted text-muted hover:fill-primary/20 hover:text-primary/20'
             }`}
           />
         </button>
@@ -104,20 +118,24 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
     });
   };
 
+  if (existingReview) {
+    return (
+      <div className="text-sm text-muted-foreground">
+        Du hast diese Aktivität bereits bewertet.
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Bewertung abgeben</h3>
-      {profile?.username ? (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Bewerten als: {profile.username}</span>
-        </div>
-      ) : (
-        <div className="text-sm text-muted-foreground">
-          Setze deinen Benutzernamen in den Account-Einstellungen
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {!rating && (
+        <div className="text-sm text-muted-foreground flex items-center gap-2">
+          <MessageSquare className="w-4 h-4" />
+          Wie würdest du diese Aktivität bewerten?
         </div>
       )}
-      <div className="flex space-x-2">
-        {renderMedals()}
+      <div className="flex space-x-1">
+        {renderTrees()}
       </div>
       <Textarea
         placeholder="Schreibe einen Kommentar..."
@@ -126,13 +144,12 @@ export const ReviewForm = ({ activity }: ReviewFormProps) => {
         className="min-h-[100px]"
       />
       <Button 
-        onClick={handleSubmitReview}
-        disabled={rating === 0}
-        className="flex items-center gap-2"
+        type="submit" 
+        disabled={isSubmitting || !rating}
+        className="w-full"
       >
-        <MessageSquare className="w-4 h-4" />
         Bewertung abschicken
       </Button>
-    </div>
+    </form>
   );
 };
