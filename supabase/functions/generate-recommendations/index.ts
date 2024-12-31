@@ -20,26 +20,42 @@ serve(async (req) => {
     );
 
     const { user_id } = await req.json();
+    console.log(`Generating recommendations for user ${user_id}`);
 
     // Get user preferences
-    const { data: preferences } = await supabaseClient
+    const { data: preferences, error: preferencesError } = await supabaseClient
       .from('user_preferences')
       .select('*')
       .eq('user_id', user_id)
       .single();
 
-    if (!preferences) {
+    if (preferencesError) {
+      console.error('Error fetching preferences:', preferencesError);
       throw new Error('User preferences not found');
     }
 
     // Get all activities
-    const { data: activities } = await supabaseClient
+    const { data: activities, error: activitiesError } = await supabaseClient
       .from('activities')
       .select('*');
 
-    if (!activities) {
+    if (activitiesError) {
+      console.error('Error fetching activities:', activitiesError);
       throw new Error('No activities found');
     }
+
+    // Delete existing recommendations for this user
+    const { error: deleteError } = await supabaseClient
+      .from('ai_recommendations')
+      .delete()
+      .eq('user_id', user_id);
+
+    if (deleteError) {
+      console.error('Error deleting existing recommendations:', deleteError);
+      throw deleteError;
+    }
+
+    console.log(`Deleted existing recommendations for user ${user_id}`);
 
     // Calculate scores for each activity
     const recommendations = activities.map(activity => {
@@ -47,24 +63,24 @@ serve(async (req) => {
       let reasons = [];
 
       // Score based on interests
-      if (preferences.interests.some(interest => 
+      if (preferences.interests?.some(interest => 
         activity.type.toLowerCase().includes(interest.toLowerCase()))) {
         score += 0.3;
         reasons.push(`Matches your interests in ${activity.type}`);
       }
 
       // Score based on age range
-      if (preferences.child_age_ranges.some(range => 
+      if (preferences.child_age_ranges?.some(range => 
         activity.age_range?.includes(range))) {
         score += 0.3;
         reasons.push('Suitable for your children\'s age');
       }
 
       // Score based on accessibility needs
-      const accessibilityMatch = preferences.accessibility_needs.filter(need => 
-        activity.description?.toLowerCase().includes(need.toLowerCase())).length;
+      const accessibilityMatch = preferences.accessibility_needs?.filter(need => 
+        activity.description?.toLowerCase().includes(need.toLowerCase())).length || 0;
       if (accessibilityMatch > 0) {
-        score += 0.2 * (accessibilityMatch / preferences.accessibility_needs.length);
+        score += 0.2 * (accessibilityMatch / (preferences.accessibility_needs?.length || 1));
         reasons.push('Meets accessibility requirements');
       }
 
@@ -76,17 +92,29 @@ serve(async (req) => {
       };
     });
 
-    // Sort recommendations by score
+    // Sort recommendations by score and take top 10
     const topRecommendations = recommendations
       .sort((a, b) => b.score - a.score)
-      .slice(0, 10);
+      .slice(0, 10)
+      .filter(rec => rec.score > 0); // Only include recommendations with a positive score
+
+    if (topRecommendations.length === 0) {
+      console.log('No matching recommendations found');
+      return new Response(
+        JSON.stringify({ success: true, recommendations: [] }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Store recommendations in the database
-    const { error } = await supabaseClient
+    const { error: insertError } = await supabaseClient
       .from('ai_recommendations')
-      .upsert(topRecommendations);
+      .insert(topRecommendations);
 
-    if (error) throw error;
+    if (insertError) {
+      console.error('Error inserting recommendations:', insertError);
+      throw insertError;
+    }
 
     console.log(`Generated ${topRecommendations.length} recommendations for user ${user_id}`);
 
