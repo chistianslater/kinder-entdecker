@@ -1,7 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { TreePine, MessageSquare } from 'lucide-react';
+import { TreePine, MessageSquare, Pencil, X } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
@@ -10,16 +10,22 @@ import { useState } from 'react';
 interface ReviewFormProps {
   activity: Activity;
   onSuccess?: () => void;
+  existingReview?: {
+    id: string;
+    rating: number;
+    comment: string | null;
+  } | null;
+  onCancelEdit?: () => void;
 }
 
-export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
-  const [rating, setRating] = useState(0);
+export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }: ReviewFormProps) => {
+  const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState(existingReview?.comment || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const { data: existingReview } = useQuery({
+  const { data: userReview } = useQuery({
     queryKey: ['userReview', activity.id],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -35,6 +41,7 @@ export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
       if (error) throw error;
       return data;
     },
+    enabled: !existingReview, // Only fetch if we're not in edit mode
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,6 +71,7 @@ export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
       const { error } = await supabase
         .from('reviews')
         .upsert({
+          id: existingReview?.id,
           activity_id: activity.id,
           user_id: user.id,
           rating,
@@ -74,12 +82,17 @@ export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
 
       toast({
         title: "Erfolg",
-        description: "Deine Bewertung wurde gespeichert.",
+        description: existingReview 
+          ? "Deine Bewertung wurde aktualisiert."
+          : "Deine Bewertung wurde gespeichert.",
       });
 
-      setComment('');
-      setRating(0);
+      if (!existingReview) {
+        setComment('');
+        setRating(0);
+      }
       onSuccess?.();
+      onCancelEdit?.();
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
@@ -118,17 +131,13 @@ export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
     });
   };
 
-  if (existingReview) {
-    return (
-      <div className="text-sm text-muted-foreground">
-        Du hast diese Aktivität bereits bewertet.
-      </div>
-    );
+  if (userReview && !existingReview) {
+    return null;
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {!rating && (
+      {!rating && !existingReview && (
         <div className="text-sm text-muted-foreground flex items-center gap-2">
           <MessageSquare className="w-4 h-4" />
           Wie würdest du diese Aktivität bewerten?
@@ -143,13 +152,24 @@ export const ReviewForm = ({ activity, onSuccess }: ReviewFormProps) => {
         onChange={(e) => setComment(e.target.value)}
         className="min-h-[100px]"
       />
-      <Button 
-        type="submit" 
-        disabled={isSubmitting || !rating}
-        className="w-full"
-      >
-        Bewertung abschicken
-      </Button>
+      <div className="flex gap-2">
+        <Button 
+          type="submit" 
+          disabled={isSubmitting || !rating}
+          className="flex-1"
+        >
+          {existingReview ? "Bewertung aktualisieren" : "Bewertung abschicken"}
+        </Button>
+        {existingReview && (
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={onCancelEdit}
+          >
+            Abbrechen
+          </Button>
+        )}
+      </div>
     </form>
   );
 };
