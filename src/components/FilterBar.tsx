@@ -22,6 +22,7 @@ interface FilterBarProps {
 
 const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
+  const [isPreferencesActive, setIsPreferencesActive] = useState(false);
   const { applyUserPreferences } = usePreferences({ onFiltersChange, setFilters });
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
@@ -30,13 +31,29 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     onFiltersChange(newFilters);
   };
 
+  const handlePreferencesClick = () => {
+    if (isPreferencesActive) {
+      // Clear filters if deselecting
+      setFilters({});
+      onFiltersChange({});
+      setIsPreferencesActive(false);
+    } else {
+      applyUserPreferences();
+      setIsPreferencesActive(true);
+    }
+  };
+
   return (
     <div className="bg-white shadow-soft rounded-2xl p-6 mb-6">
       <div className="flex gap-3 overflow-x-auto pb-2">
         <Button
-          variant="outline"
-          className="flex items-center gap-2 min-w-[140px] bg-white hover:bg-secondary/80 border-accent"
-          onClick={applyUserPreferences}
+          variant={isPreferencesActive ? "default" : "outline"}
+          className={`flex items-center gap-2 min-w-[140px] ${
+            isPreferencesActive 
+              ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+              : "bg-white hover:bg-secondary/80 border-accent"
+          }`}
+          onClick={handlePreferencesClick}
         >
           <Heart className="w-4 h-4" />
           Für Uns
