@@ -53,39 +53,32 @@ export const useFilteredActivities = (activities: Activity[]) => {
 
       // Filter by price range
       if (filters.priceRange) {
+        console.log('Filtering by price range:', filters.priceRange);
         result = result.filter(activity => {
           if (!activity.price_range) return false;
           const price = activity.price_range.toLowerCase();
+          console.log(`Checking price for ${activity.title}:`, price);
+          
+          const isFree = price.includes('kostenlos') || price.includes('free') || price === '0€' || price === '0';
+          const priceNumber = parseInt(price.match(/\d+/)?.[0] || '0');
           
           switch (filters.priceRange) {
             case 'free':
-              return price.includes('kostenlos') || price.includes('free') || price === '0€';
+              return isFree;
             case 'low':
-              if (price.includes('kostenlos') || price.includes('free') || price === '0€') return false;
-              return (
-                price.includes('bis 10€') || 
-                (price.includes('€') && 
-                  parseInt(price.match(/\d+/)?.[0] || '999') <= 10)
-              );
+              if (isFree) return false;
+              return priceNumber > 0 && priceNumber <= 10;
             case 'medium':
-              if (price.includes('kostenlos') || price.includes('free') || price === '0€') return false;
-              return (
-                price.includes('10-30€') || 
-                (price.includes('€') && 
-                  parseInt(price.match(/\d+/)?.[0] || '0') > 10 && 
-                  parseInt(price.match(/\d+/)?.[0] || '999') <= 30)
-              );
+              if (isFree) return false;
+              return priceNumber > 10 && priceNumber <= 30;
             case 'high':
-              if (price.includes('kostenlos') || price.includes('free') || price === '0€') return false;
-              return (
-                price.includes('30€+') || 
-                (price.includes('€') && 
-                  parseInt(price.match(/\d+/)?.[0] || '0') > 30)
-              );
+              if (isFree) return false;
+              return priceNumber > 30;
             default:
               return true;
           }
         });
+        console.log('After price filter:', result.length);
       }
 
       // Filter by activity type (indoor/outdoor)
