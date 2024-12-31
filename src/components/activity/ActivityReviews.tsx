@@ -46,7 +46,8 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
         console.error('Error fetching reviews:', error);
         throw error;
       }
-      return data as Review[];
+
+      return data as unknown as Review[];
     },
   });
 
