@@ -29,13 +29,15 @@ export const useActivities = () => {
       }
       return data as Activity[];
     },
-    onError: (error) => {
-      console.error('Error fetching activities:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load activities. Please try again.",
-        variant: "destructive",
-      });
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching activities:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load activities. Please try again.",
+          variant: "destructive",
+        });
+      },
     },
   });
 
