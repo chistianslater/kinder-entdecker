@@ -21,7 +21,7 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full max-w-none overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-[800px] md:max-w-[1000px] lg:max-w-[1200px] overflow-y-auto">
         <SheetHeader className="relative pb-4">
           <SheetTitle className="text-xl font-semibold">
             {activity.title}
