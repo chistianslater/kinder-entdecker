@@ -1,97 +1,92 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MapPin, Users, Euro, Tag, Building2, Check } from 'lucide-react';
 import { Activity } from '@/types/activity';
-import WeatherInfo from './WeatherInfo';
-import { Separator } from '@/components/ui/separator';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Baby, Euro, MapPin, Clock, TreePine } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
 interface ActivityCardProps {
   activity: Activity;
   onSelect: (activity: Activity) => void;
-  onClaim: (activityId: string) => void;
-  showClaimButton: boolean;
+  onClaim?: (activityId: string) => void;
+  showClaimButton?: boolean;
 }
 
-export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: ActivityCardProps) => {
-  const imageUrl = activity.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b';
-
+export const ActivityCard = ({ 
+  activity, 
+  onSelect, 
+  onClaim,
+  showClaimButton = false 
+}: ActivityCardProps) => {
   return (
-    <Card 
-      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={() => onSelect(activity)}
-    >
-      <div className="relative">
-        <img
-          src={imageUrl}
-          alt={activity.title}
-          className="w-full h-48 object-cover"
-        />
-        {activity.is_verified && (
-          <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-            <Check className="w-3 h-3" />
-            Autorisiert
-          </div>
-        )}
-        {activity.is_business && (
-          <div className="absolute top-2 left-2 bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-            <Building2 className="w-3 h-3" />
-            Unternehmensbeitrag
-          </div>
-        )}
-      </div>
-
-      <div className="p-4 space-y-4">
-        <div>
-          <h3 className="font-semibold text-lg text-primary mb-1">{activity.title}</h3>
-          <p className="text-muted-foreground text-sm line-clamp-2">{activity.description}</p>
-        </div>
-
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      <div 
+        className="h-48 bg-cover bg-center cursor-pointer" 
+        style={{ 
+          backgroundImage: activity.image_url 
+            ? `url(${activity.image_url})` 
+            : 'url(/placeholder.svg)' 
+        }}
+        onClick={() => onSelect(activity)}
+      />
+      <CardContent className="p-4">
+        <h3 
+          className="text-lg font-semibold mb-2 cursor-pointer hover:text-primary"
+          onClick={() => onSelect(activity)}
+        >
+          {activity.title}
+        </h3>
+        
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4 shrink-0" />
-            <span className="truncate">{activity.location}</span>
+          {/* Location */}
+          <div className="flex items-center text-sm text-gray-600">
+            <MapPin className="w-4 h-4 mr-2" />
+            {activity.location}
           </div>
 
+          {/* Activity Type */}
+          <div className="flex items-center text-sm text-gray-600">
+            <TreePine className="w-4 h-4 mr-2" />
+            <Badge variant="secondary">{activity.type}</Badge>
+          </div>
+
+          {/* Age Range */}
           {activity.age_range && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="w-4 h-4 shrink-0" />
-              <span>{activity.age_range}</span>
+            <div className="flex items-center text-sm text-gray-600">
+              <Baby className="w-4 h-4 mr-2" />
+              <Badge variant="outline">{activity.age_range} Jahre</Badge>
             </div>
           )}
 
+          {/* Price Range */}
           {activity.price_range && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Euro className="w-4 h-4 shrink-0" />
-              <span>{activity.price_range}</span>
+            <div className="flex items-center text-sm text-gray-600">
+              <Euro className="w-4 h-4 mr-2" />
+              <Badge variant="outline">{activity.price_range}</Badge>
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Tag className="w-4 h-4 shrink-0" />
-            <span>{activity.type}</span>
-          </div>
+          {/* Opening Hours */}
+          {activity.opening_hours && (
+            <div className="flex items-center text-sm text-gray-600">
+              <Clock className="w-4 h-4 mr-2" />
+              {activity.opening_hours}
+            </div>
+          )}
         </div>
+      </CardContent>
 
-        <Separator />
-
-        <div>
-          <WeatherInfo location={activity.location} />
-        </div>
-
-        {showClaimButton && !activity.claimed_by && !activity.is_business && (
-          <Button
-            variant="outline"
-            className="w-full mt-4"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClaim(activity.id);
-            }}
+      <CardFooter className="p-4 pt-0">
+        {showClaimButton && onClaim && (
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => onClaim(activity.id)}
           >
-            Claim Business
+            Als Geschäft beanspruchen
           </Button>
         )}
-      </div>
+      </CardFooter>
     </Card>
   );
 };
