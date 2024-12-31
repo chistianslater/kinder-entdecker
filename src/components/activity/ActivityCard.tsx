@@ -21,15 +21,18 @@ export const ActivityCard = ({
 }: ActivityCardProps) => {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div 
-        className="h-48 bg-cover bg-center cursor-pointer" 
-        style={{ 
-          backgroundImage: activity.image_url 
-            ? `url(${activity.image_url})` 
-            : 'url(/placeholder.svg)' 
-        }}
-        onClick={() => onSelect(activity)}
-      />
+      <div className="relative">
+        <ActivityBadges activity={activity} className="absolute top-2 left-2 z-10" />
+        <div 
+          className="h-48 bg-cover bg-center cursor-pointer" 
+          style={{ 
+            backgroundImage: activity.image_url 
+              ? `url(${activity.image_url})` 
+              : 'url(/placeholder.svg)' 
+          }}
+          onClick={() => onSelect(activity)}
+        />
+      </div>
       <CardContent className="p-4">
         <h3 
           className="text-lg font-semibold mb-2 cursor-pointer hover:text-primary"
@@ -37,8 +40,6 @@ export const ActivityCard = ({
         >
           {activity.title}
         </h3>
-
-        <ActivityBadges activity={activity} className="mb-4" />
         
         <div className="space-y-2">
           {/* Location */}
