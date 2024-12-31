@@ -76,8 +76,10 @@ export const useActivities = () => {
   const handleFiltersChange = (filters: Filters) => {
     let filtered = [...activities];
 
-    if (filters.type && filters.type !== 'both') {
-      filtered = filtered.filter(activity => activity.type === filters.type);
+    if (filters.type) {
+      filtered = filtered.filter(activity => 
+        activity.type.toLowerCase().includes(filters.type?.toLowerCase() || '')
+      );
     }
 
     if (filters.ageRange && filters.ageRange !== 'all') {
@@ -101,10 +103,8 @@ export const useActivities = () => {
       });
     }
 
-    if (filters.category) {
-      filtered = filtered.filter(activity => 
-        activity.type.toLowerCase().includes(filters.category?.toLowerCase() || '')
-      );
+    if (filters.activityType && filters.activityType !== 'both') {
+      filtered = filtered.filter(activity => activity.type === filters.activityType);
     }
 
     // Apply distance filter if user location is available
