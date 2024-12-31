@@ -64,15 +64,15 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
 
         <Separator className="my-6" />
 
-        <ActivityLinks activity={activity} />
+        <ActivityLinks websiteUrl={activity.website_url} ticketUrl={activity.ticket_url} />
 
         <Separator className="my-6" />
 
-        <ActivityReviews activityId={activity.id} />
+        <ActivityReviews activity={activity} />
 
         <Separator className="my-6" />
 
-        <MediaUpload activityId={activity.id} />
+        <MediaUpload activity={activity} />
       </SheetContent>
     </Sheet>
   );

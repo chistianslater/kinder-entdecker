@@ -28,11 +28,10 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
         .eq('activity_id', activity.id)
         .gte('start_time', new Date().toISOString())
         .order('start_time')
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (error) return null;
-      return data;
+      if (error) throw error;
+      return data?.[0] || null;
     },
   });
 
@@ -106,7 +105,6 @@ export const ActivityCard = ({ activity, onSelect, onClaim, showClaimButton }: A
           </>
         )}
 
-        {/* Claim Button */}
         {showClaimButton && !activity.claimed_by && !activity.is_business && (
           <Button
             variant="outline"
