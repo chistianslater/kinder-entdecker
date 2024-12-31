@@ -63,16 +63,41 @@ export const OnboardingForm = ({ onComplete, onFiltersChange }: OnboardingFormPr
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
+      // First check if user preferences already exist
+      const { data: existingPrefs, error: fetchError } = await supabase
         .from('user_preferences')
-        .upsert({
-          user_id: user.id,
-          interests: data.interests,
-          child_age_ranges: data.childAgeRanges,
-          max_distance: parseInt(data.maxDistance),
-          accessibility_needs: data.accessibilityNeeds,
-          updated_at: new Date().toISOString(),
-        });
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows returned
+        throw fetchError;
+      }
+
+      const preferencesData = {
+        user_id: user.id,
+        interests: data.interests,
+        child_age_ranges: data.childAgeRanges,
+        max_distance: parseInt(data.maxDistance),
+        accessibility_needs: data.accessibilityNeeds,
+        updated_at: new Date().toISOString(),
+      };
+
+      let error;
+      if (existingPrefs) {
+        // Update existing preferences
+        const { error: updateError } = await supabase
+          .from('user_preferences')
+          .update(preferencesData)
+          .eq('user_id', user.id);
+        error = updateError;
+      } else {
+        // Insert new preferences
+        const { error: insertError } = await supabase
+          .from('user_preferences')
+          .insert([preferencesData]);
+        error = insertError;
+      }
 
       if (error) throw error;
 
