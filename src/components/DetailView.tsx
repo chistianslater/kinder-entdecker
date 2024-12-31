@@ -5,8 +5,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import { Activity } from '@/types/activity';
 import { ActivityDetails } from './activity/ActivityDetails';
 import { ActivityReviews } from './activity/ActivityReviews';
@@ -23,17 +21,9 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="w-full max-w-none overflow-y-auto">
         <SheetHeader className="relative pb-4">
-          <Button
-            onClick={onClose}
-            variant="outline"
-            size="icon"
-            className="absolute right-4 top-4 h-8 w-8 rounded-full border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          <SheetTitle className="text-xl font-semibold pr-12">
+          <SheetTitle className="text-xl font-semibold">
             {activity.title}
           </SheetTitle>
         </SheetHeader>
