@@ -18,19 +18,24 @@ export const AccountTab = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
+      // Try to get the existing profile
       const { data, error } = await supabase
         .from('profiles')
         .select('username, avatar_url')
         .eq('id', user.id)
-        .maybeSingle();
+        .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') { // PGRST116 is the "no rows returned" error
         console.error('Error fetching profile:', error);
         return null;
       }
 
-      if (data?.username) setUsername(data.username);
-      return data;
+      // If we have data, update the username state
+      if (data?.username) {
+        setUsername(data.username);
+      }
+
+      return data || { username: null, avatar_url: null };
     },
   });
 
