@@ -19,28 +19,32 @@ export const PreferencesButton = ({ isActive, onClick }: PreferencesButtonProps)
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant={isActive ? "default" : "outline"}
-        className={`flex items-center gap-2 ${
-          isActive 
-            ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-            : "bg-white hover:bg-secondary/80 border-accent"
-        }`}
-        onClick={onClick}
-      >
+    <Button
+      variant={isActive ? "default" : "outline"}
+      className={`flex items-center gap-2 group ${
+        isActive 
+          ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+          : "bg-white hover:bg-secondary/80 border-accent"
+      }`}
+      onClick={onClick}
+    >
+      <span className="flex items-center gap-2">
         <Heart className="w-4 h-4" />
         {!isMobile && "Für Uns"}
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="hover:bg-secondary/80 p-2"
+      </span>
+      <span 
+        className={`pl-2 ml-2 border-l ${
+          isActive 
+            ? "border-primary-foreground/20" 
+            : "border-accent"
+        }`}
         onClick={navigateToDashboard}
         title="Einstellungen"
       >
-        <SlidersHorizontal className="w-4 h-4" />
-      </Button>
-    </div>
+        <SlidersHorizontal 
+          className="w-4 h-4 hover:scale-110 transition-transform" 
+        />
+      </span>
+    </Button>
   );
 };
