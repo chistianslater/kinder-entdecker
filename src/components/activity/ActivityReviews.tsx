@@ -12,7 +12,7 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string | null;
-  user: {
+  profiles: {
     username: string | null;
     avatar_url: string | null;
   } | null;
@@ -28,7 +28,10 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reviews')
-        .select('*, user:profiles!reviews_user_id_fkey(username, avatar_url)')
+        .select(`
+          *,
+          profiles!reviews_user_id_fkey(username, avatar_url)
+        `)
         .eq('activity_id', activity.id)
         .order('created_at', { ascending: false });
 
@@ -53,14 +56,14 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
           <div key={review.id} className="space-y-2">
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={review.user?.avatar_url || undefined} />
+                <AvatarImage src={review.profiles?.avatar_url || undefined} />
                 <AvatarFallback>
-                  {review.user?.username?.[0]?.toUpperCase() || '?'}
+                  {review.profiles?.username?.[0]?.toUpperCase() || '?'}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <div className="font-medium">
-                  {review.user?.username || 'Anonymer Benutzer'}
+                  {review.profiles?.username || 'Anonymer Benutzer'}
                 </div>
                 <div className="flex">
                   {Array.from({ length: review.rating }).map((_, i) => (
