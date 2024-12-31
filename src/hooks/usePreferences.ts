@@ -1,76 +1,71 @@
-import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import type { Filters } from '@/components/FilterBar';
+import { useState } from 'react';
+import { supabase } from "@/integrations/supabase/client";
+import { Filters } from '@/components/FilterBar';
+import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from '@tanstack/react-query';
 
 interface UsePreferencesProps {
   onFiltersChange: (filters: Filters) => void;
-  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  setFilters: (filters: Filters) => void;
 }
 
 export const usePreferences = ({ onFiltersChange, setFilters }: UsePreferencesProps) => {
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  const applyUserPreferences = async () => {
-    try {
+  const { data: preferences } = useQuery({
+    queryKey: ['user-preferences'],
+    queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Nicht eingeloggt",
-          description: "Bitte melden Sie sich an, um Ihre Präferenzen zu laden.",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (!user) return null;
 
-      const { data: preferences, error } = await supabase
+      const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', user.id)
         .single();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        toast({
+          title: "Error loading preferences",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
+      }
 
+      return data;
+    },
+    retry: false,
+  });
+
+  const applyUserPreferences = async () => {
+    try {
+      setLoading(true);
       if (preferences) {
-        // Map preferences to filters more comprehensively
         const newFilters: Filters = {
           type: preferences.interests?.[0],
           ageRange: preferences.child_age_ranges?.[0],
           distance: preferences.max_distance?.toString(),
-          activityType: 'both', // Default to both if not specified
-          userLocation: null // Will be set by geolocation if needed
         };
-
-        // Only include filters that have values
-        const cleanedFilters = Object.fromEntries(
-          Object.entries(newFilters).filter(([_, value]) => value != null)
-        ) as Filters;
-
-        setFilters(cleanedFilters);
-        onFiltersChange(cleanedFilters);
-
-        toast({
-          title: "Präferenzen geladen",
-          description: "Ihre persönlichen Einstellungen wurden geladen.",
-        });
-      } else {
-        toast({
-          title: "Keine Präferenzen gefunden",
-          description: "Bitte richten Sie zuerst Ihre Präferenzen ein.",
-          variant: "destructive",
-        });
-        navigate('/dashboard');
+        setFilters(newFilters);
+        onFiltersChange(newFilters);
       }
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      console.error('Error applying preferences:', error);
       toast({
-        title: "Fehler",
-        description: "Ihre Präferenzen konnten nicht geladen werden.",
+        title: "Error",
+        description: "Failed to apply preferences. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { applyUserPreferences };
+  return {
+    preferences,
+    loading,
+    applyUserPreferences,
+  };
 };
