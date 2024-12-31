@@ -11,7 +11,7 @@ import { AccessibilitySection } from './form-sections/AccessibilitySection';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Filters } from '../FilterBar';
-import { OnboardingFormData } from './types';
+import { OnboardingFormData, FormSchema } from './types';
 
 const formSchema = z.object({
   interests: z.array(z.string()).min(1, "Bitte wählen Sie mindestens ein Interesse aus"),
@@ -28,7 +28,7 @@ interface OnboardingFormProps {
 
 export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences }: OnboardingFormProps) => {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       interests: initialPreferences?.interests || [],
@@ -38,7 +38,7 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormSchema) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

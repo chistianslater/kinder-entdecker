@@ -2,7 +2,7 @@ import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { UseFormReturn } from 'react-hook-form';
-import { OnboardingFormData } from '../types';
+import { FormSchema } from '../types';
 
 const interests = [
   { id: 'nature', label: 'Natur & Wandern' },
@@ -13,7 +13,7 @@ const interests = [
 ];
 
 interface InterestsSectionProps {
-  form: UseFormReturn<OnboardingFormData>;
+  form: UseFormReturn<FormSchema>;
 }
 
 export const InterestsSection = ({ form }: InterestsSectionProps) => {
