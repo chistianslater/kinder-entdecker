@@ -9,6 +9,7 @@ import {
   filterByActivityType,
   filterByOpeningHours
 } from './filterUtils';
+import { supabase } from "@/integrations/supabase/client";
 
 export const useFilteredActivities = (activities: Activity[]) => {
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>(activities);
@@ -17,7 +18,7 @@ export const useFilteredActivities = (activities: Activity[]) => {
     setFilteredActivities(activities);
   }, [activities]);
 
-  const handleFiltersChange = (filters: Filters) => {
+  const handleFiltersChange = async (filters: Filters) => {
     console.log('Applying filters:', filters);
     let filtered = [...activities];
 
@@ -49,6 +50,31 @@ export const useFilteredActivities = (activities: Activity[]) => {
     if (filters.openingHours && filters.openingHours !== 'all') {
       filtered = filterByOpeningHours(filtered, filters.openingHours);
       console.log('After opening hours filter:', filtered.length);
+    }
+
+    if (filters.minRating) {
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('activity_id, rating');
+
+      if (reviewsData) {
+        const avgRatings = reviewsData.reduce((acc, review) => {
+          if (!acc[review.activity_id]) {
+            acc[review.activity_id] = { sum: 0, count: 0 };
+          }
+          acc[review.activity_id].sum += review.rating;
+          acc[review.activity_id].count += 1;
+          return acc;
+        }, {} as Record<string, { sum: number; count: number }>);
+
+        filtered = filtered.filter(activity => {
+          const activityRating = avgRatings[activity.id];
+          if (!activityRating) return false;
+          const average = activityRating.sum / activityRating.count;
+          return average >= parseInt(filters.minRating);
+        });
+      }
+      console.log('After rating filter:', filtered.length);
     }
 
     console.log('Final filtered activities:', filtered.length);

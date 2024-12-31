@@ -13,6 +13,7 @@ import { TypeFilter } from "./TypeFilter";
 import { PriceFilter } from "./PriceFilter";
 import { DistanceFilter } from "./DistanceFilter";
 import { OpeningHoursFilter } from "./OpeningHoursFilter";
+import { RatingFilter } from "./RatingFilter";
 import { Filters } from '../FilterBar';
 
 interface FilterDialogProps {
@@ -66,6 +67,10 @@ export const FilterDialog = ({
             <OpeningHoursFilter
               value={filters.openingHours}
               onChange={(value) => onFilterChange('openingHours', value)}
+            />
+            <RatingFilter
+              value={filters.minRating}
+              onChange={(value) => onFilterChange('minRating', value)}
             />
           </div>
         </div>

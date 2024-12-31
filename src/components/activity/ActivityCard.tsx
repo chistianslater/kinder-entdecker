@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Activity } from '@/types/activity';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Baby, Euro, MapPin, Clock, TreePine } from 'lucide-react';
+import { Baby, Euro, MapPin, Clock, TreePine, Star } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
 
@@ -39,6 +39,31 @@ export const ActivityCard = ({
   onClaim,
   showClaimButton = false 
 }: ActivityCardProps) => {
+  const [averageRating, setAverageRating] = useState<number | null>(null);
+  const [reviewCount, setReviewCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('rating')
+        .eq('activity_id', activity.id);
+
+      if (error) {
+        console.error('Error fetching ratings:', error);
+        return;
+      }
+
+      if (reviews && reviews.length > 0) {
+        const total = reviews.reduce((sum, review) => sum + review.rating, 0);
+        setAverageRating(total / reviews.length);
+        setReviewCount(reviews.length);
+      }
+    };
+
+    fetchRatings();
+  }, [activity.id]);
+
   const isCurrentlyOpen = () => {
     if (!activity.opening_hours) return null;
 
@@ -87,12 +112,21 @@ export const ActivityCard = ({
         />
       </div>
       <CardContent className="p-4">
-        <h3 
-          className="text-lg font-semibold mb-2 cursor-pointer hover:text-primary"
-          onClick={() => onSelect(activity)}
-        >
-          {activity.title}
-        </h3>
+        <div className="flex justify-between items-start mb-2">
+          <h3 
+            className="text-lg font-semibold cursor-pointer hover:text-primary"
+            onClick={() => onSelect(activity)}
+          >
+            {activity.title}
+          </h3>
+          {averageRating !== null && (
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium">{averageRating.toFixed(1)}</span>
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <span className="text-sm text-gray-500">({reviewCount})</span>
+            </div>
+          )}
+        </div>
         
         <div className="space-y-2">
           <div className="flex items-center text-sm text-gray-600">
