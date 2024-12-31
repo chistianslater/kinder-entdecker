@@ -95,8 +95,8 @@ export const useFilteredActivities = (activities: Activity[]) => {
             case 'medium':
               return maxPrice > 10 && maxPrice <= 30;
             case 'high':
-              // For high/expensive, ANY price in the range must be above 30€
-              return maxPrice > 30;
+              // For high/expensive, we consider it expensive if ANY price in the range is above 30€
+              return minPrice > 30 || maxPrice > 30;
             default:
               return true;
           }
