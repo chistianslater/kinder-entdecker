@@ -47,8 +47,8 @@ const Dashboard = () => {
     <div className="min-h-screen bg-secondary/30">
       <Header />
       <main className="container mx-auto py-8 px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Mein Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-4">Mein Dashboard</h1>
+        <div className="mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-[200px] justify-between">
