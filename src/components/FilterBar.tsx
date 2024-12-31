@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
 import { CategoryFilter } from "./filters/CategoryFilter";
 import { AgeFilter } from "./filters/AgeFilter";
 import { TypeFilter } from "./filters/TypeFilter";
 import { PriceFilter } from "./filters/PriceFilter";
 import { DistanceFilter } from "./filters/DistanceFilter";
-import { Heart, SlidersHorizontal, Filter } from "lucide-react";
 import { usePreferences } from '@/hooks/usePreferences';
-import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { PreferencesButton } from './filters/PreferencesButton';
+import { MobileFilterButton } from './filters/MobileFilterButton';
+import { DesktopFilters } from './filters/DesktopFilters';
 import {
   Drawer,
   DrawerClose,
@@ -18,6 +18,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 
 export interface Filters {
   type?: string;
@@ -42,7 +43,6 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     onFiltersChange, 
     setFilters 
   });
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -87,16 +87,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     }
   };
 
-  const navigateToDashboard = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate('/dashboard');
-  };
-
   const getActiveFiltersCount = () => {
     return Object.values(filters).filter(value => value !== undefined && value !== '').length;
   };
 
-  const renderFilters = () => (
+  const renderMobileFilters = () => (
     <div className="space-y-4">
       <CategoryFilter
         value={filters.type}
@@ -121,54 +116,27 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
     </div>
   );
 
-  const activeFiltersCount = getActiveFiltersCount();
-
   return (
     <div className="bg-white shadow-soft rounded-2xl p-4 mb-6">
       <div className="flex gap-2 items-center">
         <div className="flex-shrink-0">
-          <Button
-            variant={isPreferencesActive ? "default" : "outline"}
-            className={`flex items-center gap-2 min-w-[120px] ${
-              isPreferencesActive 
-                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                : "bg-white hover:bg-secondary/80 border-accent"
-            }`}
+          <PreferencesButton 
+            isActive={isPreferencesActive}
             onClick={handlePreferencesClick}
-          >
-            <Heart className="w-4 h-4" />
-            {!isMobile && "Für Uns"}
-            <SlidersHorizontal 
-              className="w-4 h-4 cursor-pointer hover:text-primary" 
-              onClick={navigateToDashboard}
-            />
-          </Button>
+          />
         </div>
 
         {isMobile ? (
           <Drawer>
             <DrawerTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="flex-1 flex items-center justify-between bg-white hover:bg-secondary/80 border-accent"
-              >
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <span>Filter</span>
-                </div>
-                {activeFiltersCount > 0 && (
-                  <span className="bg-primary text-white px-2 py-0.5 rounded-full text-sm">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </Button>
+              <MobileFilterButton activeFiltersCount={getActiveFiltersCount()} />
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
                 <DrawerTitle>Filter</DrawerTitle>
               </DrawerHeader>
               <div className="p-4">
-                {renderFilters()}
+                {renderMobileFilters()}
               </div>
               <DrawerFooter>
                 <DrawerClose asChild>
@@ -178,9 +146,10 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
             </DrawerContent>
           </Drawer>
         ) : (
-          <div className="flex gap-2">
-            {renderFilters()}
-          </div>
+          <DesktopFilters 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
         )}
       </div>
     </div>
