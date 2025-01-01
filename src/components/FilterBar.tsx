@@ -5,7 +5,7 @@ import { PreferencesButton } from './filters/PreferencesButton';
 import { FilterDialog } from './filters/FilterDialog';
 import { SortSelect } from './filters/SortSelect';
 import { Button } from './ui/button';
-import { Filter, Sparkles } from 'lucide-react';
+import { Filter, Sparkles, Leaf, Sun } from 'lucide-react';
 import { Badge } from './ui/badge';
 
 export interface Filters {
@@ -31,31 +31,20 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   const [filters, setFilters] = useState<Filters>({});
   const [isPreferencesActive, setIsPreferencesActive] = useState(false);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
   const { applyUserPreferences } = usePreferences({ 
     onFiltersChange, 
     setFilters 
   });
 
   useEffect(() => {
-    if (filters.distance && filters.distance !== 'all' && !filters.userLocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const newFilters = {
-            ...filters,
-            userLocation: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            },
-          };
-          setFilters(newFilters);
-          onFiltersChange(newFilters);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
-      );
-    }
-  }, [filters.distance]);
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     if (isPreferencesActive) {
@@ -84,7 +73,9 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   return (
-    <div className="bg-white/50 backdrop-blur-md rounded-3xl p-4 mb-6 shadow-card animate-fade-in border border-accent/10">
+    <div className={`rounded-3xl p-4 mb-6 transition-all duration-300 ${
+      isSticky ? 'bg-white/50 backdrop-blur-md shadow-card animate-fade-in border border-accent/10' : ''
+    }`}>
       <div className="flex items-center gap-3 flex-wrap">
         <PreferencesButton 
           isActive={isPreferencesActive}
@@ -116,7 +107,11 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           variant="ghost"
           className="ml-auto flex items-center gap-2 text-muted-foreground hover:text-primary 
                    transition-colors duration-300"
-          onClick={() => handleFilterChange('sortBy', '')}
+          onClick={() => {
+            setFilters({});
+            onFiltersChange({});
+            setIsPreferencesActive(false);
+          }}
         >
           <Sparkles className="h-4 w-4" />
           <span>Zurücksetzen</span>

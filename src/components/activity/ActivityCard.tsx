@@ -98,7 +98,7 @@ export const ActivityCard = ({
   const openStatus = isCurrentlyOpen();
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-lg">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-lg bg-[#eee]">
       <div className="relative">
         <ActivityBadges activity={activity} className="absolute top-2 left-2 right-2 z-10" />
         <div 

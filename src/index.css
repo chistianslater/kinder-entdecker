@@ -35,6 +35,12 @@
     --radius: 1rem;
   }
 
+  body {
+    @apply antialiased;
+    background-color: #D1C2BC;
+  }
+}
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -69,10 +75,6 @@
 @layer base {
   * {
     @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
   }
 }
 

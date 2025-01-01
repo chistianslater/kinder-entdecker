@@ -11,6 +11,7 @@ import { useActivities } from '@/hooks/useActivities';
 import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Leaf, Sun, Flower } from 'lucide-react';
 
 type ViewMode = 'list' | 'map' | 'events';
 
@@ -65,10 +66,24 @@ const Index = () => {
     checkUserPreferences();
   }, [session, toast]);
 
+  const renderDecorations = () => (
+    <>
+      <div className="absolute top-20 left-10 text-primary/20 animate-float">
+        <Leaf className="w-16 h-16" />
+      </div>
+      <div className="absolute top-40 right-10 text-accent/30 animate-float-delayed">
+        <Sun className="w-20 h-20" />
+      </div>
+      <div className="absolute bottom-20 left-20 text-primary/30 animate-float">
+        <Flower className="w-24 h-24" />
+      </div>
+    </>
+  );
+
   const renderContent = () => {
     if (!session) {
       return (
-        <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+        <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md relative">
           <h2 className="text-2xl font-semibold mb-6 text-center">Willkommen bei TinyTrails</h2>
           <Auth
             supabaseClient={supabase}
@@ -83,7 +98,7 @@ const Index = () => {
     return (
       <>
         <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
-        <div className="space-y-8">
+        <div className="space-y-8 relative">
           {viewMode === 'map' ? (
             <Map activities={filteredActivities} />
           ) : viewMode === 'events' ? (
@@ -102,7 +117,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="min-h-screen relative overflow-hidden">
+      {renderDecorations()}
       <Header />
       <main className="container mx-auto py-8 px-4">
         {renderContent()}
