@@ -25,20 +25,20 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#94A684",
+          DEFAULT: "#4361EE",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#E4E4D0",
-          foreground: "#333333",
+          DEFAULT: "#3F3D56",
+          foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#AEC3AE",
-          foreground: "#333333",
+          DEFAULT: "#B5FF2B",
+          foreground: "#000000",
         },
         muted: {
-          DEFAULT: "#F5F5F5",
-          foreground: "#666666",
+          DEFAULT: "#F4F7FE",
+          foreground: "#6B7280",
         },
         destructive: {
           DEFAULT: "#FF4444",
@@ -48,6 +48,17 @@ export default {
           DEFAULT: "white",
           foreground: "#333333",
         },
+      },
+      borderRadius: {
+        '4xl': '2rem',
+        '5xl': '2.5rem',
+      },
+      fontFamily: {
+        sans: ['Inter var', 'sans-serif'],
+      },
+      boxShadow: {
+        'modern': '0 20px 40px rgba(0, 0, 0, 0.05)',
+        'card': '0 8px 24px rgba(0, 0, 0, 0.08)',
       },
       keyframes: {
         "accordion-down": {
@@ -82,17 +93,6 @@ export default {
         "fade-out": "fade-out 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
         "scale-out": "scale-out 0.2s ease-out",
-      },
-      borderRadius: {
-        lg: "1.25rem",
-        md: "1rem",
-        sm: "0.75rem",
-      },
-      boxShadow: {
-        soft: "0 8px 30px rgba(0, 0, 0, 0.05)",
-      },
-      zIndex: {
-        dropdown: "1000",
       },
     },
   },

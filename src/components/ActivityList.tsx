@@ -53,11 +53,11 @@ const ActivityList = () => {
 
   return (
     <div className="relative">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pt-4 pb-2 -mx-4 px-4 shadow-sm">
+      <div className="sticky top-0 z-20 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-4 pb-2 -mx-4 px-4 border-b">
         <FilterBar onFiltersChange={handleFiltersChange} />
       </div>
       
-      <div className="mt-4">
+      <div className="mt-8">
         {filteredActivities.length === 0 ? (
           <EmptyState />
         ) : (

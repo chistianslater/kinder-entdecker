@@ -5,7 +5,7 @@ import { PreferencesButton } from './filters/PreferencesButton';
 import { FilterDialog } from './filters/FilterDialog';
 import { SortSelect } from './filters/SortSelect';
 import { Button } from './ui/button';
-import { Filter } from 'lucide-react';
+import { Filter, Sparkles } from 'lucide-react';
 import { Badge } from './ui/badge';
 
 export interface Filters {
@@ -84,7 +84,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   return (
-    <div className="bg-secondary/10 rounded-2xl p-4 mb-6 animate-fade-in">
+    <div className="bg-white/50 backdrop-blur-md rounded-3xl p-4 mb-6 shadow-card animate-fade-in border border-accent/10">
       <div className="flex items-center gap-3 flex-wrap">
         <PreferencesButton 
           isActive={isPreferencesActive}
@@ -92,15 +92,16 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
         />
         <Button
           variant="outline"
-          className="flex items-center gap-2 bg-white hover:bg-secondary/80 border-accent transition-all duration-300 hover:scale-105"
+          className="flex items-center gap-2 bg-white hover:bg-accent/10 border-accent/20 
+                   transition-all duration-300 hover:scale-105 rounded-2xl"
           onClick={() => setShowFilterDialog(true)}
         >
           <Filter className="h-4 w-4" />
           <span>Filter</span>
           {getActiveFiltersCount() > 0 && (
             <Badge 
-              variant="default" 
-              className="ml-2 animate-scale-in"
+              variant="secondary"
+              className="ml-2 bg-accent text-accent-foreground animate-scale-in rounded-xl"
             >
               {getActiveFiltersCount()}
             </Badge>
@@ -110,6 +111,16 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
           value={filters.sortBy}
           onChange={(value) => handleFilterChange('sortBy', value)}
         />
+        
+        <Button
+          variant="ghost"
+          className="ml-auto flex items-center gap-2 text-muted-foreground hover:text-primary 
+                   transition-colors duration-300"
+          onClick={() => handleFilterChange('sortBy', '')}
+        >
+          <Sparkles className="h-4 w-4" />
+          <span>Zurücksetzen</span>
+        </Button>
       </div>
 
       <FilterDialog
