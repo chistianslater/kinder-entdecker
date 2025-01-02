@@ -25,7 +25,7 @@ export const CarouselItem = ({ image, activityTitle }: CarouselItemProps) => {
       </AspectRatio>
       <Badge 
         variant="secondary" 
-        className="absolute top-4 left-4 flex items-center gap-1 bg-white/90 backdrop-blur-sm"
+        className="absolute top-4 left-4 flex items-center gap-1 bg-white/30 backdrop-blur-md border border-white/40"
       >
         <Camera className="w-3 h-3" />
         {image.isOwner ? 'Official Photo' : 'Community Photo'}
