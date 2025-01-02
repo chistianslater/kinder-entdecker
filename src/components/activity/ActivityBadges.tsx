@@ -14,7 +14,7 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
         {activity.is_business && (
           <Badge 
             variant="secondary" 
-            className="flex items-center gap-1 rounded-md ml-2 bg-white/30 backdrop-blur-md border border-white/40"
+            className="flex items-center gap-1 rounded-2xl ml-2 bg-black/30 backdrop-blur-md border border-white/40"
           >
             <Building2 className="w-4 h-4" />
             Unternehmensbeitrag
