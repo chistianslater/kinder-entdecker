@@ -12,7 +12,10 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
     <div className={`flex items-center justify-between w-full z-[5] ${className || ''}`}>
       <div>
         {activity.is_business && (
-          <Badge variant="secondary" className="flex items-center gap-1 rounded-md ml-2">
+          <Badge 
+            variant="secondary" 
+            className="flex items-center gap-1 rounded-md ml-2 bg-white/30 backdrop-blur-md border border-white/40"
+          >
             <Building2 className="w-4 h-4" />
             Unternehmensbeitrag
           </Badge>
