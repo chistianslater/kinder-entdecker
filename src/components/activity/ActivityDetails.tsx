@@ -1,8 +1,9 @@
 import React from 'react';
-import { MapPin, Clock, Euro, Users, Tag, Navigation } from 'lucide-react';
+import { MapPin, Clock, Euro, Users, Tag, Navigation, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Activity } from '@/types/activity';
 import { ImageGallery } from './ImageGallery';
+import { Badge } from "@/components/ui/badge";
 
 interface ActivityDetailsProps {
   activity: Activity;
@@ -16,6 +17,18 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
   return (
     <div className="space-y-8">
+      <div className="flex items-center gap-2">
+        {activity.is_business && (
+          <Badge 
+            variant="secondary" 
+            className="flex items-center gap-1 rounded-2xl bg-black/30 backdrop-blur-md border border-white/40"
+          >
+            <Building2 className="w-4 h-4" />
+            Unternehmensbeitrag
+          </Badge>
+        )}
+      </div>
+
       <ImageGallery activity={activity} />
 
       <h3 className="text-lg font-semibold text-primary">Details</h3>
