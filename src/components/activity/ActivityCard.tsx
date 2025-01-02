@@ -98,11 +98,11 @@ export const ActivityCard = ({
   const openStatus = isCurrentlyOpen();
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-lg bg-[#eee]">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-2xl bg-black/5 backdrop-blur-md border border-white/10">
       <div className="relative">
         <ActivityBadges activity={activity} className="absolute top-2 left-2 right-2 z-10" />
         <div 
-          className="h-48 bg-cover bg-center cursor-pointer rounded-t-lg" 
+          className="h-48 bg-cover bg-center cursor-pointer rounded-t-2xl" 
           style={{ 
             backgroundImage: activity.image_url 
               ? `url(${activity.image_url})` 

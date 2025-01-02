@@ -47,7 +47,7 @@ const EventView = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {events.map((event) => (
-        <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+        <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow rounded-2xl bg-black/5 backdrop-blur-md border border-white/10">
           <img
             src={event.activities.image_url || 'https://images.unsplash.com/photo-1501854140801-50d01698950b'}
             alt={event.activities.title}
