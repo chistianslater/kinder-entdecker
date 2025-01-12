@@ -13,7 +13,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const { toast } = useToast();
-  const { userBusinessProfile } = useBusinessProfile();
+  const { businessProfile } = useBusinessProfile();
   const { 
     filteredActivities, 
     activities,
@@ -24,9 +24,12 @@ const ActivityList = () => {
 
   const handleClaimActivity = async (activityId: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { error } = await supabase
         .from('activities')
-        .update({ claimed_by: userBusinessProfile.user_id, is_business: true })
+        .update({ claimed_by: user.id, is_business: true })
         .eq('id', activityId);
 
       if (error) throw error;
@@ -68,7 +71,7 @@ const ActivityList = () => {
             activities={filteredActivities}
             onSelect={setSelectedActivity}
             onClaim={handleClaimActivity}
-            showClaimButton={!!userBusinessProfile}
+            showClaimButton={!!businessProfile}
           />
         )}
       </div>
