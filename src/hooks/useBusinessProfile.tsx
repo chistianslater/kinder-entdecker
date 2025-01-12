@@ -12,7 +12,7 @@ export const useBusinessProfile = () => {
         .from('business_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .single();
 
       if (error) {
         console.error('Error fetching business profile:', error);
