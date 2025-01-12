@@ -30,7 +30,6 @@ export const FilterDialog = ({
   onFilterChange 
 }: FilterDialogProps) => {
   const handleReset = () => {
-    // Reset each filter type explicitly
     const filterKeys: (keyof Filters)[] = [
       'type',
       'ageRange',
@@ -53,12 +52,12 @@ export const FilterDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] animate-scale-in">
+      <DialogContent className="bg-background border border-accent/20 shadow-glass">
         <DialogHeader>
-          <DialogTitle>Filter Activities</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-white">Filter Activities</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="space-y-4">
+        <div className="grid gap-6 py-6">
+          <div className="space-y-6">
             <CategoryFilter
               value={filters.type}
               onChange={(value) => onFilterChange('type', value)}
@@ -89,19 +88,19 @@ export const FilterDialog = ({
             />
           </div>
         </div>
-        <DialogFooter className="sm:justify-between">
+        <DialogFooter className="sm:justify-between gap-4">
           <Button
-            type="button"
             variant="outline"
             onClick={handleReset}
-            className="transition-all duration-300 hover:scale-105"
+            className="w-full sm:w-auto bg-muted text-white hover:bg-accent/10 border-accent/20 
+                     transition-all duration-300 hover:scale-105 rounded-2xl"
           >
             Reset Filters
           </Button>
           <Button 
-            type="button"
             onClick={() => onOpenChange(false)}
-            className="transition-all duration-300 hover:scale-105"
+            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90
+                     transition-all duration-300 hover:scale-105 rounded-2xl"
           >
             Apply Filters
           </Button>
