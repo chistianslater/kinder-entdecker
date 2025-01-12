@@ -68,12 +68,24 @@ const Index = () => {
   const renderContent = () => {
     if (!session) {
       return (
-        <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md relative">
+        <div className="max-w-md mx-auto mt-8 p-6 bg-card rounded-2xl shadow-glass border border-border">
           <h2 className="text-2xl font-semibold mb-6 text-center">Willkommen bei TinyTrails</h2>
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            theme="light"
+            appearance={{ 
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#B5FF2B',
+                    brandAccent: '#9EE619',
+                    inputBackground: 'rgba(255, 255, 255, 0.08)',
+                    inputText: '#FFFFFF',
+                  },
+                },
+              },
+            }}
+            theme="dark"
             providers={[]}
           />
         </div>
@@ -102,7 +114,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#E8E3DE' }}>
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto py-8 px-4">
         {renderContent()}

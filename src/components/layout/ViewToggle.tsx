@@ -9,7 +9,7 @@ interface ViewToggleProps {
 
 const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
   return (
-    <div className="bg-white shadow-soft rounded-2xl p-6 mb-6">
+    <div className="bg-card/95 backdrop-blur-sm border border-border rounded-2xl p-6 mb-6 shadow-glass">
       <div className="flex justify-end gap-2">
         <Button
           variant={viewMode === 'list' ? 'default' : 'outline'}
