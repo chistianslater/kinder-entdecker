@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Upload } from "lucide-react";
 
 interface CreateActivityFormProps {
   onSuccess: () => void;
@@ -34,11 +35,53 @@ type FormData = {
   age_range: string;
   price_range: string;
   opening_hours: string;
+  ticket_url?: string;
+  image_url?: string;
 };
 
 export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormProps) {
   const { toast } = useToast();
   const form = useForm<FormData>();
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+      const file = event.target.files[0];
+      setUploading(true);
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('activity-photos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('activity-photos')
+        .getPublicUrl(filePath);
+
+      form.setValue('image_url', publicUrl);
+      
+      toast({
+        title: "Erfolg",
+        description: "Bild wurde erfolgreich hochgeladen.",
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Fehler",
+        description: "Bild konnte nicht hochgeladen werden.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -122,11 +165,11 @@ export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormPr
               <FormLabel>Typ</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue placeholder="Wähle einen Typ" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="outdoor">Outdoor</SelectItem>
                   <SelectItem value="indoor">Indoor</SelectItem>
                   <SelectItem value="education">Bildung</SelectItem>
@@ -147,11 +190,11 @@ export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormPr
               <FormLabel>Altersgruppe</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue placeholder="Wähle eine Altersgruppe" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="0-3">0-3 Jahre</SelectItem>
                   <SelectItem value="4-6">4-6 Jahre</SelectItem>
                   <SelectItem value="7-12">7-12 Jahre</SelectItem>
@@ -172,11 +215,11 @@ export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormPr
               <FormLabel>Preisklasse</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue placeholder="Wähle eine Preisklasse" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="free">Kostenlos</SelectItem>
                   <SelectItem value="low">Günstig</SelectItem>
                   <SelectItem value="medium">Mittel</SelectItem>
@@ -196,6 +239,58 @@ export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormPr
               <FormLabel>Öffnungszeiten</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="z.B. Mo-Fr 9-17 Uhr" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ticket_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ticket URL</FormLabel>
+              <FormControl>
+                <Input {...field} type="url" placeholder="https://..." />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="image_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bild</FormLabel>
+              <FormControl>
+                <div className="space-y-2">
+                  {field.value && (
+                    <img 
+                      src={field.value} 
+                      alt="Preview" 
+                      className="w-full h-40 object-cover rounded-lg"
+                    />
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Input {...field} type="url" placeholder="Bild URL" />
+                    <div className="relative">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={uploading}
+                      />
+                      <Button type="button" variant="outline" disabled={uploading}>
+                        <Upload className="w-4 h-4 mr-2" />
+                        {uploading ? 'Lädt...' : 'Upload'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
