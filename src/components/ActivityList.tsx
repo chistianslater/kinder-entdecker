@@ -12,10 +12,12 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
 import { CreateActivityDialog } from './activity/CreateActivityDialog';
+import { EditActivityDialog } from './activity/EditActivityDialog';
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [activityToEdit, setActivityToEdit] = useState<Activity | null>(null);
   const { toast } = useToast();
   const { businessProfile } = useBusinessProfile();
   const { 
@@ -84,6 +86,7 @@ const ActivityList = () => {
             activities={filteredActivities}
             onSelect={setSelectedActivity}
             onClaim={handleClaimActivity}
+            onEdit={setActivityToEdit}
             showClaimButton={!!businessProfile}
           />
         )}
@@ -100,6 +103,15 @@ const ActivityList = () => {
         onOpenChange={setShowCreateDialog}
         onSuccess={fetchActivities}
       />
+
+      {activityToEdit && (
+        <EditActivityDialog
+          activity={activityToEdit}
+          open={!!activityToEdit}
+          onOpenChange={(open) => !open && setActivityToEdit(null)}
+          onSuccess={fetchActivities}
+        />
+      )}
     </div>
   );
 };

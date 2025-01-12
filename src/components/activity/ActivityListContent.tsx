@@ -6,13 +6,15 @@ interface ActivityListContentProps {
   activities: Activity[];
   onSelect: (activity: Activity) => void;
   onClaim: (activityId: string) => void;
+  onEdit?: (activity: Activity) => void;
   showClaimButton: boolean;
 }
 
 const ActivityListContent = ({ 
   activities, 
   onSelect, 
-  onClaim, 
+  onClaim,
+  onEdit,
   showClaimButton 
 }: ActivityListContentProps) => {
   return (
@@ -23,6 +25,7 @@ const ActivityListContent = ({
           activity={activity}
           onSelect={onSelect}
           onClaim={onClaim}
+          onEdit={onEdit}
           showClaimButton={showClaimButton}
         />
       ))}

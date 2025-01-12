@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Activity } from '@/types/activity';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Baby, Euro, MapPin, Clock, TreePine, Star } from 'lucide-react';
+import { Baby, Euro, MapPin, Clock, TreePine, Star, Edit } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +30,7 @@ interface ActivityCardProps {
   activity: Activity;
   onSelect: (activity: Activity) => void;
   onClaim?: (activityId: string) => void;
+  onEdit?: (activity: Activity) => void;
   showClaimButton?: boolean;
 }
 
@@ -37,10 +38,22 @@ export const ActivityCard = ({
   activity, 
   onSelect, 
   onClaim,
+  onEdit,
   showClaimButton = false 
-}: ActivityCardProps) => {
+}: ActivityCardProps & { onEdit?: (activity: Activity) => void }) => {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    const checkOwnership = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setIsOwner(activity.created_by === user.id);
+      }
+    };
+    checkOwnership();
+  }, [activity.created_by]);
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -175,7 +188,7 @@ export const ActivityCard = ({
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 flex gap-2">
         {showClaimButton && onClaim && (
           <Button 
             variant="outline" 
@@ -183,6 +196,16 @@ export const ActivityCard = ({
             onClick={() => onClaim(activity.id)}
           >
             Als Geschäft beanspruchen
+          </Button>
+        )}
+        {isOwner && onEdit && (
+          <Button 
+            variant="outline" 
+            className="w-full rounded-md text-[#eee]"
+            onClick={() => onEdit(activity)}
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Bearbeiten
           </Button>
         )}
       </CardFooter>

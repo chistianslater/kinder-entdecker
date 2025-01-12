@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,10 +21,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload } from "lucide-react";
+import { Activity } from "@/types/activity";
 
 interface CreateActivityFormProps {
   onSuccess: () => void;
   onCancel: () => void;
+  initialData?: Activity;
 }
 
 type FormData = {
@@ -39,10 +41,23 @@ type FormData = {
   image_url?: string;
 };
 
-export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormProps) {
+export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateActivityFormProps) {
   const { toast } = useToast();
-  const form = useForm<FormData>();
   const [uploading, setUploading] = useState(false);
+
+  const form = useForm<FormData>({
+    defaultValues: initialData || {
+      title: "",
+      description: "",
+      location: "",
+      type: "",
+      age_range: "",
+      price_range: "",
+      opening_hours: "",
+      ticket_url: "",
+      image_url: "",
+    },
+  });
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -88,25 +103,43 @@ export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormPr
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('activities')
-        .insert({
-          ...data,
-          created_by: user.id,
+      if (initialData) {
+        // Update existing activity
+        const { error } = await supabase
+          .from('activities')
+          .update(data)
+          .eq('id', initialData.id)
+          .eq('created_by', user.id); // Ensure user owns the activity
+
+        if (error) throw error;
+
+        toast({
+          title: "Erfolg",
+          description: "Aktivität wurde erfolgreich aktualisiert.",
         });
+      } else {
+        // Create new activity
+        const { error } = await supabase
+          .from('activities')
+          .insert({
+            ...data,
+            created_by: user.id,
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Erfolg",
-        description: "Aktivität wurde erfolgreich erstellt.",
-      });
+        toast({
+          title: "Erfolg",
+          description: "Aktivität wurde erfolgreich erstellt.",
+        });
+      }
+
       onSuccess();
     } catch (error) {
-      console.error('Error creating activity:', error);
+      console.error('Error saving activity:', error);
       toast({
         title: "Fehler",
-        description: "Aktivität konnte nicht erstellt werden.",
+        description: "Aktivität konnte nicht gespeichert werden.",
         variant: "destructive",
       });
     }
@@ -308,4 +341,4 @@ export function CreateActivityForm({ onSuccess, onCancel }: CreateActivityFormPr
       </form>
     </Form>
   );
-}
+};
