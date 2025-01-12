@@ -31,13 +31,16 @@ export const AccountAvatar = ({ avatarUrl, onAvatarUpdate, className }: AccountA
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Upload image to Supabase Storage
+      // Create a unique file path
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      // Upload image to Supabase Storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          upsert: true // Allow overwriting existing files
+        });
 
       if (uploadError) throw uploadError;
 
