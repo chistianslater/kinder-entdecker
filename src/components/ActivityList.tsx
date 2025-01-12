@@ -9,9 +9,13 @@ import EmptyState from './activity/EmptyState';
 import ActivityListContent from './activity/ActivityListContent';
 import { useActivities } from '@/hooks/useActivities';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { Button } from './ui/button';
+import { Plus } from 'lucide-react';
+import { CreateActivityDialog } from './activity/CreateActivityDialog';
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const { toast } = useToast();
   const { businessProfile } = useBusinessProfile();
   const { 
@@ -59,7 +63,16 @@ const ActivityList = () => {
       <div className="group sticky top-0 z-20 pt-4 pb-2 -mx-4 px-4 border-b transition-colors duration-200">
         <div className="absolute inset-0 group-[.is-sticky]:bg-background/98 group-[.is-sticky]:backdrop-blur supports-[backdrop-filter]:group-[.is-sticky]:bg-background/60" />
         <div className="relative">
-          <FilterBar onFiltersChange={handleFiltersChange} />
+          <div className="flex items-center justify-between mb-4">
+            <FilterBar onFiltersChange={handleFiltersChange} />
+            <Button 
+              onClick={() => setShowCreateDialog(true)}
+              className="ml-4"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Aktivität erstellen
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -80,6 +93,12 @@ const ActivityList = () => {
         activity={selectedActivity}
         isOpen={selectedActivity !== null}
         onClose={() => setSelectedActivity(null)}
+      />
+
+      <CreateActivityDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSuccess={fetchActivities}
       />
     </div>
   );
