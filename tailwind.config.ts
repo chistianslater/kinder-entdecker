@@ -25,28 +25,32 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4361EE",
-          foreground: "#FFFFFF",
+          DEFAULT: "#B5FF2B",
+          foreground: "#1A1F2C",
         },
         secondary: {
-          DEFAULT: "#3F3D56",
+          DEFAULT: "#7E69AB",
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#B5FF2B",
-          foreground: "#000000",
+          DEFAULT: "#E5DEFF",
+          foreground: "#1A1F2C",
         },
         muted: {
-          DEFAULT: "#F4F7FE",
-          foreground: "#6B7280",
+          DEFAULT: "rgba(255, 255, 255, 0.1)",
+          foreground: "#C8C8C9",
         },
         destructive: {
           DEFAULT: "#FF4444",
           foreground: "#FFFFFF",
         },
         popover: {
-          DEFAULT: "white",
-          foreground: "#333333",
+          DEFAULT: "#1A1F2C",
+          foreground: "#FFFFFF",
+        },
+        card: {
+          DEFAULT: "rgba(26, 31, 44, 0.8)",
+          foreground: "#FFFFFF",
         },
       },
       borderRadius: {
@@ -57,8 +61,15 @@ export default {
         sans: ['Inter var', 'sans-serif'],
       },
       boxShadow: {
-        'modern': '0 20px 40px rgba(0, 0, 0, 0.05)',
-        'card': '0 8px 24px rgba(0, 0, 0, 0.08)',
+        'modern': '0 8px 32px rgba(0, 0, 0, 0.1)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.15)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+      },
+      backdropBlur: {
+        'glass': '4px',
+      },
+      backgroundImage: {
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
       },
       keyframes: {
         "accordion-down": {
@@ -85,14 +96,6 @@ export default {
           from: { transform: "scale(1)", opacity: "1" },
           to: { transform: "scale(0.95)", opacity: "0" },
         },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-20px)" },
-        },
-        "float-delayed": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-20px)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -101,8 +104,6 @@ export default {
         "fade-out": "fade-out 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
         "scale-out": "scale-out 0.2s ease-out",
-        "float": "float 6s ease-in-out infinite",
-        "float-delayed": "float-delayed 8s ease-in-out infinite 1s",
       },
     },
   },
