@@ -10,29 +10,39 @@ interface MapContainerProps {
 
 export const MapContainer = ({ mapRef, selectedActivity, onCloseDetail }: MapContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const resizeTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
+    let isSubscribed = true;
     const resizeObserver = new ResizeObserver((entries) => {
-      // Debounce the resize handler
-      const timeout = setTimeout(() => {
+      // Clear any existing timeout
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+
+      // Set a new timeout to handle the resize event
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (!isSubscribed) return;
+
         for (const entry of entries) {
-          if (entry.target === containerRef.current) {
-            // Trigger map resize if needed
-            if (mapRef.current) {
-              window.dispatchEvent(new Event('resize'));
-            }
+          if (entry.target === containerRef.current && mapRef.current) {
+            // Dispatch resize event only if the component is still mounted
+            window.dispatchEvent(new Event('resize'));
           }
         }
-      }, 100);
-
-      return () => clearTimeout(timeout);
+      }, 250); // Debounce resize events with a 250ms delay
     });
 
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current);
     }
 
+    // Cleanup function
     return () => {
+      isSubscribed = false;
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
       if (containerRef.current) {
         resizeObserver.unobserve(containerRef.current);
       }
