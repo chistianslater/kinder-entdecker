@@ -41,7 +41,7 @@ export const ReviewsTab = () => {
             <p className="text-sm text-muted-foreground">{review.activities?.location}</p>
             <div className="flex items-center gap-1 mt-2">
               {Array.from({ length: review.rating }).map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <Star key={i} className="w-4 h-4 fill-primary text-primary" />
               ))}
             </div>
             {review.comment && (
