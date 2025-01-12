@@ -25,31 +25,31 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#B5FF2B",  // Neon green from the reference
-          foreground: "#0A0C12", // Darker background for contrast
+          DEFAULT: "#B5FF2B",
+          foreground: "#050607", // Even darker background for contrast
         },
         secondary: {
-          DEFAULT: "#1E2128",  // Dark gray for cards
+          DEFAULT: "#1E2128",
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#2A2F3A",  // Slightly lighter background for hover states
+          DEFAULT: "#2A2F3A",
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "rgba(255, 255, 255, 0.08)",  // Very subtle white overlay
-          foreground: "#9CA3AF",  // Muted text color
+          DEFAULT: "rgba(255, 255, 255, 0.08)",
+          foreground: "#9CA3AF",
         },
         destructive: {
-          DEFAULT: "#FF454B",  // Bright red for destructive actions
+          DEFAULT: "#FF454B",
           foreground: "#FFFFFF",
         },
         popover: {
-          DEFAULT: "#0A0C12",  // Darker background for popovers
+          DEFAULT: "#050607",
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "rgba(14, 16, 24, 0.95)",  // Almost black with slight transparency
+          DEFAULT: "rgba(5, 6, 7, 0.95)",
           foreground: "#FFFFFF",
         },
       },
