@@ -25,31 +25,31 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#C2FF4B",  // Slightly brighter green
-          foreground: "#1A1F2C",
+          DEFAULT: "#B5FF2B",  // Neon green from the reference
+          foreground: "#0A0C12", // Darker background for contrast
         },
         secondary: {
-          DEFAULT: "#8A75B3",  // Slightly lighter purple
+          DEFAULT: "#1E2128",  // Dark gray for cards
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#EDE5FF",  // Slightly lighter accent
-          foreground: "#1A1F2C",
+          DEFAULT: "#2A2F3A",  // Slightly lighter background for hover states
+          foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "rgba(255, 255, 255, 0.12)",  // Slightly more visible muted
-          foreground: "#D0D0D1",  // Slightly lighter muted text
+          DEFAULT: "rgba(255, 255, 255, 0.08)",  // Very subtle white overlay
+          foreground: "#9CA3AF",  // Muted text color
         },
         destructive: {
-          DEFAULT: "#FF5555",  // Slightly brighter red
+          DEFAULT: "#FF454B",  // Bright red for destructive actions
           foreground: "#FFFFFF",
         },
         popover: {
-          DEFAULT: "#1A1F2C",
+          DEFAULT: "#0A0C12",  // Darker background for popovers
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "rgba(26, 31, 44, 0.85)",  // Slightly more opaque card
+          DEFAULT: "rgba(14, 16, 24, 0.95)",  // Almost black with slight transparency
           foreground: "#FFFFFF",
         },
       },
@@ -61,15 +61,15 @@ export default {
         sans: ['Inter var', 'sans-serif'],
       },
       boxShadow: {
-        'modern': '0 8px 32px rgba(0, 0, 0, 0.1)',
-        'card': '0 4px 12px rgba(0, 0, 0, 0.15)',
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'modern': '0 8px 32px rgba(0, 0, 0, 0.2)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.25)',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
       },
       backdropBlur: {
-        'glass': '4px',
+        'glass': '8px',
       },
       backgroundImage: {
-        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
       },
       keyframes: {
         "accordion-down": {
