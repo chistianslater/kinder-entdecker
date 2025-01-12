@@ -122,7 +122,7 @@ export const ActivityCard = ({
           {averageRating !== null && (
             <div className="flex items-center gap-1">
               <span className="text-sm font-medium text-[#eee]">{averageRating.toFixed(1)}</span>
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <Star className="w-4 h-4 fill-primary text-primary" />
               <span className="text-sm text-[#eee]/80">({reviewCount})</span>
             </div>
           )}
