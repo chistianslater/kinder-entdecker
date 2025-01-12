@@ -20,15 +20,16 @@ export const SortSelect = ({ value, onChange }: SortSelectProps) => {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger 
-        className={`bg-secondary text-white hover:bg-accent/80 border-accent/20 transition-all duration-300 
-                   hover:scale-105 rounded-3xl ${isMobile ? 'w-full' : 'w-[180px]'}`}
+        className={`bg-secondary text-white hover:bg-accent/80 border-accent/20 
+                   transition-all duration-300 hover:scale-105 rounded-3xl 
+                   ${isMobile ? 'w-full' : 'w-[180px]'}`}
       >
         <div className="flex items-center gap-2">
           <ArrowUpDown className="h-4 w-4" />
           <SelectValue placeholder="Sortieren" />
         </div>
       </SelectTrigger>
-      <SelectContent className="bg-secondary text-white border border-accent/20 shadow-glass">
+      <SelectContent className="bg-secondary border border-accent/20 shadow-glass">
         <SelectItem value="newest" className="text-white focus:bg-accent focus:text-white">Neueste zuerst</SelectItem>
         <SelectItem value="oldest" className="text-white focus:bg-accent focus:text-white">Älteste zuerst</SelectItem>
         <SelectItem value="rating" className="text-white focus:bg-accent focus:text-white">Beste Bewertung</SelectItem>
