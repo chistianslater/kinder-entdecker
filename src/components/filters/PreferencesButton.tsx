@@ -21,10 +21,10 @@ export const PreferencesButton = ({ isActive, onClick }: PreferencesButtonProps)
   return (
     <Button
       variant={isActive ? "default" : "outline"}
-      className={`flex items-center gap-2 group ${
+      className={`flex items-center gap-2 group transition-all duration-300 hover:scale-105 ${
         isActive 
           ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-          : "bg-white hover:bg-secondary/80 border-accent"
+          : "bg-white hover:bg-accent/10 border-accent/20 rounded-2xl"
       }`}
       onClick={onClick}
     >
@@ -36,7 +36,7 @@ export const PreferencesButton = ({ isActive, onClick }: PreferencesButtonProps)
         className={`pl-2 ml-2 border-l ${
           isActive 
             ? "border-primary-foreground/20" 
-            : "border-accent"
+            : "border-accent/20"
         }`}
         onClick={navigateToDashboard}
         title="Einstellungen"
