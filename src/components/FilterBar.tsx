@@ -65,7 +65,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   return (
-    <div className="bg-white shadow-soft rounded-2xl p-6 mb-6">
+    <div className="modern-card text-white">
       <div className="flex items-center gap-3 flex-wrap">
         <FilterButtons 
           isPreferencesActive={isPreferencesActive}
