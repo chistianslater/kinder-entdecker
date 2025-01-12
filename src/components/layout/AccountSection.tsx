@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,11 +11,34 @@ import {
 import { AccountAvatar } from '../dashboard/AccountAvatar';
 import { useAuth } from '@/hooks/useAuth';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export const AccountSection = () => {
   const navigate = useNavigate();
   const { session, signOut } = useAuth();
   const { businessProfile } = useBusinessProfile();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+
+      return data;
+    },
+  });
 
   const handleSignOut = async () => {
     try {
@@ -28,20 +50,16 @@ export const AccountSection = () => {
   };
 
   if (!session) {
-    return (
-      <Button 
-        onClick={() => navigate('/')}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
-      >
-        Login
-      </Button>
-    );
+    return null;
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="cursor-pointer">
-        <AccountAvatar onAvatarUpdate={() => {}} />
+      <DropdownMenuTrigger className="cursor-pointer outline-none">
+        <AccountAvatar 
+          avatarUrl={profile?.avatar_url} 
+          className="h-10 w-10 border-2 border-primary hover:border-primary/80 transition-colors"
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         className="w-56 bg-secondary border-accent/20 shadow-glass z-[100]" 
