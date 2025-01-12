@@ -22,6 +22,7 @@ const Map = ({ activities }: MapProps) => {
       try {
         map.current = await initializeMap(mapContainer.current);
 
+        // Add markers for each activity
         activities.forEach((activity) => {
           addActivityMarker({
             activity,
