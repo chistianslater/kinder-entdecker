@@ -39,7 +39,7 @@ const Dashboard = () => {
       <Header />
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Mein Dashboard</h1>
+          <h1 className="text-3xl font-bold text-[#eee]">Mein Dashboard</h1>
           <Link 
             to="/" 
             className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Navigation Sidebar */}
-          <nav className="md:w-64 bg-white rounded-lg p-4 shadow-md h-fit">
+          <nav className="md:w-64 bg-accent rounded-lg p-4 shadow-md h-fit border border-white/5">
             <ul className="space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
@@ -60,9 +60,9 @@ const Dashboard = () => {
                     <button
                       onClick={() => setCurrentTab(item.value)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                        "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-[#eee]",
                         currentTab === item.value
-                          ? "bg-primary text-white hover:bg-primary/90"
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
                           : "hover:bg-secondary"
                       )}
                     >
@@ -77,7 +77,7 @@ const Dashboard = () => {
 
           {/* Main Content */}
           <div className="flex-1">
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-accent p-6 rounded-lg shadow-md border border-white/5">
               {renderContent()}
             </div>
           </div>
