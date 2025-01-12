@@ -40,10 +40,8 @@ export const AccountSection = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <AccountAvatar />
-        </Button>
+      <DropdownMenuTrigger className="cursor-pointer">
+        <AccountAvatar onAvatarUpdate={() => {}} />
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         className="w-56 bg-secondary border-accent/20 shadow-glass z-[100]" 
