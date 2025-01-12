@@ -41,35 +41,41 @@ export const AccountSection = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <AccountAvatar />
+        <Button 
+          variant="ghost" 
+          className="relative h-10 w-10 rounded-full hover:bg-accent/50"
+        >
+          <AccountAvatar onAvatarUpdate={() => {}} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="w-56 bg-secondary border-accent/20 shadow-glass z-[100]" 
+        className="w-56 bg-secondary/95 backdrop-blur-sm border border-accent/20 shadow-glass z-[100] mt-2" 
         align="end"
+        sideOffset={5}
       >
-        <DropdownMenuLabel className="text-white">My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-white font-medium px-3 py-2">
+          Mein Account
+        </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-accent/20" />
         <DropdownMenuItem
-          className="text-white focus:bg-accent focus:text-white cursor-pointer"
+          className="text-white focus:bg-accent focus:text-white cursor-pointer px-3 py-2"
           onClick={() => navigate('/dashboard')}
         >
           Dashboard
         </DropdownMenuItem>
         {!businessProfile && (
           <DropdownMenuItem
-            className="text-white focus:bg-accent focus:text-white cursor-pointer"
+            className="text-white focus:bg-accent focus:text-white cursor-pointer px-3 py-2"
             onClick={() => navigate('/business-signup')}
           >
-            Register Business
+            Business registrieren
           </DropdownMenuItem>
         )}
         <DropdownMenuItem
-          className="text-white focus:bg-accent focus:text-white cursor-pointer"
+          className="text-white focus:bg-accent focus:text-white cursor-pointer px-3 py-2"
           onClick={handleSignOut}
         >
-          Sign Out
+          Abmelden
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

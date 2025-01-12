@@ -1,85 +1,68 @@
-import React, { useState } from 'react';
-import DetailView from './DetailView';
-import { Activity } from '@/types/activity';
-import FilterBar from './FilterBar';
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import LoadingState from './activity/LoadingState';
-import EmptyState from './activity/EmptyState';
-import ActivityListContent from './activity/ActivityListContent';
-import { useActivities } from '@/hooks/useActivities';
+import React from 'react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-const ActivityList = () => {
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const { toast } = useToast();
-  const { userBusinessProfile } = useBusinessProfile();
-  const { 
-    filteredActivities, 
-    activities,
-    loading, 
-    handleFiltersChange,
-    fetchActivities 
-  } = useActivities();
+export const ActivityList = () => {
+  const { businessProfile } = useBusinessProfile();
 
-  const handleClaimActivity = async (activityId: string) => {
-    try {
-      const { error } = await supabase
+  const { data: activities } = useQuery({
+    queryKey: ['activities', businessProfile?.id],
+    queryFn: async () => {
+      if (!businessProfile?.id) return [];
+
+      const { data, error } = await supabase
         .from('activities')
-        .update({ claimed_by: userBusinessProfile.user_id, is_business: true })
-        .eq('id', activityId);
+        .select('*')
+        .eq('business_id', businessProfile.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching activities:', error);
+        return [];
+      }
 
-      toast({
-        title: "Erfolg",
-        description: "Aktivität erfolgreich beansprucht.",
-      });
+      return data;
+    },
+    enabled: !!businessProfile?.id,
+  });
 
-      fetchActivities();
-    } catch (error) {
-      console.error('Error claiming activity:', error);
-      toast({
-        title: "Fehler",
-        description: "Aktivität konnte nicht beansprucht werden.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (loading) {
-    return <LoadingState />;
+  if (!activities || activities.length === 0) {
+    return (
+      <Card className="p-4">
+        <p className="text-muted-foreground text-center">Keine Aktivitäten vorhanden</p>
+      </Card>
+    );
   }
 
   return (
-    <div className="relative">
-      <div className="group sticky top-0 z-20 pt-4 pb-2 -mx-4 px-4 border-b transition-colors duration-200">
-        <div className="absolute inset-0 group-[.is-sticky]:bg-background/98 group-[.is-sticky]:backdrop-blur supports-[backdrop-filter]:group-[.is-sticky]:bg-background/60" />
-        <div className="relative">
-          <FilterBar onFiltersChange={handleFiltersChange} />
+    <Card className="p-4">
+      <ScrollArea className="h-[300px] w-full">
+        <div className="space-y-4">
+          {activities.map((activity) => (
+            <div
+              key={activity.id}
+              className="flex items-start space-x-4 p-4 rounded-lg bg-accent/20"
+            >
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium">{activity.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(activity.created_at).toLocaleDateString('de-DE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-      
-      <div className="mt-8">
-        {filteredActivities.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <ActivityListContent
-            activities={filteredActivities}
-            onSelect={setSelectedActivity}
-            onClaim={handleClaimActivity}
-            showClaimButton={!!userBusinessProfile}
-          />
-        )}
-      </div>
-
-      <DetailView 
-        activity={selectedActivity}
-        isOpen={selectedActivity !== null}
-        onClose={() => setSelectedActivity(null)}
-      />
-    </div>
+      </ScrollArea>
+    </Card>
   );
 };
-
-export default ActivityList;
