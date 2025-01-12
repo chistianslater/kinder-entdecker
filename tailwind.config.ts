@@ -25,23 +25,23 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#B5FF2B",
+          DEFAULT: "#C2FF4B",  // Slightly brighter green
           foreground: "#1A1F2C",
         },
         secondary: {
-          DEFAULT: "#7E69AB",
+          DEFAULT: "#8A75B3",  // Slightly lighter purple
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#E5DEFF",
+          DEFAULT: "#EDE5FF",  // Slightly lighter accent
           foreground: "#1A1F2C",
         },
         muted: {
-          DEFAULT: "rgba(255, 255, 255, 0.1)",
-          foreground: "#C8C8C9",
+          DEFAULT: "rgba(255, 255, 255, 0.12)",  // Slightly more visible muted
+          foreground: "#D0D0D1",  // Slightly lighter muted text
         },
         destructive: {
-          DEFAULT: "#FF4444",
+          DEFAULT: "#FF5555",  // Slightly brighter red
           foreground: "#FFFFFF",
         },
         popover: {
@@ -49,7 +49,7 @@ export default {
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "rgba(26, 31, 44, 0.8)",
+          DEFAULT: "rgba(26, 31, 44, 0.85)",  // Slightly more opaque card
           foreground: "#FFFFFF",
         },
       },
