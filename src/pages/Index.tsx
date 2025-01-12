@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import ActivityList from '@/components/ActivityList';
+import { ActivityList } from '@/components/ActivityList';
 import Map from '@/components/Map';
 import EventView from '@/components/EventView';
 import Header from '@/components/layout/Header';
