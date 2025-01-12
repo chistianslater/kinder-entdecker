@@ -58,7 +58,7 @@ export const AccountSection = () => {
       <DropdownMenuTrigger className="cursor-pointer outline-none">
         <AccountAvatar 
           avatarUrl={profile?.avatar_url} 
-          className="h-10 w-10 border-2 border-primary hover:border-primary/80 transition-colors"
+          className="border-2 border-primary hover:border-primary/80 transition-colors"
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent 

@@ -10,12 +10,12 @@ interface AccountAvatarProps {
 
 export const AccountAvatar = ({ avatarUrl, className }: AccountAvatarProps) => {
   return (
-    <Avatar className={className}>
+    <Avatar className={`h-12 w-12 ${className}`}>
       {avatarUrl ? (
         <AvatarImage src={avatarUrl} alt="Profile" />
       ) : (
         <AvatarFallback>
-          <User className="h-5 w-5" />
+          <User className="h-6 w-6" />
         </AvatarFallback>
       )}
     </Avatar>
