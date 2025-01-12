@@ -22,11 +22,11 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: "#222222",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "#B5FF2B",
-          foreground: "#050607", // Even darker background for contrast
+          foreground: "#222222",
         },
         secondary: {
           DEFAULT: "#1E2128",
@@ -45,11 +45,11 @@ export default {
           foreground: "#FFFFFF",
         },
         popover: {
-          DEFAULT: "#050607",
+          DEFAULT: "#222222",
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "rgba(5, 6, 7, 0.95)",
+          DEFAULT: "rgba(34, 34, 34, 0.95)",
           foreground: "#FFFFFF",
         },
       },
