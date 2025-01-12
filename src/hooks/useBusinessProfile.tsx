@@ -1,37 +1,27 @@
-import { useState, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useBusinessProfile = () => {
-  const [userBusinessProfile, setUserBusinessProfile] = useState<any>(null);
-
-  useEffect(() => {
-    checkBusinessProfile();
-  }, []);
-
-  const checkBusinessProfile = async () => {
-    try {
-      console.log('Checking business profile...');
+  const { data: businessProfile } = useQuery({
+    queryKey: ['businessProfile'],
+    queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        console.log('User found:', user.id);
-        const { data, error } = await supabase
-          .from('business_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
+      if (!user) return null;
 
-        if (error) {
-          console.error('Error fetching business profile:', error);
-          throw error;
-        }
+      const { data, error } = await supabase
+        .from('business_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-        console.log('Business profile:', data);
-        setUserBusinessProfile(data);
+      if (error) {
+        console.error('Error fetching business profile:', error);
+        return null;
       }
-    } catch (error) {
-      console.error('Error checking business profile:', error);
-    }
-  };
 
-  return { userBusinessProfile };
+      return data;
+    },
+  });
+
+  return { businessProfile };
 };
