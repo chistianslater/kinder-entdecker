@@ -24,7 +24,7 @@ export const PreferencesButton = ({ isActive, onClick }: PreferencesButtonProps)
       className={`flex items-center gap-2 group transition-all duration-300 hover:scale-105 ${
         isActive 
           ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-          : "bg-white hover:bg-accent/10 border-accent/20 rounded-2xl"
+          : "bg-muted text-white hover:bg-accent/10 border-accent/20 rounded-2xl"
       }`}
       onClick={onClick}
     >

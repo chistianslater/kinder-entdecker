@@ -28,7 +28,7 @@ export const FilterButtons = ({
       />
       <Button
         variant="outline"
-        className="flex items-center gap-2 bg-white hover:bg-accent/10 border-accent/20 
+        className="flex items-center gap-2 bg-muted text-white hover:bg-accent/10 border-accent/20 
                  transition-all duration-300 hover:scale-105 rounded-2xl"
         onClick={onFilterClick}
       >
@@ -45,7 +45,7 @@ export const FilterButtons = ({
       </Button>
       <Button
         variant="ghost"
-        className="ml-auto flex items-center gap-2 text-muted-foreground hover:text-primary 
+        className="ml-auto flex items-center gap-2 text-white hover:text-primary 
                  transition-colors duration-300"
         onClick={onReset}
       >
