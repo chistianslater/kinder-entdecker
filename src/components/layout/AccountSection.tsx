@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,57 +9,67 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserRound, Settings, LogOut } from 'lucide-react';
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from 'react-router-dom';
+import { AccountAvatar } from '../dashboard/AccountAvatar';
+import { useAuth } from '@/hooks/useAuth';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 
 export const AccountSection = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { session, signOut } = useAuth();
+  const { businessProfile } = useBusinessProfile();
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      toast({
-        title: "Erfolgreich abgemeldet",
-        description: "Auf Wiedersehen!",
-      });
-      
+      await signOut();
       navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
-      toast({
-        title: "Fehler beim Abmelden",
-        description: "Bitte versuchen Sie es erneut.",
-        variant: "destructive",
-      });
     }
   };
+
+  if (!session) {
+    return (
+      <Button 
+        onClick={() => navigate('/')}
+        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full"
+      >
+        Login
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="icon"
-          className="h-10 w-10 rounded-full border-2 border-primary hover:bg-primary/10"
-        >
-          <UserRound className="h-6 w-6 text-primary" />
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+          <AccountAvatar />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Mein Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Dashboard</span>
+      <DropdownMenuContent 
+        className="w-56 bg-secondary border-accent/20 shadow-glass z-[100]" 
+        align="end"
+      >
+        <DropdownMenuLabel className="text-white">My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-accent/20" />
+        <DropdownMenuItem
+          className="text-white focus:bg-accent focus:text-white cursor-pointer"
+          onClick={() => navigate('/dashboard')}
+        >
+          Dashboard
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Abmelden</span>
+        {!businessProfile && (
+          <DropdownMenuItem
+            className="text-white focus:bg-accent focus:text-white cursor-pointer"
+            onClick={() => navigate('/business-signup')}
+          >
+            Register Business
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem
+          className="text-white focus:bg-accent focus:text-white cursor-pointer"
+          onClick={handleSignOut}
+        >
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
