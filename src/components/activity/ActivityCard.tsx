@@ -114,49 +114,49 @@ export const ActivityCard = ({
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 
-            className="text-lg font-semibold cursor-pointer hover:text-primary"
+            className="text-lg font-semibold cursor-pointer hover:text-primary text-[#eee]"
             onClick={() => onSelect(activity)}
           >
             {activity.title}
           </h3>
           {averageRating !== null && (
             <div className="flex items-center gap-1">
-              <span className="text-sm font-medium">{averageRating.toFixed(1)}</span>
+              <span className="text-sm font-medium text-[#eee]">{averageRating.toFixed(1)}</span>
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm text-gray-500">({reviewCount})</span>
+              <span className="text-sm text-[#eee]/80">({reviewCount})</span>
             </div>
           )}
         </div>
         
         <div className="space-y-2">
-          <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="w-4 h-4 mr-2" />
+          <div className="flex items-center text-sm text-[#eee]/90">
+            <MapPin className="w-4 h-4 mr-2 text-[#eee]" />
             {activity.location}
           </div>
 
-          <div className="flex items-center text-sm text-gray-600">
-            <TreePine className="w-4 h-4 mr-2" />
+          <div className="flex items-center text-sm text-[#eee]/90">
+            <TreePine className="w-4 h-4 mr-2 text-[#eee]" />
             <Badge variant="secondary" className="rounded-md">{activity.type}</Badge>
           </div>
 
           {activity.age_range && (
-            <div className="flex items-center text-sm text-gray-600">
-              <Baby className="w-4 h-4 mr-2" />
+            <div className="flex items-center text-sm text-[#eee]/90">
+              <Baby className="w-4 h-4 mr-2 text-[#eee]" />
               <Badge variant="outline" className="rounded-md">{activity.age_range} Jahre</Badge>
             </div>
           )}
 
           {activity.price_range && (
-            <div className="flex items-center text-sm text-gray-600">
-              <Euro className="w-4 h-4 mr-2" />
+            <div className="flex items-center text-sm text-[#eee]/90">
+              <Euro className="w-4 h-4 mr-2 text-[#eee]" />
               <Badge variant="outline" className="rounded-md">{activity.price_range}</Badge>
             </div>
           )}
 
           {activity.opening_hours && (
-            <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center justify-between text-sm text-[#eee]/90">
               <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
+                <Clock className="w-4 h-4 mr-2 text-[#eee]" />
                 {activity.opening_hours}
               </div>
               {openStatus !== null && (
@@ -179,7 +179,7 @@ export const ActivityCard = ({
         {showClaimButton && onClaim && (
           <Button 
             variant="outline" 
-            className="w-full rounded-md"
+            className="w-full rounded-md text-[#eee]"
             onClick={() => onClaim(activity.id)}
           >
             Als Geschäft beanspruchen
