@@ -10,7 +10,7 @@ export const initializeMap = async (container: HTMLDivElement) => {
     
     const map = new mapboxgl.Map({
       container,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: 'mapbox://styles/mapbox/dark-v11', // Changed to dark style
       center: [10.4515, 51.1657],
       zoom: 5.5
     });
