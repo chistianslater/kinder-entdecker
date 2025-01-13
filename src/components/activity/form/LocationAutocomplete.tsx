@@ -62,16 +62,11 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
 
         const data = await response.json();
         
-        if (!data.features) {
-          setSuggestions([]);
-          return;
-        }
-
-        const newSuggestions = data.features.map((feature: any) => ({
+        const newSuggestions = data.features?.map((feature: any) => ({
           id: feature.id,
           place_name: feature.place_name,
           center: feature.center,
-        }));
+        })) || [];
 
         setSuggestions(newSuggestions);
       } catch (err) {
@@ -116,39 +111,39 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
             }}
             className="h-9"
           />
-          {isLoading ? (
-            <div className="py-6 text-center">
-              <Loader2 className="h-4 w-4 animate-spin mx-auto" />
-            </div>
-          ) : error ? (
-            <div className="py-6 text-center text-sm text-destructive">
-              {error}
-            </div>
-          ) : (
-            <>
-              <CommandEmpty>
-                {inputValue.trim() ? "Keine Ergebnisse gefunden." : "Beginnen Sie mit der Suche..."}
-              </CommandEmpty>
-              <CommandGroup>
-                {suggestions.map((suggestion) => (
-                  <CommandItem
-                    key={suggestion.id}
-                    value={suggestion.place_name}
-                    onSelect={() => handleSelect(suggestion)}
-                    className="cursor-pointer"
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === suggestion.place_name ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {suggestion.place_name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </>
-          )}
+          <CommandEmpty>
+            {isLoading ? (
+              <div className="py-6 text-center">
+                <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+              </div>
+            ) : error ? (
+              <div className="py-6 text-center text-sm text-destructive">
+                {error}
+              </div>
+            ) : inputValue.trim() ? (
+              "Keine Ergebnisse gefunden."
+            ) : (
+              "Beginnen Sie mit der Suche..."
+            )}
+          </CommandEmpty>
+          <CommandGroup>
+            {suggestions.map((suggestion) => (
+              <CommandItem
+                key={suggestion.id}
+                value={suggestion.place_name}
+                onSelect={() => handleSelect(suggestion)}
+                className="cursor-pointer"
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === suggestion.place_name ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {suggestion.place_name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
         </Command>
       </PopoverContent>
     </Popover>
