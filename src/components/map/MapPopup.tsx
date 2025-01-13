@@ -14,7 +14,7 @@ export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapP
   
   // Title
   const title = document.createElement('h3');
-  title.className = 'text-lg font-semibold mb-1 text-foreground';
+  title.className = 'text-lg font-semibold mb-1 text-white';
   title.textContent = activity.title;
 
   // Type
