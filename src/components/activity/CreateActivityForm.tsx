@@ -54,7 +54,7 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
       const data = await response.json();
       if (data.features && data.features.length > 0) {
         const [lng, lat] = data.features[0].center;
-        return { x: lng, y: lat };
+        return `(${lng},${lat})`; // Return coordinates in PostgreSQL point format
       }
       return null;
     } catch (error) {
@@ -84,7 +84,7 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
         title: data.title,
         description: data.description,
         location: data.location,
-        coordinates: coordinates,
+        coordinates, // Now in the correct format for PostgreSQL point type
         type: data.type,
         age_range: data.age_range,
         price_range: data.price_range,
