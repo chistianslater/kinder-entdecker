@@ -44,7 +44,11 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
       setIsLoading(true);
       try {
         const { data: { token }, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
-        if (tokenError) throw tokenError;
+        if (tokenError) {
+          console.error('Error fetching Mapbox token:', tokenError);
+          setSuggestions([]);
+          return;
+        }
 
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
@@ -57,11 +61,13 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         }
 
         const data = await response.json();
-        setSuggestions(data.features.map((feature: any) => ({
+        const newSuggestions = data.features?.map((feature: any) => ({
           id: feature.id,
           place_name: feature.place_name,
           center: feature.center,
-        })));
+        })) || [];
+        
+        setSuggestions(newSuggestions);
       } catch (error) {
         console.error('Error fetching location suggestions:', error);
         setSuggestions([]);
@@ -77,6 +83,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
     onChange(suggestion.place_name, { x: lng, y: lat });
     setOpen(false);
     setSearchValue("");
+    setSuggestions([]); // Clear suggestions after selection
   };
 
   return (
