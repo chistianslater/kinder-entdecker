@@ -23,7 +23,7 @@ export const ImageGallery = ({ activity }: ImageGalleryProps) => {
       <Carousel className="w-full">
         <CarouselContent>
           {galleryImages.map((image, index) => (
-            <CarouselItemWrapper key={`${image.id || index}`}>
+            <CarouselItemWrapper key={`${index}`}>
               <CarouselItem 
                 image={image}
                 activityTitle={activity.title}

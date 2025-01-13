@@ -7,14 +7,16 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
+interface GalleryImage {
+  url: string;
+  isOwner: boolean;
+  photographer: string;
+  caption: string;
+  id?: string;
+}
+
 interface CarouselItemProps {
-  image: {
-    url: string;
-    isOwner: boolean;
-    photographer: string;
-    caption: string;
-    id?: string;
-  };
+  image: GalleryImage;
   activityTitle: string;
   onImageDelete?: () => void;
 }
