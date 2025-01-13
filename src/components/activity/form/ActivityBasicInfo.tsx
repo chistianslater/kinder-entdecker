@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../types";
+import { LocationAutocomplete } from "./LocationAutocomplete";
 
 interface ActivityBasicInfoProps {
   form: UseFormReturn<FormData>;
@@ -53,7 +54,16 @@ export function ActivityBasicInfo({ form }: ActivityBasicInfoProps) {
           <FormItem>
             <FormLabel>Standort</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Adresse oder Standort" />
+              <LocationAutocomplete
+                value={field.value}
+                onChange={(value, coordinates) => {
+                  field.onChange(value);
+                  // Store coordinates in form data if needed
+                  if (coordinates) {
+                    form.setValue('coordinates', coordinates);
+                  }
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
