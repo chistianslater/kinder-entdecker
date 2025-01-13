@@ -24,9 +24,9 @@ export function EditActivityDialog({
 }: EditActivityDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
+      <DialogContent className="max-w-2xl max-h-[90vh] bg-background border-border">
         <DialogHeader>
-          <DialogTitle>Aktivität bearbeiten</DialogTitle>
+          <DialogTitle className="text-white">Aktivität bearbeiten</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
           <CreateActivityForm
