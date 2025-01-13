@@ -1,19 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 import debounce from 'lodash/debounce';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -29,11 +16,9 @@ interface LocationAutocompleteProps {
 }
 
 export function LocationAutocomplete({ value, onChange }: LocationAutocompleteProps) {
-  const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
-  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const fetchSuggestions = useCallback(
     debounce(async (query: string) => {
@@ -44,7 +29,6 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
       }
 
       setIsLoading(true);
-      setError(null);
 
       try {
         const { data: { token }, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
@@ -61,8 +45,6 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         }
 
         const data = await response.json();
-        
-        // Ensure we always have an array, even if empty
         const features = Array.isArray(data.features) ? data.features : [];
         const newSuggestions = features.map((feature: any) => ({
           id: feature.id,
@@ -71,10 +53,10 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         }));
 
         setSuggestions(newSuggestions);
+        setShowSuggestions(true);
       } catch (err) {
         console.error('Error fetching location suggestions:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch suggestions');
-        setSuggestions([]); // Reset to empty array on error
+        setSuggestions([]);
       } finally {
         setIsLoading(false);
       }
@@ -85,70 +67,44 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
   const handleSelect = (suggestion: LocationSuggestion) => {
     const [lng, lat] = suggestion.center;
     onChange(suggestion.place_name, { x: lng, y: lat });
-    setOpen(false);
-    setInputValue("");
+    setShowSuggestions(false);
+    setSuggestions([]);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          {value || "Ort auswählen..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start">
-        <Command shouldFilter={false}>
-          <CommandInput 
-            placeholder="Ort suchen..."
-            value={inputValue}
-            onValueChange={(value) => {
-              setInputValue(value);
-              fetchSuggestions(value);
-            }}
-          />
-          <CommandEmpty>
-            {isLoading ? (
-              <div className="py-6 text-center">
-                <Loader2 className="h-4 w-4 animate-spin mx-auto" />
-              </div>
-            ) : error ? (
-              <div className="py-6 text-center text-sm text-destructive">
-                {error}
-              </div>
-            ) : inputValue.trim() ? (
-              "Keine Ergebnisse gefunden."
-            ) : (
-              "Beginnen Sie mit der Suche..."
-            )}
-          </CommandEmpty>
-          {suggestions.length > 0 && (
-            <CommandGroup>
-              {suggestions.map((suggestion) => (
-                <CommandItem
-                  key={suggestion.id}
-                  value={suggestion.place_name}
-                  onSelect={() => handleSelect(suggestion)}
-                  className="cursor-pointer"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === suggestion.place_name ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {suggestion.place_name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div className="relative w-full">
+      <Input
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value, { x: 0, y: 0 });
+          fetchSuggestions(e.target.value);
+        }}
+        onFocus={() => setShowSuggestions(true)}
+        placeholder="Ort suchen..."
+        className="w-full"
+      />
+      
+      {isLoading && (
+        <div className="absolute right-3 top-2.5">
+          <Loader2 className="h-4 w-4 animate-spin" />
+        </div>
+      )}
+
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-md">
+          <div className="p-1">
+            {suggestions.map((suggestion) => (
+              <button
+                key={suggestion.id}
+                className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-accent hover:text-accent-foreground"
+                onClick={() => handleSelect(suggestion)}
+              >
+                {suggestion.place_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
