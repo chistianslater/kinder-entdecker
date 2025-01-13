@@ -21,6 +21,15 @@ interface ActivityImageUploadProps {
 export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
   const { toast } = useToast();
   const [uploading, setUploading] = React.useState(false);
+  const [previewUrl, setPreviewUrl] = React.useState<string>('');
+
+  React.useEffect(() => {
+    // Initialize preview URL with form value
+    const currentImageUrl = form.getValues('image_url');
+    if (currentImageUrl) {
+      setPreviewUrl(currentImageUrl);
+    }
+  }, [form]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -44,6 +53,7 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         .getPublicUrl(filePath);
 
       form.setValue('image_url', publicUrl);
+      setPreviewUrl(publicUrl);
       
       toast({
         title: "Erfolg",
@@ -61,8 +71,15 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
     }
   };
 
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    form.setValue('image_url', newUrl);
+    setPreviewUrl(newUrl);
+  };
+
   const clearImage = () => {
     form.setValue('image_url', '');
+    setPreviewUrl('');
   };
 
   return (
@@ -74,10 +91,10 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
           <FormLabel>Bild</FormLabel>
           <FormControl>
             <div className="space-y-4">
-              {field.value && (
+              {previewUrl && (
                 <div className="relative">
                   <img 
-                    src={field.value} 
+                    src={previewUrl} 
                     alt="Preview" 
                     className="w-full h-40 object-cover rounded-lg"
                   />
@@ -94,13 +111,11 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
               )}
               <div className="flex items-center gap-2">
                 <Input 
-                  {...field} 
+                  {...field}
                   type="url" 
                   placeholder="Bild URL" 
-                  onChange={(e) => {
-                    field.onChange(e);
-                    form.setValue('image_url', e.target.value);
-                  }}
+                  value={field.value || ''}
+                  onChange={handleUrlChange}
                 />
                 <div className="relative">
                   <Input
