@@ -81,22 +81,22 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         }}
         onFocus={() => setShowSuggestions(true)}
         placeholder="Ort suchen..."
-        className="w-full"
+        className="w-full text-white placeholder:text-gray-400 bg-accent border-accent"
       />
       
       {isLoading && (
         <div className="absolute right-3 top-2.5">
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-4 w-4 animate-spin text-white" />
         </div>
       )}
 
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-md">
+        <div className="absolute z-50 w-full mt-1 bg-accent border border-accent rounded-md shadow-md">
           <div className="p-1">
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion.id}
-                className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-accent hover:text-accent-foreground"
+                className="w-full text-left px-2 py-1.5 text-sm text-white rounded hover:bg-muted"
                 onClick={() => handleSelect(suggestion)}
               >
                 {suggestion.place_name}

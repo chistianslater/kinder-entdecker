@@ -28,22 +28,22 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
         name="type"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Typ</FormLabel>
+            <FormLabel className="text-white">Typ</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Wähle einen Typ" />
+                <SelectTrigger className="bg-accent border-accent text-white">
+                  <SelectValue placeholder="Wähle einen Typ" className="text-gray-400" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-background">
-                <SelectItem value="outdoor">Outdoor</SelectItem>
-                <SelectItem value="indoor">Indoor</SelectItem>
-                <SelectItem value="education">Bildung</SelectItem>
-                <SelectItem value="sports">Sport</SelectItem>
-                <SelectItem value="arts">Kunst & Kultur</SelectItem>
+              <SelectContent className="bg-accent border-accent">
+                <SelectItem value="outdoor" className="text-white">Outdoor</SelectItem>
+                <SelectItem value="indoor" className="text-white">Indoor</SelectItem>
+                <SelectItem value="education" className="text-white">Bildung</SelectItem>
+                <SelectItem value="sports" className="text-white">Sport</SelectItem>
+                <SelectItem value="arts" className="text-white">Kunst & Kultur</SelectItem>
               </SelectContent>
             </Select>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />
@@ -53,22 +53,22 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
         name="age_range"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Altersgruppe</FormLabel>
+            <FormLabel className="text-white">Altersgruppe</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Wähle eine Altersgruppe" />
+                <SelectTrigger className="bg-accent border-accent text-white">
+                  <SelectValue placeholder="Wähle eine Altersgruppe" className="text-gray-400" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-background">
-                <SelectItem value="0-3">0-3 Jahre</SelectItem>
-                <SelectItem value="4-6">4-6 Jahre</SelectItem>
-                <SelectItem value="7-12">7-12 Jahre</SelectItem>
-                <SelectItem value="13-16">13-16 Jahre</SelectItem>
-                <SelectItem value="all">Alle Altersgruppen</SelectItem>
+              <SelectContent className="bg-accent border-accent">
+                <SelectItem value="0-3" className="text-white">0-3 Jahre</SelectItem>
+                <SelectItem value="4-6" className="text-white">4-6 Jahre</SelectItem>
+                <SelectItem value="7-12" className="text-white">7-12 Jahre</SelectItem>
+                <SelectItem value="13-16" className="text-white">13-16 Jahre</SelectItem>
+                <SelectItem value="all" className="text-white">Alle Altersgruppen</SelectItem>
               </SelectContent>
             </Select>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />
@@ -78,21 +78,21 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
         name="price_range"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Preisklasse</FormLabel>
+            <FormLabel className="text-white">Preisklasse</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Wähle eine Preisklasse" />
+                <SelectTrigger className="bg-accent border-accent text-white">
+                  <SelectValue placeholder="Wähle eine Preisklasse" className="text-gray-400" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-background">
-                <SelectItem value="free">Kostenlos</SelectItem>
-                <SelectItem value="low">Günstig</SelectItem>
-                <SelectItem value="medium">Mittel</SelectItem>
-                <SelectItem value="high">Hochpreisig</SelectItem>
+              <SelectContent className="bg-accent border-accent">
+                <SelectItem value="free" className="text-white">Kostenlos</SelectItem>
+                <SelectItem value="low" className="text-white">Günstig</SelectItem>
+                <SelectItem value="medium" className="text-white">Mittel</SelectItem>
+                <SelectItem value="high" className="text-white">Hochpreisig</SelectItem>
               </SelectContent>
             </Select>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />

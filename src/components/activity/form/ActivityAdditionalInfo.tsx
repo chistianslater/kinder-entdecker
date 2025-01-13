@@ -22,11 +22,11 @@ export function ActivityAdditionalInfo({ form }: ActivityAdditionalInfoProps) {
         name="opening_hours"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Öffnungszeiten</FormLabel>
+            <FormLabel className="text-white">Öffnungszeiten</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="z.B. Mo-Fr 9-17 Uhr" />
+              <Input {...field} placeholder="z.B. Mo-Fr 9-17 Uhr" className="text-white placeholder:text-gray-400 bg-accent border-accent" />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />
@@ -36,11 +36,11 @@ export function ActivityAdditionalInfo({ form }: ActivityAdditionalInfoProps) {
         name="ticket_url"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Ticket URL</FormLabel>
+            <FormLabel className="text-white">Ticket URL</FormLabel>
             <FormControl>
-              <Input {...field} type="url" placeholder="https://..." />
+              <Input {...field} type="url" placeholder="https://..." className="text-white placeholder:text-gray-400 bg-accent border-accent" />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />

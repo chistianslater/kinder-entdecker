@@ -24,11 +24,11 @@ export function ActivityBasicInfo({ form }: ActivityBasicInfoProps) {
         name="title"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Titel</FormLabel>
+            <FormLabel className="text-white">Titel</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Name der Aktivität" />
+              <Input {...field} placeholder="Name der Aktivität" className="text-white placeholder:text-gray-400 bg-accent border-accent" />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />
@@ -38,11 +38,11 @@ export function ActivityBasicInfo({ form }: ActivityBasicInfoProps) {
         name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Beschreibung</FormLabel>
+            <FormLabel className="text-white">Beschreibung</FormLabel>
             <FormControl>
-              <Textarea {...field} placeholder="Beschreibe die Aktivität" />
+              <Textarea {...field} placeholder="Beschreibe die Aktivität" className="text-white placeholder:text-gray-400 bg-accent border-accent" />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />
@@ -52,20 +52,19 @@ export function ActivityBasicInfo({ form }: ActivityBasicInfoProps) {
         name="location"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Standort</FormLabel>
+            <FormLabel className="text-white">Standort</FormLabel>
             <FormControl>
               <LocationAutocomplete
                 value={field.value}
                 onChange={(value, coordinates) => {
                   field.onChange(value);
-                  // Store coordinates in form data if needed
                   if (coordinates) {
                     form.setValue('coordinates', coordinates);
                   }
                 }}
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />
