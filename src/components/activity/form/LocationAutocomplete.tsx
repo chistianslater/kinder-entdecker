@@ -62,17 +62,19 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
 
         const data = await response.json();
         
-        const newSuggestions = data.features?.map((feature: any) => ({
+        // Ensure we always have an array, even if empty
+        const features = Array.isArray(data.features) ? data.features : [];
+        const newSuggestions = features.map((feature: any) => ({
           id: feature.id,
           place_name: feature.place_name,
           center: feature.center,
-        })) || [];
+        }));
 
         setSuggestions(newSuggestions);
       } catch (err) {
         console.error('Error fetching location suggestions:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch suggestions');
-        setSuggestions([]);
+        setSuggestions([]); // Reset to empty array on error
       } finally {
         setIsLoading(false);
       }
@@ -109,7 +111,6 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
               setInputValue(value);
               fetchSuggestions(value);
             }}
-            className="h-9"
           />
           <CommandEmpty>
             {isLoading ? (
@@ -126,24 +127,26 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
               "Beginnen Sie mit der Suche..."
             )}
           </CommandEmpty>
-          <CommandGroup>
-            {suggestions.map((suggestion) => (
-              <CommandItem
-                key={suggestion.id}
-                value={suggestion.place_name}
-                onSelect={() => handleSelect(suggestion)}
-                className="cursor-pointer"
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === suggestion.place_name ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {suggestion.place_name}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {suggestions.length > 0 && (
+            <CommandGroup>
+              {suggestions.map((suggestion) => (
+                <CommandItem
+                  key={suggestion.id}
+                  value={suggestion.place_name}
+                  onSelect={() => handleSelect(suggestion)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === suggestion.place_name ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {suggestion.place_name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
