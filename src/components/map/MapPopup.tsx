@@ -9,40 +9,39 @@ interface MapPopupProps {
 
 export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapPopupProps) => {
   const popupContent = document.createElement('div');
-  popupContent.className = 'p-4';
+  popupContent.className = 'p-4 min-w-[240px]';
   
+  // Title
+  const title = document.createElement('h3');
+  title.className = 'text-lg font-medium mb-4 text-white';
+  title.textContent = activity.title;
+  
+  // Buttons container
   const buttonsContainer = document.createElement('div');
-  buttonsContainer.className = 'flex gap-2 mt-3';
+  buttonsContainer.className = 'flex gap-2';
 
+  // Navigation button
   const navigationBtn = document.createElement('button');
-  navigationBtn.className = 'navigation-btn flex items-center gap-1 px-3 py-1 bg-accent text-accent-foreground rounded-md text-sm hover:bg-accent/80 transition-colors';
+  navigationBtn.className = 'flex items-center justify-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg transition-colors w-full';
   navigationBtn.innerHTML = `
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
       <circle cx="12" cy="10" r="3"/>
     </svg>
     Navigation
   `;
 
+  // Details button
   const detailsBtn = document.createElement('button');
-  detailsBtn.className = 'details-btn flex items-center gap-1 px-3 py-1 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/80 transition-colors';
+  detailsBtn.className = 'flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors w-full';
   detailsBtn.innerHTML = `
     Details
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M5 12h14M12 5l7 7-7 7"/>
     </svg>
   `;
 
-  buttonsContainer.appendChild(navigationBtn);
-  buttonsContainer.appendChild(detailsBtn);
-
-  popupContent.innerHTML = `
-    <h3 class="font-bold text-lg mb-2">${activity.title}</h3>
-    <p class="text-sm text-gray-600 mb-2">${activity.type}</p>
-    ${activity.price_range ? `<p class="text-sm mb-1">Preis: ${activity.price_range}</p>` : ''}
-  `;
-  popupContent.appendChild(buttonsContainer);
-
+  // Add event listeners
   navigationBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     onNavigate();
@@ -52,6 +51,13 @@ export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapP
     e.stopPropagation();
     onViewDetails();
   });
+
+  // Assemble the popup content
+  buttonsContainer.appendChild(navigationBtn);
+  buttonsContainer.appendChild(detailsBtn);
+
+  popupContent.appendChild(title);
+  popupContent.appendChild(buttonsContainer);
 
   return popupContent;
 };
