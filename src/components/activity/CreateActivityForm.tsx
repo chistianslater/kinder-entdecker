@@ -32,6 +32,7 @@ export function CreateActivityForm({
       age_range: initialData.age_range || "",
       price_range: initialData.price_range || "",
       opening_hours: initialData.opening_hours || "",
+      website_url: initialData.website_url || "",
       ticket_url: initialData.ticket_url || "",
       image_url: initialData.image_url || "",
     } : {
@@ -42,6 +43,7 @@ export function CreateActivityForm({
       age_range: "",
       price_range: "",
       opening_hours: "",
+      website_url: "",
       ticket_url: "",
       image_url: "",
     },

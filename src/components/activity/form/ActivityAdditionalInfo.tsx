@@ -33,6 +33,20 @@ export function ActivityAdditionalInfo({ form }: ActivityAdditionalInfoProps) {
 
       <FormField
         control={form.control}
+        name="website_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-white">Website URL</FormLabel>
+            <FormControl>
+              <Input {...field} type="url" placeholder="https://..." className="text-white placeholder:text-gray-400 bg-accent border-accent" />
+            </FormControl>
+            <FormMessage className="text-white" />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="ticket_url"
         render={({ field }) => (
           <FormItem>

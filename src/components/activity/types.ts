@@ -10,6 +10,7 @@ export const formSchema = z.object({
   price_range: z.string().optional(),
   opening_hours: z.string().optional(),
   ticket_url: z.string().optional(),
+  website_url: z.string().optional(),
   image_url: z.string().optional(),
   coordinates: z.object({
     x: z.number(),
