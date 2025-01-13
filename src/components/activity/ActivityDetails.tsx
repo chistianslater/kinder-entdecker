@@ -36,13 +36,13 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
         <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
           <div className="flex items-center gap-3">
             <MapPin className="w-5 h-5 text-primary" />
-            <span>{activity.location}</span>
+            <span className="text-white">{activity.location}</span>
           </div>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={handleNavigate}
-            className="shrink-0"
+            className="shrink-0 text-white border-white/20 hover:bg-white/10"
           >
             <Navigation className="w-4 h-4 mr-2" />
             Navigation
@@ -51,22 +51,22 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Clock className="w-5 h-5 text-primary" />
-          <span>{activity.opening_hours || 'Not specified'}</span>
+          <span className="text-white">{activity.opening_hours || 'Not specified'}</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Euro className="w-5 h-5 text-primary" />
-          <span>{activity.price_range || 'Not specified'}</span>
+          <span className="text-white">{activity.price_range || 'Not specified'}</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Users className="w-5 h-5 text-primary" />
-          <span>{activity.age_range || 'Not specified'}</span>
+          <span className="text-white">{activity.age_range || 'Not specified'}</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Tag className="w-5 h-5 text-primary" />
-          <span>{activity.type}</span>
+          <span className="text-white">{activity.type}</span>
         </div>
       </div>
     </div>
