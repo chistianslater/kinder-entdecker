@@ -115,26 +115,24 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
           <CommandEmpty>
             {isLoading ? "Suche läuft..." : "Keine Ergebnisse gefunden."}
           </CommandEmpty>
-          {suggestions && suggestions.length > 0 && (
-            <CommandGroup>
-              {suggestions.map((suggestion) => (
-                <CommandItem
-                  key={suggestion.id}
-                  value={suggestion.place_name}
-                  onSelect={() => handleSelect(suggestion)}
-                  className="cursor-pointer"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === suggestion.place_name ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {suggestion.place_name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
+          <CommandGroup>
+            {suggestions.map((suggestion) => (
+              <CommandItem
+                key={suggestion.id}
+                value={suggestion.place_name}
+                onSelect={() => handleSelect(suggestion)}
+                className="cursor-pointer"
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    value === suggestion.place_name ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {suggestion.place_name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
         </Command>
       </PopoverContent>
     </Popover>
