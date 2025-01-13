@@ -10,6 +10,24 @@ interface ActivityMarkerProps {
   onSelectActivity: (activity: Activity) => void;
 }
 
+const parseCoordinates = (coordinates: string | { x: number; y: number } | null) => {
+  if (!coordinates) return null;
+  
+  if (typeof coordinates === 'string') {
+    // Parse string format "(x,y)"
+    const match = coordinates.match(/\(([-\d.]+),([-\d.]+)\)/);
+    if (match) {
+      return {
+        x: parseFloat(match[1]),
+        y: parseFloat(match[2])
+      };
+    }
+    return null;
+  }
+  
+  return coordinates;
+};
+
 export const addActivityMarker = ({
   activity,
   map,
@@ -17,7 +35,13 @@ export const addActivityMarker = ({
 }: ActivityMarkerProps) => {
   if (!activity.coordinates) return;
   
-  const { x, y } = activity.coordinates;
+  const coords = parseCoordinates(activity.coordinates);
+  if (!coords) {
+    console.warn('Invalid coordinates format for activity:', activity);
+    return;
+  }
+  
+  const { x, y } = coords;
   
   if (isNaN(x) || isNaN(y)) {
     console.warn('Invalid coordinates values for activity:', activity);

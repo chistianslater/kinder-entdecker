@@ -1,25 +1,27 @@
 import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Activity } from "@/types/activity";
+import { supabase } from "@/integrations/supabase/client";
 import { ActivityBasicInfo } from "./form/ActivityBasicInfo";
 import { ActivityTypeInfo } from "./form/ActivityTypeInfo";
 import { ActivityImageUpload } from "./form/ActivityImageUpload";
 import { ActivityAdditionalInfo } from "./form/ActivityAdditionalInfo";
-import { FormData } from "./types";
+import { FormData, formSchema } from "./types";
 
 interface CreateActivityFormProps {
-  onSuccess: () => void;
-  onCancel: () => void;
-  initialData?: Activity;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+  initialData?: any;
 }
 
 export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateActivityFormProps) {
   const { toast } = useToast();
   const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
       title: initialData.title,
       description: initialData.description || "",
@@ -43,6 +45,31 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
     },
   });
 
+  const fetchCoordinates = async (location: string) => {
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          location
+        )}.json?access_token=${await getMapboxToken()}`
+      );
+      const data = await response.json();
+      if (data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].center;
+        return `(${lng},${lat})`;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      return null;
+    }
+  };
+
+  const getMapboxToken = async () => {
+    const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
+    if (error) throw error;
+    return token;
+  };
+
   const onSubmit = async (data: FormData) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -50,6 +77,9 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
 
       console.log('Submitting form data:', data);
       console.log('Initial data:', initialData);
+
+      // Fetch coordinates for the location
+      const coordinates = await fetchCoordinates(data.location);
 
       if (initialData) {
         console.log('Updating activity:', initialData.id);
@@ -59,6 +89,7 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
             title: data.title,
             description: data.description,
             location: data.location,
+            coordinates: coordinates,
             type: data.type,
             age_range: data.age_range,
             price_range: data.price_range,
@@ -84,6 +115,7 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
           .from('activities')
           .insert({
             ...data,
+            coordinates: coordinates,
             created_by: user.id,
           });
 
@@ -98,12 +130,12 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
         });
       }
 
-      onSuccess();
+      if (onSuccess) onSuccess();
     } catch (error) {
-      console.error('Error saving activity:', error);
+      console.error('Error submitting form:', error);
       toast({
         title: "Fehler",
-        description: "Aktivität konnte nicht gespeichert werden.",
+        description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
     }
@@ -111,16 +143,18 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <ActivityBasicInfo form={form} />
         <ActivityTypeInfo form={form} />
-        <ActivityAdditionalInfo form={form} />
         <ActivityImageUpload form={form} />
+        <ActivityAdditionalInfo form={form} />
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>
-            Abbrechen
-          </Button>
+        <div className="flex justify-end gap-4">
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Abbrechen
+            </Button>
+          )}
           <Button type="submit">
             {initialData ? "Aktivität speichern" : "Aktivität erstellen"}
           </Button>
