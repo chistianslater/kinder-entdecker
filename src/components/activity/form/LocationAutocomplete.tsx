@@ -1,11 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Input } from "@/components/ui/input";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import React, { useState, useCallback } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
+import debounce from 'lodash/debounce';
 
 interface LocationSuggestion {
   place_name: string;
@@ -21,54 +31,42 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [inputValue, setInputValue] = useState(value);
-  const debounceTimeout = useRef<NodeJS.Timeout>();
 
-  const getMapboxToken = async () => {
-    const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
-    if (error) throw error;
-    return token;
-  };
+  const fetchSuggestions = useCallback(
+    debounce(async (query: string) => {
+      if (!query) {
+        setSuggestions([]);
+        return;
+      }
 
-  const fetchSuggestions = async (query: string) => {
-    if (!query) {
-      setSuggestions([]);
-      return;
-    }
+      try {
+        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
+        if (error) throw error;
 
-    try {
-      const token = await getMapboxToken();
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          query
-        )}.json?access_token=${token}&country=de&language=de`
-      );
-      const data = await response.json();
-      setSuggestions(data.features || []);
-    } catch (error) {
-      console.error('Error fetching location suggestions:', error);
-      setSuggestions([]);
-    }
-  };
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+            query
+          )}.json?access_token=${token}&country=DE&language=de`
+        );
+        const data = await response.json();
+        setSuggestions(data.features || []);
+      } catch (error) {
+        console.error('Error fetching location suggestions:', error);
+        setSuggestions([]);
+      }
+    }, 300),
+    []
+  );
 
-  useEffect(() => {
+  const handleInputChange = (value: string) => {
     setInputValue(value);
-  }, [value]);
-
-  const handleInputChange = (newValue: string) => {
-    setInputValue(newValue);
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-    debounceTimeout.current = setTimeout(() => {
-      fetchSuggestions(newValue);
-    }, 300);
+    fetchSuggestions(value);
   };
 
   const handleSelect = (suggestion: LocationSuggestion) => {
-    onChange(suggestion.place_name, {
-      x: suggestion.center[0],
-      y: suggestion.center[1]
-    });
+    const [lng, lat] = suggestion.center;
+    onChange(suggestion.place_name, { x: lng, y: lat });
+    setInputValue(suggestion.place_name);
     setOpen(false);
   };
 
@@ -81,22 +79,23 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {inputValue || "Standort wählen..."}
+          {value || "Ort auswählen..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Standort suchen..."
+            placeholder="Ort suchen..."
             value={inputValue}
             onValueChange={handleInputChange}
           />
-          <CommandEmpty>Keine Vorschläge gefunden.</CommandEmpty>
+          <CommandEmpty>Keine Ergebnisse gefunden.</CommandEmpty>
           <CommandGroup className="max-h-60 overflow-auto">
-            {suggestions.map((suggestion) => (
+            {(suggestions || []).map((suggestion) => (
               <CommandItem
                 key={suggestion.place_name}
+                value={suggestion.place_name}
                 onSelect={() => handleSelect(suggestion)}
               >
                 <Check
