@@ -9,6 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../types";
+import { OpeningHoursInput } from "./OpeningHoursInput";
 
 interface ActivityAdditionalInfoProps {
   form: UseFormReturn<FormData>;
@@ -24,7 +25,7 @@ export function ActivityAdditionalInfo({ form }: ActivityAdditionalInfoProps) {
           <FormItem>
             <FormLabel className="text-white">Öffnungszeiten</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="z.B. Mo-Fr 9-17 Uhr" className="text-white placeholder:text-gray-400 bg-accent border-accent" />
+              <OpeningHoursInput {...field} />
             </FormControl>
             <FormMessage className="text-white" />
           </FormItem>
