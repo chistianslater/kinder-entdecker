@@ -19,9 +19,18 @@ interface CreateActivityFormProps {
 
 export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateActivityFormProps) {
   const { toast } = useToast();
-
   const form = useForm<FormData>({
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      title: initialData.title,
+      description: initialData.description || "",
+      location: initialData.location,
+      type: initialData.type,
+      age_range: initialData.age_range || "",
+      price_range: initialData.price_range || "",
+      opening_hours: initialData.opening_hours || "",
+      ticket_url: initialData.ticket_url || "",
+      image_url: initialData.image_url || "",
+    } : {
       title: "",
       description: "",
       location: "",
@@ -39,20 +48,38 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      console.log('Submitting form data:', data);
+      console.log('Initial data:', initialData);
+
       if (initialData) {
+        console.log('Updating activity:', initialData.id);
         const { error } = await supabase
           .from('activities')
-          .update(data)
-          .eq('id', initialData.id)
-          .eq('created_by', user.id);
+          .update({
+            title: data.title,
+            description: data.description,
+            location: data.location,
+            type: data.type,
+            age_range: data.age_range,
+            price_range: data.price_range,
+            opening_hours: data.opening_hours,
+            ticket_url: data.ticket_url,
+            image_url: data.image_url,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', initialData.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating activity:', error);
+          throw error;
+        }
 
         toast({
           title: "Erfolg",
           description: "Aktivität wurde erfolgreich aktualisiert.",
         });
       } else {
+        console.log('Creating new activity');
         const { error } = await supabase
           .from('activities')
           .insert({
@@ -60,7 +87,10 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
             created_by: user.id,
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error creating activity:', error);
+          throw error;
+        }
 
         toast({
           title: "Erfolg",
