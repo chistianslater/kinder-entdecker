@@ -18,12 +18,16 @@ export const ImageGallery = ({ activity }: ImageGalleryProps) => {
   const { getGalleryImages, refetchPhotos } = useActivityPhotos(activity);
   const galleryImages = getGalleryImages();
 
+  if (galleryImages.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="relative">
-      <Carousel className="w-full">
+    <div className="relative w-full aspect-[16/9]">
+      <Carousel className="w-full h-full">
         <CarouselContent>
           {galleryImages.map((image, index) => (
-            <CarouselItemWrapper key={`${index}`}>
+            <CarouselItemWrapper key={`${image.url}-${index}`}>
               <CarouselItem 
                 image={image}
                 activityTitle={activity.title}

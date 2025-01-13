@@ -24,20 +24,7 @@ export const useActivityPhotos = (activity: Activity) => {
 
       if (error) throw error;
 
-      if (data) {
-        const photosWithUrls = await Promise.all(data.map(async (photo) => {
-          const { data: publicUrl } = supabase
-            .storage
-            .from('activity-photos')
-            .getPublicUrl(photo.image_url);
-          
-          return {
-            ...photo,
-            image_url: publicUrl.publicUrl
-          };
-        }));
-        setPhotos(photosWithUrls);
-      }
+      setPhotos(data || []);
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
@@ -46,7 +33,9 @@ export const useActivityPhotos = (activity: Activity) => {
   };
 
   useEffect(() => {
-    fetchPhotos();
+    if (activity.id) {
+      fetchPhotos();
+    }
   }, [activity.id]);
 
   const getGalleryImages = () => {
@@ -63,16 +52,10 @@ export const useActivityPhotos = (activity: Activity) => {
         photographer: 'Community Member',
         caption: photo.caption || 'Community Photo',
         id: photo.id
-      })),
-      ...(activity.image_url || photos.length > 0 ? [] : Array(6).fill(null).map((_, index) => ({
-        url: getRandomPlaceholder(),
-        isOwner: false,
-        photographer: `User ${index}`,
-        caption: `Community Photo ${index}`
-      })))
+      }))
     ];
 
-    return images;
+    return images.length > 0 ? images : [];
   };
 
   return {

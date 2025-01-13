@@ -41,7 +41,6 @@ export const CarouselItem = ({ image, activityTitle, onImageDelete }: CarouselIt
         description: "Das Bild wurde erfolgreich gelöscht.",
       });
 
-      // Immediately call onImageDelete to update the UI
       if (onImageDelete) {
         onImageDelete();
       }
@@ -56,12 +55,13 @@ export const CarouselItem = ({ image, activityTitle, onImageDelete }: CarouselIt
   };
 
   return (
-    <div className="relative">
-      <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg">
+    <div className="relative w-full h-full">
+      <AspectRatio ratio={16 / 9} className="bg-muted">
         <img
           src={image.url}
           alt={`${activityTitle} - ${image.caption}`}
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full rounded-lg"
+          loading="lazy"
         />
       </AspectRatio>
       <Badge 
