@@ -53,7 +53,7 @@ export const addActivityMarker = ({
   const popup = new mapboxgl.Popup({ 
     offset: 25,
     closeButton: false,
-    className: 'custom-popup !bg-background/95 !p-0 !rounded-xl !border !border-border/50 shadow-glass backdrop-blur-glass',
+    className: 'custom-popup !bg-background/90 !p-0 !rounded-xl shadow-glass backdrop-blur-glass',
     maxWidth: '300px'
   }).setDOMContent(createPopupContent({
     activity,

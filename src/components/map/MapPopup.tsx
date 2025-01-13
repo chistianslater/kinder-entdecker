@@ -1,5 +1,6 @@
 import React from 'react';
 import { Activity } from '@/types/activity';
+import { Star } from 'lucide-react';
 
 interface MapPopupProps {
   activity: Activity;
@@ -9,17 +10,31 @@ interface MapPopupProps {
 
 export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapPopupProps) => {
   const popupContent = document.createElement('div');
-  popupContent.className = 'p-4 min-w-[240px] bg-background/95 backdrop-blur-glass';
+  popupContent.className = 'p-4 min-w-[280px] bg-background/90 backdrop-blur-glass';
   
   // Title
   const title = document.createElement('h3');
-  title.className = 'text-lg font-medium mb-2 text-foreground';
+  title.className = 'text-lg font-semibold mb-1 text-foreground';
   title.textContent = activity.title;
 
   // Type
   const type = document.createElement('p');
-  type.className = 'text-sm text-muted-foreground mb-4';
+  type.className = 'text-sm text-muted-foreground mb-3';
   type.textContent = activity.type;
+
+  // Opening Hours (if available)
+  if (activity.opening_hours) {
+    const openingHours = document.createElement('div');
+    openingHours.className = 'flex items-center gap-2 text-sm text-muted-foreground mb-3';
+    openingHours.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 6v6l4 2"/>
+      </svg>
+      ${activity.opening_hours}
+    `;
+    popupContent.appendChild(openingHours);
+  }
   
   // Buttons container
   const buttonsContainer = document.createElement('div');
@@ -27,7 +42,7 @@ export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapP
 
   // Navigation button
   const navigationBtn = document.createElement('button');
-  navigationBtn.className = 'flex items-center justify-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-colors w-full';
+  navigationBtn.className = 'flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors w-full';
   navigationBtn.innerHTML = `
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
