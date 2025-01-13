@@ -6,6 +6,7 @@ import { Baby, Euro, MapPin, Clock, TreePine, Star, Edit } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 const placeholderImages = [
   'photo-1482938289607-e9573fc25ebb', // river between mountains
@@ -40,10 +41,11 @@ export const ActivityCard = ({
   onClaim,
   onEdit,
   showClaimButton = false 
-}: ActivityCardProps & { onEdit?: (activity: Activity) => void }) => {
+}: ActivityCardProps) => {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [isOwner, setIsOwner] = useState(false);
+  const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
     const checkOwnership = async () => {
@@ -198,7 +200,7 @@ export const ActivityCard = ({
             Als Geschäft beanspruchen
           </Button>
         )}
-        {isOwner && onEdit && (
+        {(isOwner || isAdmin) && onEdit && (
           <Button 
             variant="outline" 
             className="w-full rounded-md text-[#eee]"
