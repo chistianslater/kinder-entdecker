@@ -30,6 +30,7 @@ interface LocationAutocompleteProps {
 export function LocationAutocomplete({ value, onChange }: LocationAutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
+  const [inputValue, setInputValue] = useState("");
 
   const fetchSuggestions = useCallback(
     debounce(async (query: string) => {
@@ -61,6 +62,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
     const [lng, lat] = suggestion.center;
     onChange(suggestion.place_name, { x: lng, y: lat });
     setOpen(false);
+    setInputValue("");
   };
 
   return (
@@ -80,7 +82,11 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         <Command shouldFilter={false} className="w-full">
           <CommandInput 
             placeholder="Ort suchen..."
-            onValueChange={fetchSuggestions}
+            value={inputValue}
+            onValueChange={(value) => {
+              setInputValue(value);
+              fetchSuggestions(value);
+            }}
           />
           <CommandEmpty>Keine Ergebnisse gefunden.</CommandEmpty>
           <CommandGroup>
