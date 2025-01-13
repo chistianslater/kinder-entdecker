@@ -14,38 +14,38 @@ export const useActivityPhotos = (activity: Activity) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('photos')
-          .select('*')
-          .eq('activity_id', activity.id)
-          .order('created_at', { ascending: false });
+  const fetchPhotos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('photos')
+        .select('*')
+        .eq('activity_id', activity.id)
+        .order('created_at', { ascending: false });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        if (data) {
-          const photosWithUrls = await Promise.all(data.map(async (photo) => {
-            const { data: publicUrl } = supabase
-              .storage
-              .from('activity-photos')
-              .getPublicUrl(photo.image_url);
-            
-            return {
-              ...photo,
-              image_url: publicUrl.publicUrl
-            };
-          }));
-          setPhotos(photosWithUrls);
-        }
-      } catch (error) {
-        console.error('Error fetching photos:', error);
-      } finally {
-        setLoading(false);
+      if (data) {
+        const photosWithUrls = await Promise.all(data.map(async (photo) => {
+          const { data: publicUrl } = supabase
+            .storage
+            .from('activity-photos')
+            .getPublicUrl(photo.image_url);
+          
+          return {
+            ...photo,
+            image_url: publicUrl.publicUrl
+          };
+        }));
+        setPhotos(photosWithUrls);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching photos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPhotos();
   }, [activity.id]);
 
@@ -61,7 +61,8 @@ export const useActivityPhotos = (activity: Activity) => {
         url: photo.image_url,
         isOwner: false,
         photographer: 'Community Member',
-        caption: photo.caption || 'Community Photo'
+        caption: photo.caption || 'Community Photo',
+        id: photo.id
       })),
       ...(activity.image_url || photos.length > 0 ? [] : Array(6).fill(null).map((_, index) => ({
         url: getRandomPlaceholder(),
@@ -77,6 +78,7 @@ export const useActivityPhotos = (activity: Activity) => {
   return {
     photos,
     loading,
-    getGalleryImages
+    getGalleryImages,
+    refetchPhotos: fetchPhotos
   };
 };

@@ -15,7 +15,7 @@ interface ImageGalleryProps {
 }
 
 export const ImageGallery = ({ activity }: ImageGalleryProps) => {
-  const { getGalleryImages } = useActivityPhotos(activity);
+  const { getGalleryImages, refetchPhotos } = useActivityPhotos(activity);
   const galleryImages = getGalleryImages();
 
   return (
@@ -27,6 +27,7 @@ export const ImageGallery = ({ activity }: ImageGalleryProps) => {
               <CarouselItem 
                 image={image}
                 activityTitle={activity.title}
+                onImageDelete={refetchPhotos}
               />
             </CarouselItemWrapper>
           ))}
