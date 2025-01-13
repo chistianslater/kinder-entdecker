@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CreateActivityForm } from "./CreateActivityForm";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CreateActivityDialogProps {
   open: boolean;
@@ -20,17 +21,19 @@ export function CreateActivityDialog({
 }: CreateActivityDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Neue Aktivität erstellen</DialogTitle>
         </DialogHeader>
-        <CreateActivityForm
-          onSuccess={() => {
-            onSuccess();
-            onOpenChange(false);
-          }}
-          onCancel={() => onOpenChange(false)}
-        />
+        <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+          <CreateActivityForm
+            onSuccess={() => {
+              onSuccess();
+              onOpenChange(false);
+            }}
+            onCancel={() => onOpenChange(false)}
+          />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

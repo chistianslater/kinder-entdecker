@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Activity } from "@/types/activity";
 import { CreateActivityForm } from "./CreateActivityForm";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface EditActivityDialogProps {
   activity: Activity;
@@ -23,18 +24,20 @@ export function EditActivityDialog({
 }: EditActivityDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Aktivität bearbeiten</DialogTitle>
         </DialogHeader>
-        <CreateActivityForm
-          initialData={activity}
-          onSuccess={() => {
-            onSuccess();
-            onOpenChange(false);
-          }}
-          onCancel={() => onOpenChange(false)}
-        />
+        <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+          <CreateActivityForm
+            initialData={activity}
+            onSuccess={() => {
+              onSuccess();
+              onOpenChange(false);
+            }}
+            onCancel={() => onOpenChange(false)}
+          />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
