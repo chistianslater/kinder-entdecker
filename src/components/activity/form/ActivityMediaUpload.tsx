@@ -151,10 +151,10 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
         name="image_url"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Medien</FormLabel>
+            <FormLabel className="text-white">Medien</FormLabel>
             <FormControl>
               <div className="space-y-4">
-                <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                <ScrollArea className="h-[300px] w-full rounded-md border border-accent p-4">
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {mediaFiles.map((file, index) => (
                       <MediaPreview
@@ -180,7 +180,7 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
                 </div>
               </div>
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-white" />
           </FormItem>
         )}
       />

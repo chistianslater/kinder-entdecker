@@ -20,7 +20,7 @@ export const UploadButton = ({ type, onUpload, disabled }: UploadButtonProps) =>
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         disabled={disabled}
       />
-      <Button type="button" variant="outline" disabled={disabled}>
+      <Button type="button" variant="outline" disabled={disabled} className="text-white border-white/20 hover:bg-white/10">
         {type === 'image' ? (
           <ImageIcon className="w-4 h-4 mr-2" />
         ) : (
