@@ -85,7 +85,6 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
     onChange(suggestion.place_name, { x: lng, y: lat });
     setOpen(false);
     setSearchValue("");
-    setSuggestions([]);
   };
 
   return (
