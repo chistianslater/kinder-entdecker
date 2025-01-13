@@ -19,13 +19,13 @@ export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapP
 
   // Type
   const type = document.createElement('p');
-  type.className = 'text-sm text-muted-foreground mb-3';
+  type.className = 'text-sm text-white/70 mb-3';
   type.textContent = activity.type;
 
   // Opening Hours (if available)
   if (activity.opening_hours) {
     const openingHours = document.createElement('div');
-    openingHours.className = 'flex items-center gap-2 text-sm text-muted-foreground mb-3';
+    openingHours.className = 'flex items-center gap-2 text-sm text-white/70 mb-3';
     openingHours.innerHTML = `
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"/>
