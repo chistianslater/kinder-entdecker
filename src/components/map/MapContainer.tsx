@@ -11,26 +11,35 @@ interface MapContainerProps {
 export const MapContainer = ({ mapRef, selectedActivity, onCloseDetail }: MapContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const resizeTimeoutRef = useRef<NodeJS.Timeout>();
+  const requestAnimationFrameRef = useRef<number>();
 
   useEffect(() => {
     let isSubscribed = true;
+
+    const handleResize = () => {
+      if (!isSubscribed || !mapRef.current) return;
+      
+      // Use requestAnimationFrame to ensure smooth handling of resize events
+      if (requestAnimationFrameRef.current) {
+        cancelAnimationFrame(requestAnimationFrameRef.current);
+      }
+
+      requestAnimationFrameRef.current = requestAnimationFrame(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+    };
+
     const resizeObserver = new ResizeObserver((entries) => {
       // Clear any existing timeout
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
 
-      // Set a new timeout to handle the resize event
+      // Debounce resize events
       resizeTimeoutRef.current = setTimeout(() => {
         if (!isSubscribed) return;
-
-        for (const entry of entries) {
-          if (entry.target === containerRef.current && mapRef.current) {
-            // Dispatch resize event only if the component is still mounted
-            window.dispatchEvent(new Event('resize'));
-          }
-        }
-      }, 250); // Debounce resize events with a 250ms delay
+        handleResize();
+      }, 100);
     });
 
     if (containerRef.current) {
@@ -40,12 +49,19 @@ export const MapContainer = ({ mapRef, selectedActivity, onCloseDetail }: MapCon
     // Cleanup function
     return () => {
       isSubscribed = false;
+      
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
+      
+      if (requestAnimationFrameRef.current) {
+        cancelAnimationFrame(requestAnimationFrameRef.current);
+      }
+      
       if (containerRef.current) {
         resizeObserver.unobserve(containerRef.current);
       }
+      
       resizeObserver.disconnect();
     };
   }, [mapRef]);
