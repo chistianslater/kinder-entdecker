@@ -4,10 +4,12 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { Activity } from '@/types/activity';
 import { ActivityDetails } from './activity/ActivityDetails';
 import { UserContributions } from './activity/UserContributions';
+import { X } from 'lucide-react';
 
 interface DetailViewProps {
   activity: Activity | null;
@@ -25,6 +27,10 @@ const DetailView = ({ activity, isOpen, onClose }: DetailViewProps) => {
           <SheetTitle className="text-xl font-semibold text-white">
             {activity.title}
           </SheetTitle>
+          <SheetClose className="absolute right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-secondary">
+            <X className="h-4 w-4 text-white" />
+            <span className="sr-only">Close</span>
+          </SheetClose>
         </SheetHeader>
         
         <div className="space-y-8 py-4">

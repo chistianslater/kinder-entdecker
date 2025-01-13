@@ -179,7 +179,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {!rating && !existingReview && (
-        <div className="text-sm text-muted-foreground flex items-center gap-2">
+        <div className="text-sm text-white/70 flex items-center gap-2">
           <MessageSquare className="w-4 h-4" />
           Wie würdest du diese Aktivität bewerten?
         </div>
@@ -200,7 +200,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
             type="button"
             variant={mediaType === 'photo' ? 'default' : 'outline'}
             onClick={() => setMediaType('photo')}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 ${mediaType !== 'photo' && 'text-white border-white/20 hover:bg-white/10'}`}
           >
             <ImagePlus className="w-4 h-4" />
             Foto
@@ -209,7 +209,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
             type="button"
             variant={mediaType === 'video' ? 'default' : 'outline'}
             onClick={() => setMediaType('video')}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 ${mediaType !== 'video' && 'text-white border-white/20 hover:bg-white/10'}`}
           >
             <Video className="w-4 h-4" />
             Video
@@ -250,6 +250,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
             type="button" 
             variant="outline"
             onClick={onCancelEdit}
+            className="text-white border-white/20 hover:bg-white/10"
           >
             Abbrechen
           </Button>
