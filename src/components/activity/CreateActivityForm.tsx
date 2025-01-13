@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -335,10 +335,10 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
             Abbrechen
           </Button>
           <Button type="submit">
-            Aktivität erstellen
+            {initialData ? "Aktivität speichern" : "Aktivität erstellen"}
           </Button>
         </div>
       </form>
     </Form>
   );
-};
+}
