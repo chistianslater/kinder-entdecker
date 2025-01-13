@@ -1,6 +1,7 @@
 import * as z from "zod";
 
 export const formSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Titel ist erforderlich"),
   description: z.string().optional(),
   location: z.string().min(1, "Standort ist erforderlich"),

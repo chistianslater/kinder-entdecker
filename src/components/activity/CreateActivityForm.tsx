@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ActivityBasicInfo } from "./form/ActivityBasicInfo";
 import { ActivityTypeInfo } from "./form/ActivityTypeInfo";
-import { ActivityImageUpload } from "./form/ActivityImageUpload";
+import { ActivityMediaUpload } from "./form/ActivityMediaUpload";
 import { ActivityAdditionalInfo } from "./form/ActivityAdditionalInfo";
 import { FormData, formSchema } from "./types";
 import { useActivityForm } from "@/hooks/useActivityForm";
@@ -24,6 +24,7 @@ export function CreateActivityForm({
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
+      id: initialData.id,
       title: initialData.title,
       description: initialData.description || "",
       location: initialData.location,
@@ -53,7 +54,7 @@ export function CreateActivityForm({
       <form onSubmit={form.handleSubmit((data) => handleSubmit(data, initialData))} className="space-y-8">
         <ActivityBasicInfo form={form} />
         <ActivityTypeInfo form={form} />
-        <ActivityImageUpload form={form} />
+        <ActivityMediaUpload form={form} />
         <ActivityAdditionalInfo form={form} />
 
         <div className="flex justify-end gap-4">
