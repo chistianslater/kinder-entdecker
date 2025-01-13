@@ -59,7 +59,7 @@ export function CreateActivityForm({
 
         <div className="flex justify-end gap-4">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={onCancel} className="text-white border-white/20 hover:bg-white/10">
               Abbrechen
             </Button>
           )}
