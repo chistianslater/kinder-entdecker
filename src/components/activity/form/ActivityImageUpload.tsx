@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -61,6 +61,10 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
     }
   };
 
+  const clearImage = () => {
+    form.setValue('image_url', '');
+  };
+
   return (
     <FormField
       control={form.control}
@@ -69,16 +73,35 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         <FormItem>
           <FormLabel>Bild</FormLabel>
           <FormControl>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {field.value && (
-                <img 
-                  src={field.value} 
-                  alt="Preview" 
-                  className="w-full h-40 object-cover rounded-lg"
-                />
+                <div className="relative">
+                  <img 
+                    src={field.value} 
+                    alt="Preview" 
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2"
+                    onClick={clearImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               )}
               <div className="flex items-center gap-2">
-                <Input {...field} type="url" placeholder="Bild URL" />
+                <Input 
+                  {...field} 
+                  type="url" 
+                  placeholder="Bild URL" 
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.setValue('image_url', e.target.value);
+                  }}
+                />
                 <div className="relative">
                   <Input
                     type="file"
