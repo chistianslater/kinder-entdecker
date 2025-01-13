@@ -54,7 +54,7 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
       const data = await response.json();
       if (data.features && data.features.length > 0) {
         const [lng, lat] = data.features[0].center;
-        return `(${lng},${lat})`;
+        return { x: lng, y: lat };
       }
       return null;
     } catch (error) {
@@ -80,23 +80,25 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
       // Fetch coordinates for the location
       const coordinates = await fetchCoordinates(data.location);
 
+      const activityData = {
+        title: data.title,
+        description: data.description,
+        location: data.location,
+        coordinates: coordinates,
+        type: data.type,
+        age_range: data.age_range,
+        price_range: data.price_range,
+        opening_hours: data.opening_hours,
+        ticket_url: data.ticket_url,
+        image_url: data.image_url,
+        updated_at: new Date().toISOString(),
+      };
+
       if (initialData) {
         console.log('Updating activity:', initialData.id);
         const { error } = await supabase
           .from('activities')
-          .update({
-            title: data.title,
-            description: data.description,
-            location: data.location,
-            coordinates: coordinates,
-            type: data.type,
-            age_range: data.age_range,
-            price_range: data.price_range,
-            opening_hours: data.opening_hours,
-            ticket_url: data.ticket_url,
-            image_url: data.image_url,
-            updated_at: new Date().toISOString(),
-          })
+          .update(activityData)
           .eq('id', initialData.id);
 
         if (error) {
@@ -113,8 +115,7 @@ export function CreateActivityForm({ onSuccess, onCancel, initialData }: CreateA
         const { error } = await supabase
           .from('activities')
           .insert({
-            ...data,
-            coordinates: coordinates,
+            ...activityData,
             created_by: user.id,
           });
 
