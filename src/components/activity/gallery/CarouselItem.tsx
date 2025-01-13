@@ -39,6 +39,7 @@ export const CarouselItem = ({ image, activityTitle, onImageDelete }: CarouselIt
         description: "Das Bild wurde erfolgreich gelöscht.",
       });
 
+      // Immediately call onImageDelete to update the UI
       if (onImageDelete) {
         onImageDelete();
       }
@@ -68,7 +69,7 @@ export const CarouselItem = ({ image, activityTitle, onImageDelete }: CarouselIt
         <Camera className="w-3 h-3" />
         {image.isOwner ? 'Official Photo' : 'Community Photo'}
       </Badge>
-      {isAdmin && image.id && (
+      {isAdmin && image.id && !image.isOwner && (
         <Button
           variant="destructive"
           size="icon"
