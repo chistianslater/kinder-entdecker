@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FormData } from "../types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useActivityPhotos } from "@/hooks/useActivityPhotos";
 
 interface ActivityMediaUploadProps {
   form: UseFormReturn<FormData>;
@@ -23,14 +24,50 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
   const { toast } = useToast();
   const [uploading, setUploading] = React.useState(false);
   const [mediaFiles, setMediaFiles] = React.useState<Array<{ type: 'image' | 'video', url: string, id?: string }>>([]);
+  const activityId = form.getValues('id');
+  const { getGalleryImages, refetchPhotos } = useActivityPhotos({ id: activityId } as any);
 
   React.useEffect(() => {
     // Initialize with existing media
-    const currentImageUrl = form.getValues('image_url');
-    if (currentImageUrl) {
-      setMediaFiles([{ type: 'image', url: currentImageUrl }]);
-    }
-  }, [form]);
+    const loadExistingMedia = async () => {
+      if (!activityId) {
+        const currentImageUrl = form.getValues('image_url');
+        if (currentImageUrl) {
+          setMediaFiles([{ type: 'image', url: currentImageUrl }]);
+        }
+        return;
+      }
+
+      // Load existing photos
+      const { data: photos } = await supabase
+        .from('photos')
+        .select('*')
+        .eq('activity_id', activityId);
+
+      // Load existing videos
+      const { data: videos } = await supabase
+        .from('videos')
+        .select('*')
+        .eq('activity_id', activityId);
+
+      const existingMedia = [
+        ...(photos || []).map(photo => ({ 
+          type: 'image' as const, 
+          url: photo.image_url, 
+          id: photo.id 
+        })),
+        ...(videos || []).map(video => ({ 
+          type: 'video' as const, 
+          url: video.video_url, 
+          id: video.id 
+        }))
+      ];
+
+      setMediaFiles(existingMedia);
+    };
+
+    loadExistingMedia();
+  }, [activityId]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, fileType: 'image' | 'video') => {
     try {
@@ -58,24 +95,31 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
           form.setValue('image_url', publicUrl);
         }
 
-        // Store in the appropriate table
-        const { data, error: dbError } = await supabase
-          .from(fileType === 'image' ? 'photos' : 'videos')
-          .insert({
-            activity_id: form.getValues('id'),
-            user_id: (await supabase.auth.getUser()).data.user?.id,
-            [fileType === 'image' ? 'image_url' : 'video_url']: publicUrl,
-            caption: file.name
-          })
-          .select()
-          .single();
+        if (activityId) {
+          // Store in the appropriate table
+          const { data, error: dbError } = await supabase
+            .from(fileType === 'image' ? 'photos' : 'videos')
+            .insert({
+              activity_id: activityId,
+              user_id: (await supabase.auth.getUser()).data.user?.id,
+              [fileType === 'image' ? 'image_url' : 'video_url']: publicUrl,
+              caption: file.name
+            })
+            .select()
+            .single();
 
-        if (dbError) throw dbError;
+          if (dbError) throw dbError;
+
+          return {
+            type: fileType,
+            url: publicUrl,
+            id: data.id
+          };
+        }
 
         return {
           type: fileType,
-          url: publicUrl,
-          id: data.id
+          url: publicUrl
         };
       });
 
@@ -100,16 +144,22 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
 
   const handleDelete = async (index: number) => {
     const file = mediaFiles[index];
-    if (!file.id) return;
+    if (!file.id && !activityId) {
+      // For new activities, just remove from state
+      setMediaFiles(prev => prev.filter((_, i) => i !== index));
+      return;
+    }
 
     try {
-      const table = file.type === 'image' ? 'photos' : 'videos';
-      const { error } = await supabase
-        .from(table)
-        .delete()
-        .eq('id', file.id);
+      if (file.id) {
+        const table = file.type === 'image' ? 'photos' : 'videos';
+        const { error } = await supabase
+          .from(table)
+          .delete()
+          .eq('id', file.id);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       setMediaFiles(prev => prev.filter((_, i) => i !== index));
       
@@ -123,6 +173,10 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
         title: "Erfolg",
         description: `${file.type === 'image' ? 'Bild' : 'Video'} wurde gelöscht.`,
       });
+
+      if (refetchPhotos) {
+        refetchPhotos();
+      }
     } catch (error) {
       console.error('Error deleting file:', error);
       toast({
