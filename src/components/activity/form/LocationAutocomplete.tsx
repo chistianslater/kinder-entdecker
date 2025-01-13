@@ -85,7 +85,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
     onChange(suggestion.place_name, { x: lng, y: lat });
     setOpen(false);
     setSearchValue("");
-    setSuggestions([]); // Clear suggestions after selection
+    setSuggestions([]);
   };
 
   return (
@@ -115,7 +115,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
           <CommandEmpty>
             {isLoading ? "Suche läuft..." : "Keine Ergebnisse gefunden."}
           </CommandEmpty>
-          {suggestions.length > 0 && (
+          {suggestions && suggestions.length > 0 && (
             <CommandGroup>
               {suggestions.map((suggestion) => (
                 <CommandItem
