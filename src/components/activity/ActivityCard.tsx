@@ -129,49 +129,49 @@ export const ActivityCard = ({
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 
-            className="text-lg font-semibold cursor-pointer hover:text-primary text-[#eee]"
+            className="text-lg font-semibold cursor-pointer hover:text-primary text-white"
             onClick={() => onSelect(activity)}
           >
             {activity.title}
           </h3>
           {averageRating !== null && (
             <div className="flex items-center gap-1">
-              <span className="text-sm font-medium text-[#eee]">{averageRating.toFixed(1)}</span>
+              <span className="text-sm font-medium text-white">{averageRating.toFixed(1)}</span>
               <Star className="w-4 h-4 fill-primary text-primary" />
-              <span className="text-sm text-[#eee]/80">({reviewCount})</span>
+              <span className="text-sm text-white/80">({reviewCount})</span>
             </div>
           )}
         </div>
         
         <div className="space-y-2">
-          <div className="flex items-center text-sm text-[#eee]/90">
-            <MapPin className="w-4 h-4 mr-2 text-[#eee]" />
+          <div className="flex items-center text-sm text-white/90">
+            <MapPin className="w-4 h-4 mr-2 text-white" />
             {activity.location}
           </div>
 
-          <div className="flex items-center text-sm text-[#eee]/90">
-            <TreePine className="w-4 h-4 mr-2 text-[#eee]" />
-            <Badge variant="secondary" className="rounded-md">{activity.type}</Badge>
+          <div className="flex items-center text-sm text-white/90">
+            <TreePine className="w-4 h-4 mr-2 text-white" />
+            <Badge variant="secondary" className="rounded-md bg-white/10 text-white">{activity.type}</Badge>
           </div>
 
           {activity.age_range && (
-            <div className="flex items-center text-sm text-[#eee]/90">
-              <Baby className="w-4 h-4 mr-2 text-[#eee]" />
-              <Badge variant="outline" className="rounded-md">{activity.age_range} Jahre</Badge>
+            <div className="flex items-center text-sm text-white/90">
+              <Baby className="w-4 h-4 mr-2 text-white" />
+              <Badge variant="outline" className="rounded-md border-white/20 text-white">{activity.age_range} Jahre</Badge>
             </div>
           )}
 
           {activity.price_range && (
-            <div className="flex items-center text-sm text-[#eee]/90">
-              <Euro className="w-4 h-4 mr-2 text-[#eee]" />
-              <Badge variant="outline" className="rounded-md">{activity.price_range}</Badge>
+            <div className="flex items-center text-sm text-white/90">
+              <Euro className="w-4 h-4 mr-2 text-white" />
+              <Badge variant="outline" className="rounded-md border-white/20 text-white">{activity.price_range}</Badge>
             </div>
           )}
 
           {activity.opening_hours && (
-            <div className="flex items-center justify-between text-sm text-[#eee]/90">
+            <div className="flex items-center justify-between text-sm text-white/90">
               <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-[#eee]" />
+                <Clock className="w-4 h-4 mr-2 text-white" />
                 {activity.opening_hours}
               </div>
               {openStatus !== null && (
@@ -194,7 +194,7 @@ export const ActivityCard = ({
         {showClaimButton && onClaim && (
           <Button 
             variant="outline" 
-            className="w-full rounded-md text-[#eee]"
+            className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
             onClick={() => onClaim(activity.id)}
           >
             Als Geschäft beanspruchen
@@ -203,7 +203,7 @@ export const ActivityCard = ({
         {(isOwner || isAdmin) && onEdit && (
           <Button 
             variant="outline" 
-            className="w-full rounded-md text-[#eee]"
+            className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
             onClick={() => onEdit(activity)}
           >
             <Edit className="w-4 h-4 mr-2" />

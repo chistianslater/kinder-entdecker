@@ -9,12 +9,12 @@ interface ViewToggleProps {
 
 const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
   return (
-    <div className="bg-card/95 backdrop-blur-sm border border-border rounded-3xl p-6 mb-6 shadow-glass">
+    <div className="bg-card/95 backdrop-blur-sm border border-white/10 rounded-3xl p-6 mb-6 shadow-glass">
       <div className="flex justify-end gap-2">
         <Button
           variant={viewMode === 'list' ? 'default' : 'outline'}
           onClick={() => onViewChange('list')}
-          className="flex items-center gap-2"
+          className={`flex items-center gap-2 ${viewMode !== 'list' && 'text-white hover:text-white'}`}
         >
           <List className="w-4 h-4" />
           Liste
@@ -22,7 +22,7 @@ const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
         <Button
           variant={viewMode === 'map' ? 'default' : 'outline'}
           onClick={() => onViewChange('map')}
-          className="flex items-center gap-2"
+          className={`flex items-center gap-2 ${viewMode !== 'map' && 'text-white hover:text-white'}`}
         >
           <MapIcon className="w-4 h-4" />
           Karte
@@ -30,7 +30,7 @@ const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
         <Button
           variant={viewMode === 'events' ? 'default' : 'outline'}
           onClick={() => onViewChange('events')}
-          className="flex items-center gap-2"
+          className={`flex items-center gap-2 ${viewMode !== 'events' && 'text-white hover:text-white'}`}
         >
           <Calendar className="w-4 h-4" />
           Events
