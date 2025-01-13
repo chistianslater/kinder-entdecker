@@ -6,31 +6,25 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Upload, X, Image as ImageIcon, Video } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FormData } from "../types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MediaFile } from "@/types/media";
+import { useMediaUpload } from "@/hooks/useMediaUpload";
+import { MediaPreview } from "./MediaPreview";
+import { UploadButton } from "./UploadButton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ActivityMediaUploadProps {
   form: UseFormReturn<FormData>;
 }
 
-interface MediaFile {
-  type: 'image' | 'video';
-  url: string;
-  id?: string;
-  caption?: string;
-}
-
 export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
   const { toast } = useToast();
-  const [uploading, setUploading] = React.useState(false);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const activityId = form.getValues('id');
+  const { handleFileUpload, uploading } = useMediaUpload(activityId);
 
   useEffect(() => {
     const loadExistingMedia = async () => {
@@ -43,28 +37,22 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
       }
 
       try {
-        const { data: photos, error: photosError } = await supabase
-          .from('photos')
-          .select('*')
-          .eq('activity_id', activityId);
+        const [photosResponse, videosResponse] = await Promise.all([
+          supabase.from('photos').select('*').eq('activity_id', activityId),
+          supabase.from('videos').select('*').eq('activity_id', activityId)
+        ]);
 
-        if (photosError) throw photosError;
-
-        const { data: videos, error: videosError } = await supabase
-          .from('videos')
-          .select('*')
-          .eq('activity_id', activityId);
-
-        if (videosError) throw videosError;
+        if (photosResponse.error) throw photosResponse.error;
+        if (videosResponse.error) throw videosResponse.error;
 
         const existingMedia: MediaFile[] = [
-          ...(photos || []).map(photo => ({
+          ...(photosResponse.data || []).map(photo => ({
             type: 'image' as const,
             url: photo.image_url,
             id: photo.id,
             caption: photo.caption
           })),
-          ...(videos || []).map(video => ({
+          ...(videosResponse.data || []).map(video => ({
             type: 'video' as const,
             url: video.video_url,
             id: video.id,
@@ -86,86 +74,21 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
     loadExistingMedia();
   }, [activityId]);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, fileType: 'image' | 'video') => {
+  const handleFileUploadWrapper = async (
+    event: React.ChangeEvent<HTMLInputElement>, 
+    fileType: 'image' | 'video'
+  ) => {
     try {
       if (!event.target.files || event.target.files.length === 0) return;
       
-      setUploading(true);
       const files = Array.from(event.target.files);
-      const uploadPromises = files.map(async (file) => {
-        const fileExt = file.name.split('.').pop();
-        const filePath = `${crypto.randomUUID()}.${fileExt}`;
-        const bucketName = fileType === 'image' ? 'activity-photos' : 'activity-videos';
-
-        const { error: uploadError } = await supabase.storage
-          .from(bucketName)
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(filePath);
-
-        if (fileType === 'image' && mediaFiles.filter(f => f.type === 'image').length === 0) {
-          form.setValue('image_url', publicUrl);
-        }
-
-        if (activityId) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) throw new Error('User not authenticated');
-
-          if (fileType === 'image') {
-            const { data, error: dbError } = await supabase
-              .from('photos')
-              .insert({
-                activity_id: activityId,
-                user_id: user.id,
-                image_url: publicUrl,
-                caption: file.name
-              })
-              .select()
-              .single();
-
-            if (dbError) throw dbError;
-
-            return {
-              type: 'image' as const,
-              url: publicUrl,
-              id: data.id,
-              caption: file.name
-            };
-          } else {
-            const { data, error: dbError } = await supabase
-              .from('videos')
-              .insert({
-                activity_id: activityId,
-                user_id: user.id,
-                video_url: publicUrl,
-                caption: file.name
-              })
-              .select()
-              .single();
-
-            if (dbError) throw dbError;
-
-            return {
-              type: 'video' as const,
-              url: publicUrl,
-              id: data.id,
-              caption: file.name
-            };
-          }
-        }
-
-        return {
-          type: fileType,
-          url: publicUrl,
-          caption: file.name
-        };
-      });
-
+      const uploadPromises = files.map(file => handleFileUpload(file, fileType));
       const newFiles = await Promise.all(uploadPromises);
+
+      if (fileType === 'image' && mediaFiles.filter(f => f.type === 'image').length === 0) {
+        form.setValue('image_url', newFiles[0].url);
+      }
+
       setMediaFiles(prev => [...prev, ...newFiles]);
       
       toast({
@@ -179,8 +102,6 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
         description: "Dateien konnten nicht hochgeladen werden.",
         variant: "destructive",
       });
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -236,62 +157,26 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
                 <ScrollArea className="h-[300px] w-full rounded-md border p-4">
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {mediaFiles.map((file, index) => (
-                      <div key={index} className="relative group">
-                        {file.type === 'image' ? (
-                          <img
-                            src={file.url}
-                            alt={`Media ${index + 1}`}
-                            className="w-full h-40 object-cover rounded-lg"
-                          />
-                        ) : (
-                          <video
-                            src={file.url}
-                            className="w-full h-40 object-cover rounded-lg"
-                            controls
-                          />
-                        )}
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleDelete(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <MediaPreview
+                        key={index}
+                        file={file}
+                        onDelete={handleDelete}
+                        index={index}
+                      />
                     ))}
                   </div>
                 </ScrollArea>
                 <div className="flex gap-4">
-                  <div className="relative">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => handleFileUpload(e, 'image')}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      disabled={uploading}
-                    />
-                    <Button type="button" variant="outline" disabled={uploading}>
-                      <ImageIcon className="w-4 h-4 mr-2" />
-                      Bilder hochladen
-                    </Button>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      type="file"
-                      accept="video/*"
-                      multiple
-                      onChange={(e) => handleFileUpload(e, 'video')}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      disabled={uploading}
-                    />
-                    <Button type="button" variant="outline" disabled={uploading}>
-                      <Video className="w-4 h-4 mr-2" />
-                      Videos hochladen
-                    </Button>
-                  </div>
+                  <UploadButton
+                    type="image"
+                    onUpload={(e) => handleFileUploadWrapper(e, 'image')}
+                    disabled={uploading}
+                  />
+                  <UploadButton
+                    type="video"
+                    onUpload={(e) => handleFileUploadWrapper(e, 'video')}
+                    disabled={uploading}
+                  />
                 </div>
               </div>
             </FormControl>
