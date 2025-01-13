@@ -38,6 +38,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
     debounce(async (query: string) => {
       if (!query) {
         setSuggestions([]);
+        setIsLoading(false);
         return;
       }
 
@@ -47,6 +48,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         if (tokenError) {
           console.error('Error fetching Mapbox token:', tokenError);
           setSuggestions([]);
+          setIsLoading(false);
           return;
         }
 
@@ -113,24 +115,26 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
           <CommandEmpty>
             {isLoading ? "Suche läuft..." : "Keine Ergebnisse gefunden."}
           </CommandEmpty>
-          <CommandGroup>
-            {suggestions.map((suggestion) => (
-              <CommandItem
-                key={suggestion.id}
-                value={suggestion.place_name}
-                onSelect={() => handleSelect(suggestion)}
-                className="cursor-pointer"
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === suggestion.place_name ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {suggestion.place_name}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {suggestions.length > 0 && (
+            <CommandGroup>
+              {suggestions.map((suggestion) => (
+                <CommandItem
+                  key={suggestion.id}
+                  value={suggestion.place_name}
+                  onSelect={() => handleSelect(suggestion)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === suggestion.place_name ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {suggestion.place_name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
