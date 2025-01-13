@@ -43,7 +43,6 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
       }
 
       try {
-        // Load existing photos
         const { data: photos, error: photosError } = await supabase
           .from('photos')
           .select('*')
@@ -51,7 +50,6 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
 
         if (photosError) throw photosError;
 
-        // Load existing videos
         const { data: videos, error: videosError } = await supabase
           .from('videos')
           .select('*')
@@ -109,31 +107,55 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
           .from(bucketName)
           .getPublicUrl(filePath);
 
-        // If it's the first image, set it as the main activity image
         if (fileType === 'image' && mediaFiles.filter(f => f.type === 'image').length === 0) {
           form.setValue('image_url', publicUrl);
         }
 
         if (activityId) {
-          const { data, error: dbError } = await supabase
-            .from(fileType === 'image' ? 'photos' : 'videos')
-            .insert({
-              activity_id: activityId,
-              user_id: (await supabase.auth.getUser()).data.user?.id,
-              [fileType === 'image' ? 'image_url' : 'video_url']: publicUrl,
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('User not authenticated');
+
+          if (fileType === 'image') {
+            const { data, error: dbError } = await supabase
+              .from('photos')
+              .insert({
+                activity_id: activityId,
+                user_id: user.id,
+                image_url: publicUrl,
+                caption: file.name
+              })
+              .select()
+              .single();
+
+            if (dbError) throw dbError;
+
+            return {
+              type: 'image' as const,
+              url: publicUrl,
+              id: data.id,
               caption: file.name
-            })
-            .select()
-            .single();
+            };
+          } else {
+            const { data, error: dbError } = await supabase
+              .from('videos')
+              .insert({
+                activity_id: activityId,
+                user_id: user.id,
+                video_url: publicUrl,
+                caption: file.name
+              })
+              .select()
+              .single();
 
-          if (dbError) throw dbError;
+            if (dbError) throw dbError;
 
-          return {
-            type: fileType,
-            url: publicUrl,
-            id: data.id,
-            caption: file.name
-          };
+            return {
+              type: 'video' as const,
+              url: publicUrl,
+              id: data.id,
+              caption: file.name
+            };
+          }
         }
 
         return {
@@ -182,7 +204,6 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
 
       setMediaFiles(prev => prev.filter((_, i) => i !== index));
       
-      // If we're deleting the main image, update form
       if (file.type === 'image' && file.url === form.getValues('image_url')) {
         const nextImage = mediaFiles.find((f, i) => f.type === 'image' && i !== index);
         form.setValue('image_url', nextImage?.url || '');
