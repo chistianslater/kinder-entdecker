@@ -30,7 +30,7 @@ interface LocationAutocompleteProps {
 export function LocationAutocomplete({ value, onChange }: LocationAutocompleteProps) {
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
-  const [inputValue, setInputValue] = useState(value || '');
+  const [inputValue, setInputValue] = useState('');
 
   const fetchSuggestions = useCallback(
     debounce(async (query: string) => {
@@ -58,9 +58,9 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
     []
   );
 
-  const handleInputChange = (value: string) => {
-    setInputValue(value);
-    fetchSuggestions(value);
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
+    fetchSuggestions(newValue);
   };
 
   const handleSelect = (suggestion: LocationSuggestion) => {
@@ -84,10 +84,10 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command value={inputValue} onValueChange={handleInputChange}>
+        <Command>
           <CommandInput
             placeholder="Ort suchen..."
-            value={inputValue}
+            onValueChange={handleInputChange}
           />
           <CommandEmpty>Keine Ergebnisse gefunden.</CommandEmpty>
           <CommandGroup>
