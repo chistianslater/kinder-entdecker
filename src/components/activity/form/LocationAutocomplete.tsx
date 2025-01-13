@@ -32,6 +32,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [searchValue, setSearchValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchSuggestions = useCallback(
     debounce(async (query: string) => {
@@ -40,9 +41,10 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         return;
       }
 
+      setIsLoading(true);
       try {
-        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
-        if (error) throw error;
+        const { data: { token }, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+        if (tokenError) throw tokenError;
 
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
@@ -63,6 +65,8 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
       } catch (error) {
         console.error('Error fetching location suggestions:', error);
         setSuggestions([]);
+      } finally {
+        setIsLoading(false);
       }
     }, 300),
     []
@@ -89,7 +93,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command shouldFilter={false} className="w-full">
+        <Command shouldFilter={false}>
           <CommandInput 
             placeholder="Ort suchen..."
             value={searchValue}
@@ -97,8 +101,11 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
               setSearchValue(newValue);
               fetchSuggestions(newValue);
             }}
+            className="h-9"
           />
-          <CommandEmpty>Keine Ergebnisse gefunden.</CommandEmpty>
+          <CommandEmpty>
+            {isLoading ? "Suche läuft..." : "Keine Ergebnisse gefunden."}
+          </CommandEmpty>
           <CommandGroup>
             {suggestions.map((suggestion) => (
               <CommandItem
