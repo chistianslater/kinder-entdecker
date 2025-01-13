@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import debounce from 'lodash/debounce';
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationSuggestion {
   id: string;
@@ -40,10 +41,13 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
       }
 
       try {
+        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
+        if (error) throw error;
+
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
             query
-          )}.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}&country=de&types=place,locality,neighborhood,address&language=de`
+          )}.json?access_token=${token}&country=de&types=place,locality,neighborhood,address&language=de`
         );
 
         if (!response.ok) {
