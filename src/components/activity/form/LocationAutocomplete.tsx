@@ -77,7 +77,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command shouldFilter={false}>
+        <Command shouldFilter={false} className="w-full">
           <CommandInput 
             placeholder="Ort suchen..."
             onValueChange={fetchSuggestions}
@@ -89,6 +89,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
                 key={suggestion.place_name}
                 value={suggestion.place_name}
                 onSelect={() => handleSelect(suggestion)}
+                className="cursor-pointer"
               >
                 <Check
                   className={cn(
