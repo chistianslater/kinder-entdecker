@@ -72,7 +72,7 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
-          contentType: file.type // Explicitly set content type
+          contentType: file.type
         });
 
       if (uploadError) throw uploadError;
@@ -80,6 +80,27 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
       const { data: { publicUrl } } = supabase.storage
         .from('activity-photos')
         .getPublicUrl(filePath);
+
+      // Get the current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // Get the activity ID if we're editing an existing activity
+      const activityId = form.getValues('id');
+      
+      // If we have an activity ID, create a photo record
+      if (activityId) {
+        const { error: photoError } = await supabase
+          .from('photos')
+          .insert({
+            activity_id: activityId,
+            user_id: user.id,
+            image_url: publicUrl,
+            caption: file.name
+          });
+
+        if (photoError) throw photoError;
+      }
 
       form.setValue('image_url', publicUrl);
       
