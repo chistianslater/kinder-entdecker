@@ -29,7 +29,12 @@ export const ImageGallery = ({ activity }: ImageGalleryProps) => {
           {galleryImages.map((image, index) => (
             <CarouselItemWrapper key={`${image.url}-${index}`}>
               <CarouselItem 
-                image={image}
+                image={{
+                  ...image,
+                  isOwner: index === 0 && !!activity.image_url,
+                  photographer: index === 0 ? 'Owner' : 'Community Member',
+                  caption: image.caption || (index === 0 ? 'Featured Image' : 'Community Photo')
+                }}
                 activityTitle={activity.title}
                 onImageDelete={refetchPhotos}
               />
