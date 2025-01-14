@@ -28,6 +28,7 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
 
   useEffect(() => {
     const loadExistingMedia = async () => {
+      // If no activity ID (new activity), check for image_url in form
       if (!activityId) {
         const currentImageUrl = form.getValues('image_url');
         if (currentImageUrl) {
@@ -36,6 +37,7 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
         return;
       }
 
+      // Only query the database if we have an activity ID
       try {
         const [photosResponse, videosResponse] = await Promise.all([
           supabase.from('photos').select('*').eq('activity_id', activityId),
