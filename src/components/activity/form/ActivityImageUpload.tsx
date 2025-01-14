@@ -25,7 +25,6 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    // Initialize preview URL with form value
     const currentImageUrl = form.getValues('image_url');
     if (currentImageUrl) {
       setPreviewUrl(currentImageUrl);
@@ -40,7 +39,6 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
       const file = event.target.files[0];
       setUploading(true);
 
-      // Basic validation
       if (!file.type.startsWith('image/')) {
         toast({
           title: "Fehler",
@@ -50,7 +48,6 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         return;
       }
 
-      // Size validation (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Fehler",
@@ -63,7 +60,6 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
-      // Create a local preview URL
       const localPreviewUrl = URL.createObjectURL(file);
       setPreviewUrl(localPreviewUrl);
 
@@ -81,10 +77,11 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         .from('activity-photos')
         .getPublicUrl(filePath);
 
-      // Get the activity ID if we're editing an existing activity
-      const activityId = form.getValues('id');
-      
+      // Set the image URL in the form
+      form.setValue('image_url', publicUrl);
+
       // Only create a photo record if we're editing an existing activity
+      const activityId = form.getValues('id');
       if (activityId) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('User not authenticated');
@@ -101,14 +98,11 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         if (photoError) throw photoError;
       }
 
-      form.setValue('image_url', publicUrl);
-      
       toast({
         title: "Erfolg",
         description: "Bild wurde erfolgreich hochgeladen.",
       });
 
-      // Clean up the local preview URL
       URL.revokeObjectURL(localPreviewUrl);
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -120,7 +114,7 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
-        fileInputRef.current.value = ''; // Reset file input
+        fileInputRef.current.value = '';
       }
     }
   };
