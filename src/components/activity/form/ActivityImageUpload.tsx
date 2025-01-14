@@ -81,15 +81,14 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         .from('activity-photos')
         .getPublicUrl(filePath);
 
-      // Get the current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-
       // Get the activity ID if we're editing an existing activity
       const activityId = form.getValues('id');
       
-      // If we have an activity ID, create a photo record
+      // Only create a photo record if we're editing an existing activity
       if (activityId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
         const { error: photoError } = await supabase
           .from('photos')
           .insert({
