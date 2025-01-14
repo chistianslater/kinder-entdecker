@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import DetailView from './DetailView';
 import { Activity } from '@/types/activity';
-import FilterBar from './FilterBar';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import LoadingState from './activity/LoadingState';
@@ -9,10 +7,8 @@ import EmptyState from './activity/EmptyState';
 import ActivityListContent from './activity/ActivityListContent';
 import { useActivities } from '@/hooks/useActivities';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
-import { Button } from './ui/button';
-import { Plus } from 'lucide-react';
-import { CreateActivityDialog } from './activity/CreateActivityDialog';
-import { EditActivityDialog } from './activity/EditActivityDialog';
+import ActivityListHeader from './activity/ActivityListHeader';
+import ActivityListDialogs from './activity/ActivityListDialogs';
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -62,21 +58,10 @@ const ActivityList = () => {
 
   return (
     <div className="relative">
-      <div className="group sticky top-0 z-20 pt-4 pb-2 -mx-4 px-4 border-b transition-colors duration-200">
-        <div className="absolute inset-0 group-[.is-sticky]:bg-secondary group-[.is-sticky]:backdrop-blur-sm" />
-        <div className="relative">
-          <div className="flex items-center justify-between mb-4">
-            <FilterBar onFiltersChange={handleFiltersChange} />
-            <Button 
-              onClick={() => setShowCreateDialog(true)}
-              className="ml-4"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Aktivität erstellen
-            </Button>
-          </div>
-        </div>
-      </div>
+      <ActivityListHeader 
+        onFiltersChange={handleFiltersChange}
+        onCreateClick={() => setShowCreateDialog(true)}
+      />
       
       <div className="mt-8">
         {filteredActivities.length === 0 ? (
@@ -92,26 +77,15 @@ const ActivityList = () => {
         )}
       </div>
 
-      <DetailView 
-        activity={selectedActivity}
-        isOpen={selectedActivity !== null}
-        onClose={() => setSelectedActivity(null)}
-      />
-
-      <CreateActivityDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
+      <ActivityListDialogs 
+        selectedActivity={selectedActivity}
+        showCreateDialog={showCreateDialog}
+        activityToEdit={activityToEdit}
+        onCloseDetail={() => setSelectedActivity(null)}
+        onCreateDialogChange={setShowCreateDialog}
+        onEditDialogChange={(open) => !open && setActivityToEdit(null)}
         onSuccess={fetchActivities}
       />
-
-      {activityToEdit && (
-        <EditActivityDialog
-          activity={activityToEdit}
-          open={!!activityToEdit}
-          onOpenChange={(open) => !open && setActivityToEdit(null)}
-          onSuccess={fetchActivities}
-        />
-      )}
     </div>
   );
 };
