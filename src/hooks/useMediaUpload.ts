@@ -14,7 +14,11 @@ export const useMediaUpload = (activityId?: string) => {
 
     const { error: uploadError } = await supabase.storage
       .from(bucketName)
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      });
 
     if (uploadError) throw uploadError;
 
@@ -31,7 +35,7 @@ export const useMediaUpload = (activityId?: string) => {
     fileType: 'image' | 'video'
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) throw new Error('Nicht authentifiziert');
 
     if (fileType === 'image') {
       const { data, error } = await supabase
@@ -64,16 +68,26 @@ export const useMediaUpload = (activityId?: string) => {
     }
   };
 
-  const handleFileUpload = async (file: File, fileType: 'image' | 'video') => {
+  const handleFileUpload = async (file: File, fileType: 'image' | 'video'): Promise<MediaFile> => {
     try {
       setUploading(true);
       const publicUrl = await uploadToStorage(file, fileType);
-      const data = await saveToDatabase(publicUrl, file, fileType);
-
+      
+      // Only save to database if we have an activity ID
+      if (activityId) {
+        const data = await saveToDatabase(publicUrl, file, fileType);
+        return {
+          type: fileType,
+          url: publicUrl,
+          id: data.id,
+          caption: file.name
+        };
+      }
+      
+      // If no activity ID, just return the file info
       return {
         type: fileType,
         url: publicUrl,
-        id: data.id,
         caption: file.name
       };
     } catch (error) {

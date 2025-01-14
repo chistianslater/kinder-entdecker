@@ -28,46 +28,52 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
 
   useEffect(() => {
     const loadExistingMedia = async () => {
-      // If no activity ID (new activity), check for image_url in form
-      if (!activityId) {
+      try {
+        // Check for current image URL in form
         const currentImageUrl = form.getValues('image_url');
         if (currentImageUrl) {
           setMediaFiles([{ type: 'image', url: currentImageUrl }]);
         }
-        return;
-      }
 
-      // Only query the database if we have an activity ID
-      try {
-        const [photosResponse, videosResponse] = await Promise.all([
-          supabase.from('photos').select('*').eq('activity_id', activityId),
-          supabase.from('videos').select('*').eq('activity_id', activityId)
-        ]);
+        // Only query database if we have an activity ID
+        if (activityId) {
+          const { data: photos, error: photosError } = await supabase
+            .from('photos')
+            .select('*')
+            .eq('activity_id', activityId);
 
-        if (photosResponse.error) throw photosResponse.error;
-        if (videosResponse.error) throw videosResponse.error;
+          if (photosError) throw photosError;
 
-        const existingMedia: MediaFile[] = [
-          ...(photosResponse.data || []).map(photo => ({
-            type: 'image' as const,
-            url: photo.image_url,
-            id: photo.id,
-            caption: photo.caption
-          })),
-          ...(videosResponse.data || []).map(video => ({
-            type: 'video' as const,
-            url: video.video_url,
-            id: video.id,
-            caption: video.caption
-          }))
-        ];
+          const { data: videos, error: videosError } = await supabase
+            .from('videos')
+            .select('*')
+            .eq('activity_id', activityId);
 
-        setMediaFiles(existingMedia);
+          if (videosError) throw videosError;
+
+          const existingMedia: MediaFile[] = [
+            ...(currentImageUrl ? [{ type: 'image' as const, url: currentImageUrl }] : []),
+            ...(photos || []).map(photo => ({
+              type: 'image' as const,
+              url: photo.image_url,
+              id: photo.id,
+              caption: photo.caption
+            })),
+            ...(videos || []).map(video => ({
+              type: 'video' as const,
+              url: video.video_url,
+              id: video.id,
+              caption: video.caption
+            }))
+          ];
+
+          setMediaFiles(existingMedia);
+        }
       } catch (error) {
         console.error('Error loading media:', error);
         toast({
           title: "Fehler",
-          description: "Medien konnten nicht geladen werden.",
+          description: "Medien konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
           variant: "destructive",
         });
       }
@@ -81,9 +87,29 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
     fileType: 'image' | 'video'
   ) => {
     try {
-      if (!event.target.files || event.target.files.length === 0) return;
+      if (!event.target.files || event.target.files.length === 0) {
+        toast({
+          title: "Fehler",
+          description: "Bitte wählen Sie mindestens eine Datei aus.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       const files = Array.from(event.target.files);
+      
+      // Check file size
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const oversizedFiles = files.filter(file => file.size > maxSize);
+      if (oversizedFiles.length > 0) {
+        toast({
+          title: "Fehler",
+          description: "Einige Dateien sind zu groß. Maximale Größe ist 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const uploadPromises = files.map(file => handleFileUpload(file, fileType));
       const newFiles = await Promise.all(uploadPromises);
 
@@ -95,13 +121,13 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
       
       toast({
         title: "Erfolg",
-        description: `${files.length} ${fileType}${files.length > 1 ? 's' : ''} erfolgreich hochgeladen.`,
+        description: `${files.length} ${fileType === 'image' ? 'Bild' : 'Video'}${files.length > 1 ? 'er' : ''} erfolgreich hochgeladen.`,
       });
     } catch (error) {
       console.error('Error uploading files:', error);
       toast({
         title: "Fehler",
-        description: "Dateien konnten nicht hochgeladen werden.",
+        description: "Dateien konnten nicht hochgeladen werden. Bitte versuchen Sie es später erneut.",
         variant: "destructive",
       });
     }
@@ -140,7 +166,7 @@ export function ActivityMediaUpload({ form }: ActivityMediaUploadProps) {
       console.error('Error deleting file:', error);
       toast({
         title: "Fehler",
-        description: "Datei konnte nicht gelöscht werden.",
+        description: "Datei konnte nicht gelöscht werden. Bitte versuchen Sie es später erneut.",
         variant: "destructive",
       });
     }
