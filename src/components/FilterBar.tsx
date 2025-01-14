@@ -65,27 +65,29 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
   };
 
   return (
-    <div className="modern-card p-4 md:p-6 mb-6">
-      <div className="flex items-center gap-3 flex-wrap">
-        <FilterButtons 
-          isPreferencesActive={isPreferencesActive}
-          onPreferencesClick={handlePreferencesClick}
-          activeFiltersCount={getActiveFiltersCount()}
-          onFilterClick={() => setShowFilterDialog(true)}
-          onReset={handleReset}
-        />
-        <SortSelect
-          value={filters.sortBy}
-          onChange={(value) => handleFilterChange('sortBy', value)}
+    <div className="sticky top-0 z-50">
+      <div className="modern-card p-4 md:p-6 mb-6 bg-background/95 backdrop-blur-sm border-b border-accent/20 shadow-glass">
+        <div className="flex items-center gap-3 flex-wrap">
+          <FilterButtons 
+            isPreferencesActive={isPreferencesActive}
+            onPreferencesClick={handlePreferencesClick}
+            activeFiltersCount={getActiveFiltersCount()}
+            onFilterClick={() => setShowFilterDialog(true)}
+            onReset={handleReset}
+          />
+          <SortSelect
+            value={filters.sortBy}
+            onChange={(value) => handleFilterChange('sortBy', value)}
+          />
+        </div>
+
+        <FilterDialog
+          open={showFilterDialog}
+          onOpenChange={setShowFilterDialog}
+          filters={filters}
+          onFilterChange={handleFilterChange}
         />
       </div>
-
-      <FilterDialog
-        open={showFilterDialog}
-        onOpenChange={setShowFilterDialog}
-        filters={filters}
-        onFilterChange={handleFilterChange}
-      />
     </div>
   );
 };
