@@ -22,6 +22,7 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
   const { toast } = useToast();
   const [uploading, setUploading] = React.useState(false);
   const [previewUrl, setPreviewUrl] = React.useState<string>('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     // Initialize preview URL with form value
@@ -39,12 +40,40 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
       const file = event.target.files[0];
       setUploading(true);
 
+      // Basic validation
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Fehler",
+          description: "Bitte wähle eine gültige Bilddatei aus.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Size validation (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Fehler",
+          description: "Das Bild darf nicht größer als 5MB sein.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
+      // Create a local preview URL
+      const localPreviewUrl = URL.createObjectURL(file);
+      setPreviewUrl(localPreviewUrl);
+
       const { error: uploadError } = await supabase.storage
         .from('activity-photos')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type // Explicitly set content type
+        });
 
       if (uploadError) throw uploadError;
 
@@ -53,12 +82,14 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         .getPublicUrl(filePath);
 
       form.setValue('image_url', publicUrl);
-      setPreviewUrl(publicUrl);
       
       toast({
         title: "Erfolg",
         description: "Bild wurde erfolgreich hochgeladen.",
       });
+
+      // Clean up the local preview URL
+      URL.revokeObjectURL(localPreviewUrl);
     } catch (error) {
       console.error('Error uploading image:', error);
       toast({
@@ -68,6 +99,9 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
       });
     } finally {
       setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''; // Reset file input
+      }
     }
   };
 
@@ -80,6 +114,15 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
   const clearImage = () => {
     form.setValue('image_url', '');
     setPreviewUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   return (
@@ -119,13 +162,20 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
                 />
                 <div className="relative">
                   <Input
+                    ref={fileInputRef}
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     onChange={handleImageUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    className="hidden"
                     disabled={uploading}
                   />
-                  <Button type="button" variant="outline" disabled={uploading}>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    disabled={uploading}
+                    onClick={triggerFileInput}
+                  >
                     <Upload className="w-4 h-4 mr-2" />
                     {uploading ? 'Lädt...' : 'Upload'}
                   </Button>
