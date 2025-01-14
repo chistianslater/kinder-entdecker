@@ -63,7 +63,7 @@ const ActivityList = () => {
   return (
     <div className="relative">
       <div className="group sticky top-0 z-20 pt-4 pb-2 -mx-4 px-4 border-b transition-colors duration-200">
-        <div className="absolute inset-0 group-[.is-sticky]:bg-background/98 group-[.is-sticky]:backdrop-blur supports-[backdrop-filter]:group-[.is-sticky]:bg-background/60" />
+        <div className="absolute inset-0 group-[.is-sticky]:bg-secondary group-[.is-sticky]:backdrop-blur-sm" />
         <div className="relative">
           <div className="flex items-center justify-between mb-4">
             <FilterBar onFiltersChange={handleFiltersChange} />
