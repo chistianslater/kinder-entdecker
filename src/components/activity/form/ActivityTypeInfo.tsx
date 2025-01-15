@@ -47,7 +47,7 @@ interface ActivityTypeInfoProps {
 
 export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
   const handleTypeSelect = (value: string) => {
-    const currentValues = form.getValues("type");
+    const currentValues = form.getValues("type") || [];
     const newValues = Array.isArray(currentValues) ? currentValues : [];
     const updatedValues = newValues.includes(value)
       ? newValues.filter((v) => v !== value)
@@ -56,7 +56,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
   };
 
   const handleAgeRangeSelect = (value: string) => {
-    const currentValues = form.getValues("age_range");
+    const currentValues = form.getValues("age_range") || [];
     const newValues = Array.isArray(currentValues) ? currentValues : [];
     const updatedValues = newValues.includes(value)
       ? newValues.filter((v) => v !== value)
