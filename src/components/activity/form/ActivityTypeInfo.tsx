@@ -65,7 +65,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value?.length > 0
+                    {Array.isArray(field.value) && field.value.length > 0
                       ? `${field.value.length} ausgewählt`
                       : "Typ auswählen"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -82,7 +82,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                         value={type.value}
                         key={type.value}
                         onSelect={() => {
-                          const currentValues = field.value || [];
+                          const currentValues = Array.isArray(field.value) ? field.value : [];
                           const newValues = currentValues.includes(type.value)
                             ? currentValues.filter((value) => value !== type.value)
                             : [...currentValues, type.value];
@@ -93,7 +93,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            (field.value || []).includes(type.value)
+                            Array.isArray(field.value) && field.value.includes(type.value)
                               ? "opacity-100"
                               : "opacity-0"
                           )}
@@ -106,7 +106,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
               </PopoverContent>
             </Popover>
             <div className="flex flex-wrap gap-2 mt-2">
-              {field.value?.map((type) => (
+              {Array.isArray(field.value) && field.value.map((type) => (
                 <Badge
                   key={type}
                   variant="secondary"
@@ -154,7 +154,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value?.length > 0
+                    {Array.isArray(field.value) && field.value.length > 0
                       ? `${field.value.length} ausgewählt`
                       : "Altersgruppe auswählen"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -171,7 +171,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                         value={range.value}
                         key={range.value}
                         onSelect={() => {
-                          const currentValues = field.value || [];
+                          const currentValues = Array.isArray(field.value) ? field.value : [];
                           const newValues = currentValues.includes(range.value)
                             ? currentValues.filter((value) => value !== range.value)
                             : [...currentValues, range.value];
@@ -182,7 +182,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            (field.value || []).includes(range.value)
+                            Array.isArray(field.value) && field.value.includes(range.value)
                               ? "opacity-100"
                               : "opacity-0"
                           )}
@@ -195,7 +195,7 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
               </PopoverContent>
             </Popover>
             <div className="flex flex-wrap gap-2 mt-2">
-              {field.value?.map((range) => (
+              {Array.isArray(field.value) && field.value.map((range) => (
                 <Badge
                   key={range}
                   variant="secondary"
