@@ -4,8 +4,8 @@ export interface Activity {
   description: string | null;
   location: string;
   coordinates?: { x: number; y: number } | null;
-  type: string;
-  age_range: string | null;
+  type: string[];  // Changed from string to string[]
+  age_range: string[] | null;  // Changed from string to string[]
   price_range: string | null;
   opening_hours: string | null;
   created_at: string | null;
