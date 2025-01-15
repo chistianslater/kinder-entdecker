@@ -46,6 +46,22 @@ interface ActivityTypeInfoProps {
 }
 
 export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
+  const handleTypeSelect = (value: string) => {
+    const currentValues = Array.isArray(form.getValues("type")) ? form.getValues("type") : [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    form.setValue("type", newValues);
+  };
+
+  const handleAgeRangeSelect = (value: string) => {
+    const currentValues = Array.isArray(form.getValues("age_range")) ? form.getValues("age_range") : [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    form.setValue("age_range", newValues);
+  };
+
   return (
     <>
       <FormField
@@ -81,19 +97,13 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                       <CommandItem
                         value={type.value}
                         key={type.value}
-                        onSelect={() => {
-                          const currentValues = Array.isArray(field.value) ? field.value : [];
-                          const newValues = currentValues.includes(type.value)
-                            ? currentValues.filter((value) => value !== type.value)
-                            : [...currentValues, type.value];
-                          field.onChange(newValues);
-                        }}
+                        onSelect={() => handleTypeSelect(type.value)}
                         className="text-white hover:bg-accent/50"
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            Array.isArray(field.value) && field.value.includes(type.value)
+                            Array.isArray(field.value) && field.value?.includes(type.value)
                               ? "opacity-100"
                               : "opacity-0"
                           )}
@@ -111,20 +121,14 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                   key={type}
                   variant="secondary"
                   className="bg-accent/50 text-white"
-                  onClick={() => {
-                    field.onChange(
-                      field.value?.filter((value) => value !== type)
-                    );
-                  }}
+                  onClick={() => handleTypeSelect(type)}
                 >
                   {type}
                   <button
                     className="ml-1 hover:text-red-400"
                     onClick={(e) => {
                       e.stopPropagation();
-                      field.onChange(
-                        field.value?.filter((value) => value !== type)
-                      );
+                      handleTypeSelect(type);
                     }}
                   >
                     ×
@@ -170,19 +174,13 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                       <CommandItem
                         value={range.value}
                         key={range.value}
-                        onSelect={() => {
-                          const currentValues = Array.isArray(field.value) ? field.value : [];
-                          const newValues = currentValues.includes(range.value)
-                            ? currentValues.filter((value) => value !== range.value)
-                            : [...currentValues, range.value];
-                          field.onChange(newValues);
-                        }}
+                        onSelect={() => handleAgeRangeSelect(range.value)}
                         className="text-white hover:bg-accent/50"
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            Array.isArray(field.value) && field.value.includes(range.value)
+                            Array.isArray(field.value) && field.value?.includes(range.value)
                               ? "opacity-100"
                               : "opacity-0"
                           )}
@@ -200,20 +198,14 @@ export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
                   key={range}
                   variant="secondary"
                   className="bg-accent/50 text-white"
-                  onClick={() => {
-                    field.onChange(
-                      field.value?.filter((value) => value !== range)
-                    );
-                  }}
+                  onClick={() => handleAgeRangeSelect(range)}
                 >
                   {ageRanges.find((r) => r.value === range)?.label || range}
                   <button
                     className="ml-1 hover:text-red-400"
                     onClick={(e) => {
                       e.stopPropagation();
-                      field.onChange(
-                        field.value?.filter((value) => value !== range)
-                      );
+                      handleAgeRangeSelect(range);
                     }}
                   >
                     ×
