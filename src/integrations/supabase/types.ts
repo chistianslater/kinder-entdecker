@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       activities: {
         Row: {
-          age_range: string | null
+          age_range: string[] | null
           claimed_by: string | null
           coordinates: unknown | null
           created_at: string | null
@@ -26,12 +26,12 @@ export type Database = {
           price_range: string | null
           ticket_url: string | null
           title: string
-          type: string
+          type: string[]
           updated_at: string | null
           website_url: string | null
         }
         Insert: {
-          age_range?: string | null
+          age_range?: string[] | null
           claimed_by?: string | null
           coordinates?: unknown | null
           created_at?: string | null
@@ -46,12 +46,12 @@ export type Database = {
           price_range?: string | null
           ticket_url?: string | null
           title: string
-          type: string
+          type: string[]
           updated_at?: string | null
           website_url?: string | null
         }
         Update: {
-          age_range?: string | null
+          age_range?: string[] | null
           claimed_by?: string | null
           coordinates?: unknown | null
           created_at?: string | null
@@ -66,7 +66,7 @@ export type Database = {
           price_range?: string | null
           ticket_url?: string | null
           title?: string
-          type?: string
+          type?: string[]
           updated_at?: string | null
           website_url?: string | null
         }
