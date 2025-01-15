@@ -47,19 +47,21 @@ interface ActivityTypeInfoProps {
 
 export function ActivityTypeInfo({ form }: ActivityTypeInfoProps) {
   const handleTypeSelect = (value: string) => {
-    const currentValues = Array.isArray(form.getValues("type")) ? form.getValues("type") : [];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter((v) => v !== value)
-      : [...currentValues, value];
-    form.setValue("type", newValues);
+    const currentValues = form.getValues("type") || [];
+    const newValues = Array.isArray(currentValues) ? currentValues : [];
+    const updatedValues = newValues.includes(value)
+      ? newValues.filter((v) => v !== value)
+      : [...newValues, value];
+    form.setValue("type", updatedValues, { shouldValidate: true });
   };
 
   const handleAgeRangeSelect = (value: string) => {
-    const currentValues = Array.isArray(form.getValues("age_range")) ? form.getValues("age_range") : [];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter((v) => v !== value)
-      : [...currentValues, value];
-    form.setValue("age_range", newValues);
+    const currentValues = form.getValues("age_range") || [];
+    const newValues = Array.isArray(currentValues) ? currentValues : [];
+    const updatedValues = newValues.includes(value)
+      ? newValues.filter((v) => v !== value)
+      : [...newValues, value];
+    form.setValue("age_range", updatedValues, { shouldValidate: true });
   };
 
   return (
