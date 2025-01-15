@@ -38,12 +38,13 @@ interface TypeSelectorProps {
 }
 
 export function TypeSelector({ form }: TypeSelectorProps) {
+  const [open, setOpen] = React.useState(false);
+  const currentValues = form.watch("type") || [];
+
   const handleTypeSelect = (value: string) => {
-    const currentValues = form.getValues("type") || [];
-    const newValues = Array.isArray(currentValues) ? currentValues : [];
-    const updatedValues = newValues.includes(value)
-      ? newValues.filter((v) => v !== value)
-      : [...newValues, value];
+    const updatedValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
     form.setValue("type", updatedValues, { shouldValidate: true });
   };
 
@@ -54,7 +55,7 @@ export function TypeSelector({ form }: TypeSelectorProps) {
       render={({ field }) => (
         <FormItem className="flex flex-col">
           <FormLabel className="text-white">Typ</FormLabel>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
@@ -74,20 +75,28 @@ export function TypeSelector({ form }: TypeSelectorProps) {
             </PopoverTrigger>
             <PopoverContent className="w-full p-0 bg-accent border-accent">
               <Command className="bg-accent">
-                <CommandInput placeholder="Suchen..." className="text-white" />
-                <CommandEmpty>Keine Ergebnisse gefunden.</CommandEmpty>
-                <CommandGroup>
+                <CommandInput 
+                  placeholder="Suchen..." 
+                  className="text-white"
+                />
+                <CommandEmpty className="text-white">
+                  Keine Ergebnisse gefunden.
+                </CommandEmpty>
+                <CommandGroup className="max-h-[200px] overflow-y-auto">
                   {activityTypes.map((type) => (
                     <CommandItem
-                      value={type.value}
                       key={type.value}
-                      onSelect={() => handleTypeSelect(type.value)}
+                      value={type.value}
+                      onSelect={() => {
+                        handleTypeSelect(type.value);
+                        setOpen(false);
+                      }}
                       className="text-white hover:bg-accent/50"
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          Array.isArray(field.value) && field.value?.includes(type.value)
+                          Array.isArray(currentValues) && currentValues.includes(type.value)
                             ? "opacity-100"
                             : "opacity-0"
                         )}
