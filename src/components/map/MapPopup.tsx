@@ -20,7 +20,7 @@ export const createPopupContent = ({ activity, onNavigate, onViewDetails }: MapP
   // Type
   const type = document.createElement('p');
   type.className = 'text-sm text-white/70 mb-3';
-  type.textContent = activity.type;
+  type.textContent = activity.type.join(', '); // Join array elements with comma
 
   // Opening Hours (if available)
   if (activity.opening_hours) {

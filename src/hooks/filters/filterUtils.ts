@@ -6,7 +6,7 @@ export const filterByType = (activities: Activity[], type?: string) => {
   console.log('Filtering by type:', type);
   console.log('Available types:', activities.map(a => a.type));
   return activities.filter(activity => 
-    activity.type.toLowerCase() === type.toLowerCase()
+    activity.type.some(t => t.toLowerCase() === type.toLowerCase())
   );
 };
 
@@ -14,7 +14,9 @@ export const filterByAgeRange = (activities: Activity[], ageRange?: string) => {
   if (!ageRange || ageRange === 'all') return activities;
   console.log('Filtering by age range:', ageRange);
   console.log('Available age ranges:', activities.map(a => a.age_range));
-  return activities.filter(activity => activity.age_range === ageRange);
+  return activities.filter(activity => 
+    activity.age_range?.includes(ageRange)
+  );
 };
 
 export const filterByActivityType = (activities: Activity[], activityType?: string) => {
@@ -22,9 +24,10 @@ export const filterByActivityType = (activities: Activity[], activityType?: stri
   console.log('Filtering by activity type:', activityType);
   return activities.filter(activity => {
     if (!activity.type) return false;
-    const type = activity.type.toLowerCase();
     const searchType = activityType.toLowerCase();
-    return type === searchType || type.includes(searchType);
+    return activity.type.some(t => 
+      t.toLowerCase() === searchType || t.toLowerCase().includes(searchType)
+    );
   });
 };
 
