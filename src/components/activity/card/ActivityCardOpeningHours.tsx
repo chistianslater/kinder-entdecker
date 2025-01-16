@@ -28,7 +28,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         
         formattedSchedule.push({
           days: day,
-          hours: times === 'Geschlossen' ? 'Geschlossen' : times
+          hours: times === 'Geschlossen' ? 'geschlossen' : `${times} Uhr`
         });
       }
     }
@@ -100,11 +100,11 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         {formattedHours.map((schedule, index) => (
           <div 
             key={index} 
-            className="text-sm text-white/90 border-b border-white/10 py-2 last:border-0"
+            className="text-sm text-white/90 py-1.5 last:border-0"
           >
-            <div className="grid grid-cols-[1fr_auto] gap-4">
-              <span className="font-medium">{schedule.days}:</span>
-              <span className="text-right">{schedule.hours}</span>
+            <div className="grid grid-cols-[120px_1fr] items-center">
+              <span className="font-medium">{schedule.days}</span>
+              <span>{schedule.hours}</span>
             </div>
           </div>
         ))}
