@@ -30,6 +30,7 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     setSchedule(prevSchedule => {
       const newSchedule = [...prevSchedule];
       newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
+      newSchedule[dayIndex].isAlwaysOpen = false;
       return newSchedule;
     });
   }, []);
@@ -66,6 +67,14 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     });
   }, []);
 
+  const handleAlwaysOpenChange = React.useCallback((dayIndex: number, checked: boolean) => {
+    setSchedule(prevSchedule => {
+      const newSchedule = [...prevSchedule];
+      newSchedule[dayIndex].isAlwaysOpen = checked;
+      return newSchedule;
+    });
+  }, []);
+
   React.useEffect(() => {
     const formattedValue = formatSchedule(schedule);
     if (formattedValue !== value) {
@@ -87,6 +96,8 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
           }
           onDeleteSlot={(slotIndex) => handleDeleteSlot(dayIndex, slotIndex)}
           maxSlots={MAX_SLOTS_PER_DAY}
+          isAlwaysOpen={daySchedule.isAlwaysOpen || false}
+          onAlwaysOpenChange={(checked) => handleAlwaysOpenChange(dayIndex, checked)}
         />
       ))}
     </div>

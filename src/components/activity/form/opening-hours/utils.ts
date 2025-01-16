@@ -18,6 +18,7 @@ export interface TimeSlot {
 export interface DaySchedule {
   day: string;
   slots: TimeSlot[];
+  isAlwaysOpen?: boolean;
 }
 
 export const generateTimeOptions = () => {
@@ -31,38 +32,45 @@ export const generateTimeOptions = () => {
   return options;
 };
 
-export const parseTimeSlots = (timePart: string): TimeSlot[] => {
-  if (timePart.toLowerCase() === 'geschlossen') {
-    return [];
+export const parseTimeSlots = (timePart: string): { slots: TimeSlot[], isAlwaysOpen: boolean } => {
+  if (timePart.toLowerCase() === '24/7') {
+    return { slots: [], isAlwaysOpen: true };
   }
-  return timePart.split(',').slice(0, MAX_SLOTS_PER_DAY).map(slot => {
-    const [open, close] = slot.trim().split('-').map(t => t.trim());
-    return { 
-      open: open || '09:00', 
-      close: close || '17:00' 
-    };
-  });
+  if (timePart.toLowerCase() === 'geschlossen') {
+    return { slots: [], isAlwaysOpen: false };
+  }
+  return {
+    slots: timePart.split(',').slice(0, MAX_SLOTS_PER_DAY).map(slot => {
+      const [open, close] = slot.trim().split('-').map(t => t.trim());
+      return { 
+        open: open || '09:00', 
+        close: close || '17:00' 
+      };
+    }),
+    isAlwaysOpen: false
+  };
 };
 
 export const parseOpeningHours = (value: string): DaySchedule[] => {
   if (!value) {
-    return DAYS.map(day => ({ day, slots: [] }));
+    return DAYS.map(day => ({ day, slots: [], isAlwaysOpen: false }));
   }
 
   const scheduleMap = new Map(
-    DAYS.map(day => [day, { day, slots: [] as TimeSlot[] }])
+    DAYS.map(day => [day, { day, slots: [], isAlwaysOpen: false }])
   );
 
   value.split('\n').forEach(line => {
     const [days, times] = line.split(':').map(part => part.trim());
     if (!times) return;
 
-    const timeSlots = parseTimeSlots(times);
+    const { slots, isAlwaysOpen } = parseTimeSlots(times);
     days.split(',').forEach(day => {
       const trimmedDay = day.trim();
       const schedule = scheduleMap.get(trimmedDay);
       if (schedule) {
-        schedule.slots = timeSlots;
+        schedule.slots = slots;
+        schedule.isAlwaysOpen = isAlwaysOpen;
       }
     });
   });
@@ -72,9 +80,12 @@ export const parseOpeningHours = (value: string): DaySchedule[] => {
 
 export const formatSchedule = (schedule: DaySchedule[]): string => {
   return schedule
-    .map(({ day, slots }) => {
-      if (slots.length === 0) {
+    .map(({ day, slots, isAlwaysOpen }) => {
+      if (slots.length === 0 && !isAlwaysOpen) {
         return `${day}: Geschlossen`;
+      }
+      if (isAlwaysOpen) {
+        return `${day}: 24/7`;
       }
       const timeRanges = slots
         .map(slot => `${slot.open}-${slot.close}`)
