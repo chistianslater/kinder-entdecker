@@ -149,7 +149,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         onChange={(e) =>
                           updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
                         }
-                        className="bg-background border-white/10"
+                        className="bg-background border-white/10 text-white"
                       />
                     </div>
                     <span className="text-sm text-white mt-6">-</span>
@@ -161,7 +161,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         onChange={(e) =>
                           updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
                         }
-                        className="bg-background border-white/10"
+                        className="bg-background border-white/10 text-white"
                       />
                     </div>
                     <Button
@@ -171,7 +171,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                       onClick={() => removeTimeSlot(dayIndex, slotIndex)}
                       className="mt-6 text-white hover:text-white hover:bg-white/10"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 text-white" />
                     </Button>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                   onClick={() => addTimeSlot(dayIndex)}
                   className="text-white hover:text-white hover:bg-white/10 w-full"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 text-white" />
                 </Button>
               )}
             </div>
