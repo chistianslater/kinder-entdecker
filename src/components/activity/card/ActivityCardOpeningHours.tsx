@@ -69,7 +69,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
     <Collapsible
       open={isOpeningHoursOpen}
       onOpenChange={setIsOpeningHoursOpen}
-      className="space-y-2"
+      className="space-y-2 pt-4"
     >
       <div className="flex items-center justify-between text-sm text-white/90">
         <CollapsibleTrigger asChild>
