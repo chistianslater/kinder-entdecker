@@ -33,17 +33,46 @@ const DAYS = [
 
 const formatTimeValue = (time: string | undefined): string => {
   if (!time) return '00:00';
-  // Ensure the time is in HH:MM format
-  const [hours, minutes] = time.split(':');
-  const formattedHours = hours?.padStart(2, '0') || '00';
-  const formattedMinutes = minutes?.padStart(2, '0') || '00';
+  // Remove any whitespace and ensure proper format
+  const cleanTime = time.trim();
+  if (!cleanTime.includes(':')) return '00:00';
+  
+  const [hours, minutes] = cleanTime.split(':');
+  if (!hours || !minutes) return '00:00';
+  
+  const formattedHours = hours.padStart(2, '0');
+  const formattedMinutes = minutes.padStart(2, '0');
   return `${formattedHours}:${formattedMinutes}`;
+};
+
+const parseTimeSlots = (timePart: string): TimeSlot[] => {
+  if (!timePart) return [{ open: '08:00', close: '17:00' }];
+  
+  try {
+    return timePart.split(',').map(slot => {
+      const [open, close] = slot.trim().split('-');
+      return {
+        open: formatTimeValue(open),
+        close: formatTimeValue(close)
+      };
+    });
+  } catch (error) {
+    console.error('Error parsing time slots:', error);
+    return [{ open: '08:00', close: '17:00' }];
+  }
 };
 
 export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() => {
     try {
-      // Try to parse existing value
+      if (!value) {
+        return DAYS.map(day => ({
+          day,
+          isClosed: true,
+          slots: [{ open: '08:00', close: '17:00' }]
+        }));
+      }
+
       const lines = value.split('\n');
       return DAYS.map(day => {
         const dayLine = lines.find(line => line.startsWith(day));
@@ -54,22 +83,16 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
             slots: [{ open: '08:00', close: '17:00' }]
           };
         }
-        const timePart = dayLine.split(':')[1];
-        const timeSlots = timePart.split(',').map(slot => {
-          const [open, close] = slot.trim().split('-').map(t => t?.trim());
-          return { 
-            open: formatTimeValue(open), 
-            close: formatTimeValue(close)
-          };
-        });
+
+        const [, timePart] = dayLine.split(':');
         return {
           day,
           isClosed: false,
-          slots: timeSlots
+          slots: parseTimeSlots(timePart)
         };
       });
-    } catch {
-      // Default schedule if parsing fails
+    } catch (error) {
+      console.error('Error parsing schedule:', error);
       return DAYS.map(day => ({
         day,
         isClosed: true,
