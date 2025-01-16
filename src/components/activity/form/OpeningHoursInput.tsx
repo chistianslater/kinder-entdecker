@@ -1,9 +1,7 @@
 import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Plus, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Plus, Minus } from 'lucide-react';
 
 interface TimeSlot {
   open: string;
@@ -12,13 +10,7 @@ interface TimeSlot {
 
 interface DaySchedule {
   day: string;
-  isClosed: boolean;
   slots: TimeSlot[];
-}
-
-interface OpeningHoursInputProps {
-  value: string;
-  onChange: (value: string) => void;
 }
 
 const DAYS = [
@@ -38,86 +30,77 @@ const formatTimeValue = (time: string): string => {
 };
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
-  if (!timePart) return [{ open: '08:00', close: '17:00' }];
-  
-  try {
-    return timePart.split(',').map(slot => {
-      const [open, close] = slot.trim().split('-');
-      return {
-        open: formatTimeValue(open.trim()),
-        close: formatTimeValue(close.trim())
-      };
-    });
-  } catch (error) {
-    console.error('Error parsing time slots:', error);
-    return [{ open: '08:00', close: '17:00' }];
+  if (timePart.toLowerCase() === 'geschlossen') {
+    return [];
   }
+  return timePart.split(',').map(slot => {
+    const [open, close] = slot.trim().split('-').map(t => t.trim());
+    return { open: formatTimeValue(open), close: formatTimeValue(close) };
+  });
 };
 
-export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
-  const [schedule, setSchedule] = React.useState<DaySchedule[]>(() => {
-    try {
-      if (!value) {
-        return DAYS.map(day => ({
-          day,
-          isClosed: true,
-          slots: [{ open: '08:00', close: '17:00' }]
-        }));
+const parseOpeningHours = (value: string): DaySchedule[] => {
+  if (!value) {
+    return DAYS.map(day => ({ day, slots: [] }));
+  }
+
+  const scheduleMap = new Map(
+    DAYS.map(day => [day, { day, slots: [] as TimeSlot[] }])
+  );
+
+  value.split('\n').forEach(line => {
+    const [days, times] = line.split(':').map(part => part.trim());
+    if (!times) return;
+
+    const timeSlots = parseTimeSlots(times);
+    days.split(',').forEach(day => {
+      const trimmedDay = day.trim();
+      const schedule = scheduleMap.get(trimmedDay);
+      if (schedule) {
+        schedule.slots = timeSlots;
       }
-
-      const lines = value.split('\n');
-      return DAYS.map(day => {
-        const dayLine = lines.find(line => line.startsWith(day));
-        if (!dayLine || dayLine.includes('Geschlossen')) {
-          return {
-            day,
-            isClosed: true,
-            slots: [{ open: '08:00', close: '17:00' }]
-          };
-        }
-
-        const [, timePart] = dayLine.split(':');
-        return {
-          day,
-          isClosed: false,
-          slots: parseTimeSlots(timePart)
-        };
-      });
-    } catch (error) {
-      console.error('Error parsing schedule:', error);
-      return DAYS.map(day => ({
-        day,
-        isClosed: true,
-        slots: [{ open: '08:00', close: '17:00' }]
-      }));
-    }
+    });
   });
+
+  return Array.from(scheduleMap.values());
+};
+
+const formatSchedule = (schedule: DaySchedule[]): string => {
+  return schedule
+    .map(({ day, slots }) => {
+      if (slots.length === 0) {
+        return `${day}: Geschlossen`;
+      }
+      const timeRanges = slots
+        .map(slot => `${slot.open}-${slot.close}`)
+        .join(', ');
+      return `${day}: ${timeRanges}`;
+    })
+    .join('\n');
+};
+
+interface OpeningHoursInputProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) => {
+  const [schedule, setSchedule] = React.useState<DaySchedule[]>(() =>
+    parseOpeningHours(value)
+  );
+
+  React.useEffect(() => {
+    setSchedule(parseOpeningHours(value));
+  }, [value]);
 
   const updateSchedule = (newSchedule: DaySchedule[]) => {
     setSchedule(newSchedule);
-    const formattedSchedule = newSchedule
-      .map(day => {
-        if (day.isClosed) {
-          return `${day.day}: Geschlossen`;
-        }
-        const slots = day.slots
-          .map(slot => `${slot.open}-${slot.close}`)
-          .join(', ');
-        return `${day.day}: ${slots}`;
-      })
-      .join('\n');
-    onChange(formattedSchedule);
-  };
-
-  const toggleDay = (dayIndex: number) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].isClosed = !newSchedule[dayIndex].isClosed;
-    updateSchedule(newSchedule);
+    onChange(formatSchedule(newSchedule));
   };
 
   const addTimeSlot = (dayIndex: number) => {
     const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots.push({ open: '08:00', close: '17:00' });
+    newSchedule[dayIndex].slots.push({ open: '00:00', close: '00:00' });
     updateSchedule(newSchedule);
   };
 
@@ -135,69 +118,71 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
 
   return (
     <div className="space-y-4">
-      {schedule.map((day, dayIndex) => (
-        <div key={day.day} className="space-y-3 p-4 rounded-lg bg-accent/10">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={!day.isClosed}
-              onCheckedChange={() => toggleDay(dayIndex)}
-              className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-            />
-            <Label className="text-white text-base">{day.day}</Label>
+      {schedule.map((daySchedule, dayIndex) => (
+        <div key={daySchedule.day} className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-white">{daySchedule.day}</span>
+            {daySchedule.slots.length === 0 ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => addTimeSlot(dayIndex)}
+                className="text-white border-white/20 hover:bg-white/10"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Öffnungszeit hinzufügen
+              </Button>
+            ) : null}
           </div>
-
-          {!day.isClosed && (
-            <div className="space-y-3 pl-6">
-              {day.slots.map((slot, slotIndex) => (
-                <div key={slotIndex} className="flex items-center gap-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-sm text-white/60">Öffnet um</Label>
-                    <Input
-                      type="time"
-                      value={slot.open}
-                      onChange={(e) => updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)}
-                      className="w-32 bg-accent border-accent text-white"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-sm text-white/60">Schließt um</Label>
-                    <Input
-                      type="time"
-                      value={slot.close}
-                      onChange={(e) => updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)}
-                      className="w-32 bg-accent border-accent text-white"
-                    />
-                  </div>
-                  <div className="flex items-end gap-2">
-                    {slotIndex > 0 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeTimeSlot(dayIndex, slotIndex)}
-                        className="mb-1.5 text-white hover:text-white/80 hover:bg-red-500/20"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {slotIndex === day.slots.length - 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => addTimeSlot(dayIndex)}
-                        className="mb-1.5 text-white hover:text-white/80"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
+          {daySchedule.slots.length > 0 ? (
+            <div className="space-y-2">
+              {daySchedule.slots.map((slot, slotIndex) => (
+                <div key={slotIndex} className="flex items-center gap-2">
+                  <Input
+                    type="time"
+                    value={slot.open}
+                    onChange={(e) =>
+                      updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
+                    }
+                    className="w-32"
+                  />
+                  <span className="text-white">-</span>
+                  <Input
+                    type="time"
+                    value={slot.close}
+                    onChange={(e) =>
+                      updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
+                    }
+                    className="w-32"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeTimeSlot(dayIndex, slotIndex)}
+                    className="text-white border-white/20 hover:bg-white/10"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
                 </div>
               ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => addTimeSlot(dayIndex)}
+                className="text-white border-white/20 hover:bg-white/10"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Weitere Öffnungszeit
+              </Button>
             </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">Geschlossen</div>
           )}
         </div>
       ))}
     </div>
   );
-}
+};
