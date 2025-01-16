@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Activity } from '@/types/activity';
 import { ReviewForm } from './ReviewForm';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, Pencil } from 'lucide-react';
+import { TreePine, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -101,7 +101,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
                       </div>
                       <div className="flex">
                         {Array.from({ length: review.rating }).map((_, i) => (
-                          <Star 
+                          <TreePine 
                             key={i} 
                             className="w-4 h-4 fill-primary text-primary" 
                           />
