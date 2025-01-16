@@ -32,18 +32,6 @@ const DAYS = [
 
 const MAX_SLOTS_PER_DAY = 2;
 
-// Memoize TIME_OPTIONS to prevent recreation on each render
-const TIME_OPTIONS = React.useMemo(() => {
-  const options = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute of [0, 30]) {
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      options.push(timeString);
-    }
-  }
-  return options;
-}, []);
-
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
   if (timePart.toLowerCase() === 'geschlossen') {
     return [];
@@ -107,7 +95,18 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     parseOpeningHours(value)
   );
 
-  // Memoize handlers to prevent recreation on each render
+  // Move TIME_OPTIONS inside the component and memoize it
+  const TIME_OPTIONS = React.useMemo(() => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute of [0, 30]) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        options.push(timeString);
+      }
+    }
+    return options;
+  }, []);
+
   const updateSchedule = React.useCallback((newSchedule: DaySchedule[]) => {
     const formattedValue = formatSchedule(newSchedule);
     if (formattedValue !== value) {
@@ -141,7 +140,6 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     updateSchedule(newSchedule);
   }, [schedule, updateSchedule]);
 
-  // Update local state when prop value changes
   React.useEffect(() => {
     const newSchedule = parseOpeningHours(value);
     if (JSON.stringify(newSchedule) !== JSON.stringify(schedule)) {
