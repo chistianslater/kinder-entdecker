@@ -9,21 +9,7 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const activityTypes = [
   { value: "Natur & Wandern", label: "Natur & Wandern" },
@@ -38,90 +24,58 @@ interface TypeSelectorProps {
 }
 
 export function TypeSelector({ form }: TypeSelectorProps) {
-  const [open, setOpen] = React.useState(false);
-  
   return (
     <FormField
       control={form.control}
       name="type"
       render={({ field }) => {
         const currentValues = Array.isArray(field.value) ? field.value : [];
-        
-        const handleTypeSelect = (value: string) => {
-          const updatedValues = currentValues.includes(value)
-            ? currentValues.filter((v) => v !== value)
-            : [...currentValues, value];
+
+        const handleTypeSelect = (checked: boolean, value: string) => {
+          const updatedValues = checked
+            ? [...currentValues, value]
+            : currentValues.filter((v) => v !== value);
           form.setValue("type", updatedValues, { shouldValidate: true });
-          setOpen(false);
         };
 
         return (
           <FormItem className="flex flex-col">
-            <FormLabel className="text-white">Typ</FormLabel>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "w-full justify-between bg-accent border-accent text-white",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {currentValues.length > 0
-                      ? `${currentValues.length} ausgewählt`
-                      : "Typ auswählen"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0 bg-accent border-accent">
-                <Command className="bg-accent">
-                  <CommandInput 
-                    placeholder="Suchen..." 
-                    className="text-white"
-                  />
-                  <CommandEmpty className="text-white">
-                    Keine Ergebnisse gefunden.
-                  </CommandEmpty>
-                  <CommandGroup className="max-h-[200px] overflow-y-auto">
-                    {activityTypes.map((type) => (
-                      <CommandItem
-                        key={type.value}
-                        value={type.value}
-                        onSelect={() => handleTypeSelect(type.value)}
-                        className="text-white hover:bg-accent/50"
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            currentValues.includes(type.value)
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {type.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <FormLabel className="text-white mb-2">Typ</FormLabel>
+            <div className="grid grid-cols-2 gap-4">
+              {activityTypes.map((type) => (
+                <FormItem
+                  key={type.value}
+                  className="flex items-center space-x-3 space-y-0"
+                >
+                  <FormControl>
+                    <Checkbox
+                      checked={currentValues.includes(type.value)}
+                      onCheckedChange={(checked) => 
+                        handleTypeSelect(checked as boolean, type.value)
+                      }
+                      className="bg-accent data-[state=checked]:bg-primary"
+                    />
+                  </FormControl>
+                  <FormLabel className="text-white font-normal">
+                    {type.label}
+                  </FormLabel>
+                </FormItem>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
               {currentValues.map((type) => (
                 <Badge
                   key={type}
                   variant="secondary"
                   className="bg-accent/50 text-white"
-                  onClick={() => handleTypeSelect(type)}
+                  onClick={() => handleTypeSelect(false, type)}
                 >
                   {type}
                   <button
                     className="ml-1 hover:text-red-400"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleTypeSelect(type);
+                      handleTypeSelect(false, type);
                     }}
                   >
                     ×
