@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Activity } from '@/types/activity';
 import { ImageGallery } from './ImageGallery';
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface ActivityDetailsProps {
   activity: Activity;
@@ -32,8 +33,8 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
       <ImageGallery activity={activity} />
 
       <h3 className="text-lg font-semibold text-primary">Details</h3>
-      <div className="grid gap-4">
-        <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
+      <div className="grid gap-6">
+        <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
           <div className="flex items-center gap-3">
             <MapPin className="w-5 h-5 text-primary" />
             <span className="text-white">{activity.location}</span>
@@ -49,22 +50,30 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
           </Button>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
+        <Separator className="bg-accent/20" />
+
+        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
           <Clock className="w-5 h-5 text-primary" />
           <span className="text-white">{activity.opening_hours || 'Nicht angegeben'}</span>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
+        <Separator className="bg-accent/20" />
+
+        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
           <Euro className="w-5 h-5 text-primary" />
           <span className="text-white">{activity.price_range || 'Nicht angegeben'}</span>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
+        <Separator className="bg-accent/20" />
+
+        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
           <Users className="w-5 h-5 text-primary" />
           <span className="text-white">{activity.age_range || 'Nicht angegeben'}</span>
         </div>
 
-        <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
+        <Separator className="bg-accent/20" />
+
+        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
           <Tag className="w-5 h-5 text-primary" />
           <span className="text-white">{activity.type}</span>
         </div>
