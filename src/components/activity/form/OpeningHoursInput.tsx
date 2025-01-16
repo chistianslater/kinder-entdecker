@@ -31,18 +31,9 @@ const DAYS = [
   'Sonntag'
 ];
 
-const formatTimeValue = (time: string | undefined): string => {
+const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
-  // Remove any whitespace and ensure proper format
-  const cleanTime = time.trim();
-  if (!cleanTime.includes(':')) return '00:00';
-  
-  const [hours, minutes] = cleanTime.split(':');
-  if (!hours || !minutes) return '00:00';
-  
-  const formattedHours = hours.padStart(2, '0');
-  const formattedMinutes = minutes.padStart(2, '0');
-  return `${formattedHours}:${formattedMinutes}`;
+  return time;
 };
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
@@ -52,8 +43,8 @@ const parseTimeSlots = (timePart: string): TimeSlot[] => {
     return timePart.split(',').map(slot => {
       const [open, close] = slot.trim().split('-');
       return {
-        open: formatTimeValue(open),
-        close: formatTimeValue(close)
+        open: formatTimeValue(open.trim()),
+        close: formatTimeValue(close.trim())
       };
     });
   } catch (error) {
@@ -109,11 +100,7 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
           return `${day.day}: Geschlossen`;
         }
         const slots = day.slots
-          .map(slot => {
-            const formattedOpen = formatTimeValue(slot.open);
-            const formattedClose = formatTimeValue(slot.close);
-            return `${formattedOpen}-${formattedClose}`;
-          })
+          .map(slot => `${slot.open}-${slot.close}`)
           .join(', ');
         return `${day.day}: ${slots}`;
       })
