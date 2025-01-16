@@ -96,7 +96,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-medium">
+                      <div className="font-medium text-white">
                         {review.profiles?.username || 'Anonymer Benutzer'}
                       </div>
                       <div className="flex">
