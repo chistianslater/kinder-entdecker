@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface TimeSlot {
@@ -95,6 +95,12 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     updateSchedule(newSchedule);
   };
 
+  const removeTimeSlot = (dayIndex: number, slotIndex: number) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots.splice(slotIndex, 1);
+    updateSchedule(newSchedule);
+  };
+
   const updateTimeSlot = (dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
     const newSchedule = [...schedule];
     newSchedule[dayIndex].slots[slotIndex][field] = value;
@@ -136,17 +142,30 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
                       className="w-32 bg-accent border-accent text-white"
                     />
                   </div>
-                  {slotIndex === day.slots.length - 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => addTimeSlot(dayIndex)}
-                      className="mt-6 text-white hover:text-white/80"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <div className="flex items-end gap-2">
+                    {slotIndex > 0 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeTimeSlot(dayIndex, slotIndex)}
+                        className="mb-1.5 text-white hover:text-white/80 hover:bg-red-500/20"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {slotIndex === day.slots.length - 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => addTimeSlot(dayIndex)}
+                        className="mb-1.5 text-white hover:text-white/80"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
