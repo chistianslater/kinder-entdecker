@@ -28,7 +28,14 @@ const MAX_SLOTS_PER_DAY = 2;
 
 const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
-  return time.includes(':') ? time : `${time}:00`;
+  // Remove any non-time characters and ensure HH:mm format
+  const cleanTime = time.replace(/[^0-9:]/g, '');
+  if (!cleanTime.includes(':')) {
+    const hours = cleanTime.slice(0, 2).padStart(2, '0');
+    const minutes = cleanTime.slice(2, 4).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  return cleanTime;
 };
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
@@ -103,7 +110,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
   const addTimeSlot = (dayIndex: number) => {
     const newSchedule = [...schedule];
     if (newSchedule[dayIndex].slots.length < MAX_SLOTS_PER_DAY) {
-      newSchedule[dayIndex].slots.push({ open: '00:00', close: '00:00' });
+      newSchedule[dayIndex].slots.push({ open: '09:00', close: '17:00' });
       updateSchedule(newSchedule);
     }
   };
@@ -129,7 +136,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
               checked={daySchedule.slots.length > 0}
               onCheckedChange={(checked) => {
                 const newSchedule = [...schedule];
-                newSchedule[dayIndex].slots = checked ? [{ open: '00:00', close: '00:00' }] : [];
+                newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
                 updateSchedule(newSchedule);
               }}
               className="border-white/20"
@@ -152,7 +159,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                           }
                           className="bg-background border-white/10 text-white pl-8"
                         />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 stroke-white" />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
                       </div>
                     </div>
                     <span className="text-sm text-white mt-6">-</span>
@@ -167,7 +174,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                           }
                           className="bg-background border-white/10 text-white pl-8"
                         />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 stroke-white" />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
                       </div>
                     </div>
                     <Button
@@ -177,7 +184,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                       onClick={() => removeTimeSlot(dayIndex, slotIndex)}
                       className="mt-6 text-white hover:text-white hover:bg-white/10"
                     >
-                      <Trash2 className="w-4 h-4 stroke-white" />
+                      <Trash2 className="w-4 h-4 text-white" />
                     </Button>
                   </div>
                 </div>
@@ -190,7 +197,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                   onClick={() => addTimeSlot(dayIndex)}
                   className="text-white hover:text-white hover:bg-white/10 w-full"
                 >
-                  <Plus className="w-4 h-4 stroke-white" />
+                  <Plus className="w-4 h-4 text-white" />
                 </Button>
               )}
             </div>
