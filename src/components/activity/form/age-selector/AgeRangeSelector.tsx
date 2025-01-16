@@ -9,21 +9,8 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { X } from "lucide-react";
 
 const ageRanges = [
   { value: "0-3", label: "0-3 Jahre" },
@@ -38,13 +25,18 @@ interface AgeRangeSelectorProps {
 }
 
 export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
-  const handleAgeRangeSelect = (value: string) => {
+  const handleAgeRangeSelect = (checked: boolean, value: string) => {
     const currentValues = form.getValues("age_range") || [];
-    const newValues = Array.isArray(currentValues) ? currentValues : [];
-    const updatedValues = newValues.includes(value)
-      ? newValues.filter((v) => v !== value)
-      : [...newValues, value];
-    form.setValue("age_range", updatedValues, { shouldValidate: true });
+    const newValues = checked
+      ? [...currentValues, value]
+      : currentValues.filter((v) => v !== value);
+    form.setValue("age_range", newValues, { shouldValidate: true });
+  };
+
+  const removeAgeRange = (valueToRemove: string) => {
+    const currentValues = form.getValues("age_range") || [];
+    const newValues = currentValues.filter((value) => value !== valueToRemove);
+    form.setValue("age_range", newValues, { shouldValidate: true });
   };
 
   return (
@@ -52,74 +44,54 @@ export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
       control={form.control}
       name="age_range"
       render={({ field }) => (
-        <FormItem className="flex flex-col">
+        <FormItem className="space-y-4">
           <FormLabel className="text-white">Altersgruppe</FormLabel>
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    "w-full justify-between bg-accent border-accent text-white",
-                    !field.value && "text-muted-foreground"
-                  )}
-                >
-                  {Array.isArray(field.value) && field.value.length > 0
-                    ? `${field.value.length} ausgewählt`
-                    : "Altersgruppe auswählen"}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0 bg-accent border-accent">
-              <Command className="bg-accent">
-                <CommandInput placeholder="Suchen..." className="text-white" />
-                <CommandEmpty>Keine Ergebnisse gefunden.</CommandEmpty>
-                <CommandGroup>
-                  {ageRanges.map((range) => (
-                    <CommandItem
-                      value={range.value}
-                      key={range.value}
-                      onSelect={() => handleAgeRangeSelect(range.value)}
-                      className="text-white hover:bg-accent/50"
+          <FormControl>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {ageRanges.map((range) => (
+                  <div key={range.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`age-${range.value}`}
+                      checked={field.value?.includes(range.value)}
+                      onCheckedChange={(checked) => 
+                        handleAgeRangeSelect(checked as boolean, range.value)
+                      }
+                      className="border-white/20 data-[state=checked]:bg-primary 
+                               data-[state=checked]:text-primary-foreground"
+                    />
+                    <label
+                      htmlFor={`age-${range.value}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed 
+                               peer-disabled:opacity-70 text-white"
                     >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          Array.isArray(field.value) && field.value?.includes(range.value)
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
                       {range.label}
-                    </CommandItem>
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {field.value && field.value.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {field.value.map((value) => (
+                    <Badge
+                      key={value}
+                      variant="secondary"
+                      className="bg-accent/50 text-white"
+                    >
+                      {ageRanges.find((r) => r.value === value)?.label || value}
+                      <button
+                        type="button"
+                        onClick={() => removeAgeRange(value)}
+                        className="ml-1 hover:text-red-400"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
                   ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {Array.isArray(field.value) && field.value.map((range) => (
-              <Badge
-                key={range}
-                variant="secondary"
-                className="bg-accent/50 text-white"
-                onClick={() => handleAgeRangeSelect(range)}
-              >
-                {ageRanges.find((r) => r.value === range)?.label || range}
-                <button
-                  className="ml-1 hover:text-red-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAgeRangeSelect(range);
-                  }}
-                >
-                  ×
-                </button>
-              </Badge>
-            ))}
-          </div>
+                </div>
+              )}
+            </div>
+          </FormControl>
           <FormMessage className="text-white" />
         </FormItem>
       )}
