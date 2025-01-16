@@ -14,7 +14,7 @@ const ActivityListHeader = ({
   onCreateClick 
 }: ActivityListHeaderProps) => {
   return (
-    <div className="sticky top-16 z-10 pt-4 pb-2 -mx-4 px-4 transition-colors duration-200 bg-background">
+    <div className="sticky top-0 z-20 pt-4 pb-2 -mx-4 px-4 transition-colors duration-200 bg-background">
       <div className="absolute inset-0 group-[.is-sticky]:bg-secondary group-[.is-sticky]:backdrop-blur-sm group-[.is-sticky]:shadow-md group-[.is-sticky]:pt-6" />
       <div className="relative">
         <div className="flex items-center justify-between mb-4">
