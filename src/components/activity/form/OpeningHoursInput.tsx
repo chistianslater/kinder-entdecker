@@ -15,13 +15,13 @@ interface DaySchedule {
 }
 
 const DAYS = [
-  'Sonntag',
   'Montag',
   'Dienstag',
   'Mittwoch',
   'Donnerstag',
   'Freitag',
-  'Samstag'
+  'Samstag',
+  'Sonntag'
 ];
 
 const formatTimeValue = (time: string): string => {
