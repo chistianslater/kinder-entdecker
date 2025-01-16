@@ -34,9 +34,9 @@ export const PriceFilter = ({ value, onChange }: PriceFilterProps) => {
         </SelectTrigger>
         <SelectContent className="bg-secondary border border-accent/20 shadow-glass">
           <SelectItem value="free" className="text-white focus:bg-accent focus:text-white">Kostenlos</SelectItem>
-          <SelectItem value="low" className="text-white focus:bg-accent focus:text-white">Günstig</SelectItem>
-          <SelectItem value="medium" className="text-white focus:bg-accent focus:text-white">Mittel</SelectItem>
-          <SelectItem value="high" className="text-white focus:bg-accent focus:text-white">Teuer</SelectItem>
+          <SelectItem value="low" className="text-white focus:bg-accent focus:text-white">Günstig (bis 10€)</SelectItem>
+          <SelectItem value="medium" className="text-white focus:bg-accent focus:text-white">Mittel (10-30€)</SelectItem>
+          <SelectItem value="high" className="text-white focus:bg-accent focus:text-white">Teuer (30€+)</SelectItem>
         </SelectContent>
       </Select>
     </div>
