@@ -143,26 +143,32 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                   <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
                     <div className="space-y-1">
                       <span className="text-xs text-white/60">Öffnet um</span>
-                      <Input
-                        type="time"
-                        value={slot.open}
-                        onChange={(e) =>
-                          updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
-                        }
-                        className="bg-background border-white/10 text-white"
-                      />
+                      <div className="relative">
+                        <Input
+                          type="time"
+                          value={slot.open}
+                          onChange={(e) =>
+                            updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
+                          }
+                          className="bg-background border-white/10 text-white pl-8"
+                        />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 stroke-white" />
+                      </div>
                     </div>
                     <span className="text-sm text-white mt-6">-</span>
                     <div className="space-y-1">
                       <span className="text-xs text-white/60">Schließt um</span>
-                      <Input
-                        type="time"
-                        value={slot.close}
-                        onChange={(e) =>
-                          updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
-                        }
-                        className="bg-background border-white/10 text-white"
-                      />
+                      <div className="relative">
+                        <Input
+                          type="time"
+                          value={slot.close}
+                          onChange={(e) =>
+                            updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
+                          }
+                          className="bg-background border-white/10 text-white pl-8"
+                        />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 stroke-white" />
+                      </div>
                     </div>
                     <Button
                       type="button"
