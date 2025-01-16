@@ -122,19 +122,17 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
         <div key={daySchedule.day} className="space-y-3">
           <div className="flex items-center gap-3">
             <Checkbox
-              checked={daySchedule.slots.length === 0}
+              checked={daySchedule.slots.length > 0}
               onCheckedChange={(checked) => {
                 const newSchedule = [...schedule];
-                newSchedule[dayIndex].slots = checked ? [] : [{ open: '00:00', close: '00:00' }];
+                newSchedule[dayIndex].slots = checked ? [{ open: '00:00', close: '00:00' }] : [];
                 updateSchedule(newSchedule);
               }}
               className="border-white/20"
             />
             <div className="flex items-center justify-between w-full">
               <span className="text-lg text-white">{daySchedule.day}</span>
-              {daySchedule.slots.length === 0 ? (
-                <span className="text-white/60">Geschlossen</span>
-              ) : (
+              {daySchedule.slots.length > 0 && (
                 <Button
                   type="button"
                   variant="ghost"
