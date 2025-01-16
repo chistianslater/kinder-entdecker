@@ -27,7 +27,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         
         formattedSchedule.push({
           days: day,
-          hours: times === 'Geschlossen' ? 'geschlossen' : times
+          hours: times === 'Geschlossen' ? 'Geschlossen' : times
         });
       }
     }
@@ -93,16 +93,14 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
           </div>
         )}
       </div>
-      <CollapsibleContent className="pl-6">
+      <CollapsibleContent className="pl-6 space-y-1">
         {formattedHours.map((schedule, index) => (
           <div 
             key={index} 
-            className="text-sm text-white/90 py-1"
+            className="text-base text-white/90 flex items-start"
           >
-            <div className="flex">
-              <span className="w-[140px] font-medium">{schedule.days}</span>
-              <span>{schedule.hours}</span>
-            </div>
+            <span className="w-32 font-normal">{schedule.days}</span>
+            <span className="font-normal">{schedule.hours}</span>
           </div>
         ))}
       </CollapsibleContent>
