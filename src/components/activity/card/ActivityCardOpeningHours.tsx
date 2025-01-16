@@ -26,7 +26,8 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
       const formattedHours = times.split(',').map(slot => {
         const [start, end] = slot.trim().split('-').map(t => t.trim());
         if (!start || !end) return null;
-        return `${start}-${end}`;
+        const formatTime = (time: string) => time.includes(':') ? time : `${time}:00`;
+        return `${formatTime(start)} - ${formatTime(end)} Uhr`;
       }).filter(Boolean).join(', ');
 
       return { days: formattedDays, hours: formattedHours };
