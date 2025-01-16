@@ -17,22 +17,16 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
 
     const scheduleLines = openingHours.split('\n');
     const formattedSchedule = scheduleLines.map(line => {
-      const [days, hours] = line.split(':').map(s => s.trim());
-      if (!hours || hours === 'Geschlossen') {
+      const [days, times] = line.split(':').map(s => s.trim());
+      if (!times || times.toLowerCase() === 'geschlossen') {
         return { days, hours: 'Geschlossen' };
       }
 
-      const formattedDays = days.split(',').map(day => 
-        day.trim().split('-').map(d => 
-          d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
-        ).join('-')
-      ).join(', ');
-
-      const formattedHours = hours.split(',').map(slot => {
+      const formattedDays = days;
+      const formattedHours = times.split(',').map(slot => {
         const [start, end] = slot.trim().split('-').map(t => t.trim());
         if (!start || !end) return null;
-        const formatTime = (time: string) => time.includes(':') ? time : `${time}:00`;
-        return `${formatTime(start)} - ${formatTime(end)} Uhr`;
+        return `${start}-${end}`;
       }).filter(Boolean).join(', ');
 
       return { days: formattedDays, hours: formattedHours };
