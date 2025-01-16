@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Clock } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
@@ -110,34 +109,42 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
     parseOpeningHours(value)
   );
 
+  // Only update schedule when value prop changes
   React.useEffect(() => {
-    setSchedule(parseOpeningHours(value));
+    const newSchedule = parseOpeningHours(value);
+    setSchedule(newSchedule);
   }, [value]);
 
-  const updateSchedule = (newSchedule: DaySchedule[]) => {
-    setSchedule(newSchedule);
-    onChange(formatSchedule(newSchedule));
-  };
+  const updateSchedule = React.useCallback((newSchedule: DaySchedule[]) => {
+    const formattedValue = formatSchedule(newSchedule);
+    onChange(formattedValue);
+  }, [onChange]);
 
-  const addTimeSlot = (dayIndex: number) => {
+  const addTimeSlot = React.useCallback((dayIndex: number) => {
     const newSchedule = [...schedule];
     if (newSchedule[dayIndex].slots.length < MAX_SLOTS_PER_DAY) {
       newSchedule[dayIndex].slots.push({ open: '09:00', close: '17:00' });
       updateSchedule(newSchedule);
     }
-  };
+  }, [schedule, updateSchedule]);
 
-  const removeTimeSlot = (dayIndex: number, slotIndex: number) => {
+  const removeTimeSlot = React.useCallback((dayIndex: number, slotIndex: number) => {
     const newSchedule = [...schedule];
     newSchedule[dayIndex].slots.splice(slotIndex, 1);
     updateSchedule(newSchedule);
-  };
+  }, [schedule, updateSchedule]);
 
-  const updateTimeSlot = (dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
+  const updateTimeSlot = React.useCallback((dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
     const newSchedule = [...schedule];
     newSchedule[dayIndex].slots[slotIndex][field] = value;
     updateSchedule(newSchedule);
-  };
+  }, [schedule, updateSchedule]);
+
+  const handleDayToggle = React.useCallback((dayIndex: number, checked: boolean) => {
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
+    updateSchedule(newSchedule);
+  }, [schedule, updateSchedule]);
 
   return (
     <div className="space-y-4 bg-accent rounded-lg p-4">
@@ -146,11 +153,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
           <div className="flex items-center gap-3">
             <Checkbox
               checked={daySchedule.slots.length > 0}
-              onCheckedChange={(checked) => {
-                const newSchedule = [...schedule];
-                newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
-                updateSchedule(newSchedule);
-              }}
+              onCheckedChange={(checked) => handleDayToggle(dayIndex, checked as boolean)}
               className="border-white/20"
             />
             <span className="text-base text-white">{daySchedule.day}</span>
