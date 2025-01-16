@@ -33,7 +33,7 @@ const DAYS = [
 const MAX_SLOTS_PER_DAY = 2;
 
 // Generate time options in 30-minute intervals
-const generateTimeOptions = () => {
+const TIME_OPTIONS = (() => {
   const options = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute of [0, 30]) {
@@ -42,9 +42,7 @@ const generateTimeOptions = () => {
     }
   }
   return options;
-};
-
-const TIME_OPTIONS = generateTimeOptions();
+})();
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
   if (timePart.toLowerCase() === 'geschlossen') {
@@ -104,21 +102,24 @@ interface OpeningHoursInputProps {
   onChange: (value: string) => void;
 }
 
-export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) => {
+export const OpeningHoursInput = React.memo(({ value, onChange }: OpeningHoursInputProps) => {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() =>
     parseOpeningHours(value)
   );
 
-  // Only update schedule when value prop changes
   React.useEffect(() => {
     const newSchedule = parseOpeningHours(value);
-    setSchedule(newSchedule);
+    if (JSON.stringify(newSchedule) !== JSON.stringify(schedule)) {
+      setSchedule(newSchedule);
+    }
   }, [value]);
 
   const updateSchedule = React.useCallback((newSchedule: DaySchedule[]) => {
     const formattedValue = formatSchedule(newSchedule);
-    onChange(formattedValue);
-  }, [onChange]);
+    if (formattedValue !== value) {
+      onChange(formattedValue);
+    }
+  }, [onChange, value]);
 
   const addTimeSlot = React.useCallback((dayIndex: number) => {
     const newSchedule = [...schedule];
@@ -170,7 +171,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'open', value)}
                       >
                         <SelectTrigger className="bg-background border-white/10 text-white">
-                          <SelectValue placeholder="Öffnungszeit" />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-background border-accent/20">
                           {TIME_OPTIONS.map((time) => (
@@ -193,7 +194,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'close', value)}
                       >
                         <SelectTrigger className="bg-background border-white/10 text-white">
-                          <SelectValue placeholder="Schließzeit" />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-background border-accent/20">
                           {TIME_OPTIONS.map((time) => (
@@ -237,4 +238,6 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
       ))}
     </div>
   );
-};
+});
+
+OpeningHoursInput.displayName = 'OpeningHoursInput';
