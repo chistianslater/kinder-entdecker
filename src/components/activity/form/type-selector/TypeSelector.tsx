@@ -9,7 +9,7 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Tag } from "lucide-react";
 
 const activityTypes = [
   { value: "Natur & Wandern", label: "Natur & Wandern" },
@@ -49,11 +49,12 @@ export function TypeSelector({ form }: TypeSelectorProps) {
                     key={type.value}
                     type="button"
                     onClick={() => handleTypeSelect(type.value)}
-                    className={`px-4 py-2 rounded-full transition-all duration-200 text-sm
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 text-sm
                               ${currentValues.includes(type.value)
                                 ? 'bg-primary text-primary-foreground'
-                                : 'bg-secondary/80 text-white hover:bg-accent/80'}`}
+                                : 'bg-[#1E2128] text-white hover:bg-[#2A2F3A]'}`}
                   >
+                    <Tag className="h-4 w-4" />
                     {type.label}
                   </button>
                 ))}

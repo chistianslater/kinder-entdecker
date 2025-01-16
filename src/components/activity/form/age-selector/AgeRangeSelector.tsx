@@ -9,7 +9,7 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Baby } from "lucide-react";
 
 const ageRanges = [
   { value: "0-3", label: "0-3 Jahre" },
@@ -53,11 +53,12 @@ export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
                     key={range.value}
                     type="button"
                     onClick={() => handleAgeRangeSelect(range.value)}
-                    className={`px-4 py-2 rounded-full transition-all duration-200 text-sm
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 text-sm
                               ${field.value?.includes(range.value)
                                 ? 'bg-primary text-primary-foreground'
-                                : 'bg-secondary/80 text-white hover:bg-accent/80'}`}
+                                : 'bg-[#1E2128] text-white hover:bg-[#2A2F3A]'}`}
                   >
+                    <Baby className="h-4 w-4" />
                     {range.label}
                   </button>
                 ))}
