@@ -9,7 +9,7 @@ interface ActivityCardDetailsProps {
 
 export const ActivityCardDetails = ({ activity }: ActivityCardDetailsProps) => {
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <div className="flex items-center text-sm text-white/90">
         <MapPin className="w-4 h-4 mr-2 text-white" />
         {activity.location}
