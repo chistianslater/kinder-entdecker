@@ -45,12 +45,18 @@ export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
       name="age_range"
       render={({ field }) => (
         <FormItem className="space-y-4">
-          <FormLabel className="text-white">Altersgruppe</FormLabel>
+          <FormLabel className="text-lg font-medium text-white">Altersgruppe</FormLabel>
           <FormControl>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {ageRanges.map((range) => (
-                  <div key={range.value} className="flex items-center space-x-2">
+                  <div
+                    key={range.value}
+                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200
+                              ${field.value?.includes(range.value)
+                                ? 'bg-primary/20 border border-primary'
+                                : 'bg-accent/20 border border-accent/20 hover:border-accent/40'}`}
+                  >
                     <Checkbox
                       id={`age-${range.value}`}
                       checked={field.value?.includes(range.value)}
@@ -62,8 +68,8 @@ export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
                     />
                     <label
                       htmlFor={`age-${range.value}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed 
-                               peer-disabled:opacity-70 text-white"
+                      className="text-sm font-medium leading-none cursor-pointer
+                               text-white hover:text-primary transition-colors"
                     >
                       {range.label}
                     </label>
@@ -71,18 +77,18 @@ export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
                 ))}
               </div>
               {field.value && field.value.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-4">
                   {field.value.map((value) => (
                     <Badge
                       key={value}
                       variant="secondary"
-                      className="bg-accent/50 text-white"
+                      className="bg-primary/20 text-white border border-primary/40 px-3 py-1.5"
                     >
                       {ageRanges.find((r) => r.value === value)?.label || value}
                       <button
                         type="button"
                         onClick={() => removeAgeRange(value)}
-                        className="ml-1 hover:text-red-400"
+                        className="ml-2 hover:text-primary transition-colors"
                       >
                         <X className="h-3 w-3" />
                       </button>

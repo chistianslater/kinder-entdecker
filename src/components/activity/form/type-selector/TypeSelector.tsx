@@ -10,6 +10,7 @@ import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { X } from "lucide-react";
 
 const activityTypes = [
   { value: "Natur & Wandern", label: "Natur & Wandern" },
@@ -39,49 +40,57 @@ export function TypeSelector({ form }: TypeSelectorProps) {
         };
 
         return (
-          <FormItem className="flex flex-col">
-            <FormLabel className="text-white mb-2">Typ</FormLabel>
-            <div className="grid grid-cols-2 gap-4">
-              {activityTypes.map((type) => (
-                <FormItem
-                  key={type.value}
-                  className="flex items-center space-x-3 space-y-0"
-                >
-                  <FormControl>
-                    <Checkbox
-                      checked={currentValues.includes(type.value)}
-                      onCheckedChange={(checked) => 
-                        handleTypeSelect(checked as boolean, type.value)
-                      }
-                      className="bg-accent data-[state=checked]:bg-primary"
-                    />
-                  </FormControl>
-                  <FormLabel className="text-white font-normal">
-                    {type.label}
-                  </FormLabel>
-                </FormItem>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {currentValues.map((type) => (
-                <Badge
-                  key={type}
-                  variant="secondary"
-                  className="bg-accent/50 text-white"
-                  onClick={() => handleTypeSelect(false, type)}
-                >
-                  {type}
-                  <button
-                    className="ml-1 hover:text-red-400"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTypeSelect(false, type);
-                    }}
+          <FormItem className="space-y-4">
+            <FormLabel className="text-lg font-medium text-white">Typ</FormLabel>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {activityTypes.map((type) => (
+                  <div
+                    key={type.value}
+                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200
+                              ${currentValues.includes(type.value)
+                                ? 'bg-primary/20 border border-primary'
+                                : 'bg-accent/20 border border-accent/20 hover:border-accent/40'}`}
                   >
-                    ×
-                  </button>
-                </Badge>
-              ))}
+                    <FormControl>
+                      <Checkbox
+                        checked={currentValues.includes(type.value)}
+                        onCheckedChange={(checked) => 
+                          handleTypeSelect(checked as boolean, type.value)
+                        }
+                        className="border-white/20 data-[state=checked]:bg-primary 
+                                 data-[state=checked]:text-primary-foreground"
+                      />
+                    </FormControl>
+                    <FormLabel className="text-sm font-medium cursor-pointer m-0
+                                       text-white hover:text-primary transition-colors">
+                      {type.label}
+                    </FormLabel>
+                  </div>
+                ))}
+              </div>
+              {currentValues.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {currentValues.map((type) => (
+                    <Badge
+                      key={type}
+                      variant="secondary"
+                      className="bg-primary/20 text-white border border-primary/40 px-3 py-1.5"
+                    >
+                      {type}
+                      <button
+                        className="ml-2 hover:text-primary transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTypeSelect(false, type);
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
             <FormMessage className="text-white" />
           </FormItem>
