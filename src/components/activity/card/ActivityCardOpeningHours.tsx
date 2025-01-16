@@ -97,7 +97,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
       </div>
       <CollapsibleContent className="pl-6 space-y-0.5">
         {formattedHours.map((schedule, index) => (
-          <div key={index} className="text-sm text-white">
+          <div key={index} className="text-sm text-white whitespace-nowrap">
             <span className="font-medium">{schedule.days}:</span> {schedule.hours}
           </div>
         ))}
