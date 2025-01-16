@@ -14,21 +14,20 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
   const formatOpeningHours = (openingHours: string) => {
     if (!openingHours || openingHours.trim() === '') return null;
 
-    const entries = openingHours.split(' ');
+    // Split by spaces and filter out empty strings
+    const parts = openingHours.split(/\s+/).filter(part => part);
     const formattedSchedule = [];
     
-    for (let i = 0; i < entries.length; i++) {
-      const entry = entries[i];
-      if (entry.endsWith(':')) {
-        const day = entry.slice(0, -1);
-        const times = entries[i + 1];
-        
-        i++;
-        
+    for (let i = 0; i < parts.length; i++) {
+      const day = parts[i].replace(':', ''); // Remove any colons from day names
+      const hours = parts[i + 1];
+      
+      if (hours) {
         formattedSchedule.push({
           days: day,
-          hours: times === 'Geschlossen' ? 'Geschlossen' : times
+          hours: hours
         });
+        i++; // Skip the next part since we used it as hours
       }
     }
 
@@ -42,23 +41,21 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
     const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' });
     const currentTime = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-    const isOpen = activity.opening_hours.split(' ').some((part, index, array) => {
-      if (part.endsWith(':')) {
-        const day = part.slice(0, -1);
-        const times = array[index + 1];
+    const parts = activity.opening_hours.split(/\s+/).filter(part => part);
+    
+    for (let i = 0; i < parts.length; i += 2) {
+      const day = parts[i].replace(':', '');
+      const hours = parts[i + 1];
+      
+      if (day.toLowerCase() === currentDay.toLowerCase()) {
+        if (hours === 'Geschlossen') return false;
         
-        if (!times || times === 'Geschlossen') return false;
-        
-        const isDayIncluded = day.toLowerCase() === currentDay.toLowerCase();
-        if (!isDayIncluded) return false;
-
-        const [start, end] = times.split('-').map(t => t.trim());
+        const [start, end] = hours.split('-');
         return currentTime >= start && currentTime <= end;
       }
-      return false;
-    });
+    }
 
-    return isOpen;
+    return false;
   };
 
   const formattedHours = activity.opening_hours ? formatOpeningHours(activity.opening_hours) : null;
