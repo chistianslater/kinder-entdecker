@@ -31,8 +31,8 @@ export const ActivityCardDetails = ({ activity }: ActivityCardDetailsProps) => {
       </div>
 
       {activity.age_range && activity.age_range.length > 0 && (
-        <div className="flex items-center text-sm text-white/90">
-          <Baby className="w-4 h-4 mr-2 text-white" />
+        <div className="flex items-start text-sm text-white/90">
+          <Baby className="w-4 h-4 mr-2 mt-1 text-white shrink-0" />
           <div className="flex flex-wrap gap-1">
             {activity.age_range.map((range, index) => (
               <Badge 
