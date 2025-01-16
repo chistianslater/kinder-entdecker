@@ -130,59 +130,57 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
               }}
               className="border-white/20"
             />
-            <div className="flex items-center justify-between w-full">
-              <span className="text-lg text-white">{daySchedule.day}</span>
-              {daySchedule.slots.length > 0 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => addTimeSlot(dayIndex)}
-                  className="text-white hover:text-white hover:bg-white/10"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
+            <span className="text-lg text-white">{daySchedule.day}</span>
           </div>
           {daySchedule.slots.length > 0 && (
-            <div className="space-y-2 pl-8">
+            <div className="space-y-4 pl-8">
               {daySchedule.slots.map((slot, slotIndex) => (
-                <div key={slotIndex} className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
-                  <div className="space-y-1">
-                    <span className="text-sm text-white/60">Öffnet um</span>
-                    <Input
-                      type="time"
-                      value={slot.open}
-                      onChange={(e) =>
-                        updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
-                      }
-                      className="bg-background border-white/10"
-                    />
+                <div key={slotIndex} className="space-y-2">
+                  <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
+                    <div className="space-y-1">
+                      <span className="text-sm text-white/60">Öffnet um</span>
+                      <Input
+                        type="time"
+                        value={slot.open}
+                        onChange={(e) =>
+                          updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
+                        }
+                        className="bg-background border-white/10"
+                      />
+                    </div>
+                    <span className="text-white mt-6">-</span>
+                    <div className="space-y-1">
+                      <span className="text-sm text-white/60">Schließt um</span>
+                      <Input
+                        type="time"
+                        value={slot.close}
+                        onChange={(e) =>
+                          updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
+                        }
+                        className="bg-background border-white/10"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeTimeSlot(dayIndex, slotIndex)}
+                      className="mt-6 text-white hover:text-white hover:bg-white/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <span className="text-white mt-6">-</span>
-                  <div className="space-y-1">
-                    <span className="text-sm text-white/60">Schließt um</span>
-                    <Input
-                      type="time"
-                      value={slot.close}
-                      onChange={(e) =>
-                        updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
-                      }
-                      className="bg-background border-white/10"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeTimeSlot(dayIndex, slotIndex)}
-                    className="mt-6 text-white hover:text-white hover:bg-white/10"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
               ))}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => addTimeSlot(dayIndex)}
+                className="text-white hover:text-white hover:bg-white/10 w-full"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
           )}
         </div>
