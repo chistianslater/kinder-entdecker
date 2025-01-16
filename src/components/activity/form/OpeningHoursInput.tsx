@@ -90,12 +90,84 @@ interface OpeningHoursInputProps {
   onChange: (value: string) => void;
 }
 
+const TimeSlotComponent = React.memo(({ 
+  slot, 
+  timeOptions,
+  onUpdate,
+  onDelete,
+  index
+}: { 
+  slot: TimeSlot;
+  timeOptions: string[];
+  onUpdate: (field: 'open' | 'close', value: string) => void;
+  onDelete: () => void;
+  index: number;
+}) => (
+  <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
+    <div className="space-y-1">
+      <span className="text-xs text-white/60">Öffnet um</span>
+      <Select
+        value={slot.open}
+        onValueChange={(value) => onUpdate('open', value)}
+      >
+        <SelectTrigger className="bg-background border-white/10 text-white">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="bg-background border-accent/20">
+          {timeOptions.map((time) => (
+            <SelectItem 
+              key={time} 
+              value={time}
+              className="text-white focus:bg-accent focus:text-white"
+            >
+              {time}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    <span className="text-sm text-white mt-6">-</span>
+    <div className="space-y-1">
+      <span className="text-xs text-white/60">Schließt um</span>
+      <Select
+        value={slot.close}
+        onValueChange={(value) => onUpdate('close', value)}
+      >
+        <SelectTrigger className="bg-background border-white/10 text-white">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="bg-background border-accent/20">
+          {timeOptions.map((time) => (
+            <SelectItem 
+              key={time} 
+              value={time}
+              className="text-white focus:bg-accent focus:text-white"
+            >
+              {time}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      onClick={onDelete}
+      className="mt-6 text-white hover:text-white hover:bg-white/10"
+    >
+      <Trash2 className="w-4 h-4 text-white" />
+    </Button>
+  </div>
+));
+
+TimeSlotComponent.displayName = 'TimeSlotComponent';
+
 function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() =>
     parseOpeningHours(value)
   );
 
-  // Move TIME_OPTIONS inside the component and memoize it
   const TIME_OPTIONS = React.useMemo(() => {
     const options = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -111,41 +183,51 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     const formattedValue = formatSchedule(newSchedule);
     if (formattedValue !== value) {
       onChange(formattedValue);
+      setSchedule(newSchedule);
     }
   }, [onChange, value]);
 
   const addTimeSlot = React.useCallback((dayIndex: number) => {
-    const newSchedule = [...schedule];
-    if (newSchedule[dayIndex].slots.length < MAX_SLOTS_PER_DAY) {
-      newSchedule[dayIndex].slots.push({ open: '09:00', close: '17:00' });
-      updateSchedule(newSchedule);
-    }
-  }, [schedule, updateSchedule]);
+    setSchedule(prevSchedule => {
+      const newSchedule = [...prevSchedule];
+      if (newSchedule[dayIndex].slots.length < MAX_SLOTS_PER_DAY) {
+        newSchedule[dayIndex].slots.push({ open: '09:00', close: '17:00' });
+        return newSchedule;
+      }
+      return prevSchedule;
+    });
+  }, []);
 
   const removeTimeSlot = React.useCallback((dayIndex: number, slotIndex: number) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots.splice(slotIndex, 1);
-    updateSchedule(newSchedule);
-  }, [schedule, updateSchedule]);
+    setSchedule(prevSchedule => {
+      const newSchedule = [...prevSchedule];
+      newSchedule[dayIndex].slots.splice(slotIndex, 1);
+      return newSchedule;
+    });
+  }, []);
 
   const updateTimeSlot = React.useCallback((dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots[slotIndex][field] = value;
-    updateSchedule(newSchedule);
-  }, [schedule, updateSchedule]);
+    setSchedule(prevSchedule => {
+      const newSchedule = [...prevSchedule];
+      newSchedule[dayIndex].slots[slotIndex][field] = value;
+      return newSchedule;
+    });
+  }, []);
 
   const handleDayToggle = React.useCallback((dayIndex: number, checked: boolean) => {
-    const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
-    updateSchedule(newSchedule);
-  }, [schedule, updateSchedule]);
+    setSchedule(prevSchedule => {
+      const newSchedule = [...prevSchedule];
+      newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
+      return newSchedule;
+    });
+  }, []);
 
   React.useEffect(() => {
-    const newSchedule = parseOpeningHours(value);
-    if (JSON.stringify(newSchedule) !== JSON.stringify(schedule)) {
-      setSchedule(newSchedule);
+    const formattedValue = formatSchedule(schedule);
+    if (formattedValue !== value) {
+      onChange(formattedValue);
     }
-  }, [value]);
+  }, [schedule, onChange, value]);
 
   return (
     <div className="space-y-4 bg-accent rounded-lg p-4">
@@ -162,62 +244,14 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
           {daySchedule.slots.length > 0 && (
             <div className="space-y-4 pl-8">
               {daySchedule.slots.map((slot, slotIndex) => (
-                <div key={slotIndex} className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
-                  <div className="space-y-1">
-                    <span className="text-xs text-white/60">Öffnet um</span>
-                    <Select
-                      value={slot.open}
-                      onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'open', value)}
-                    >
-                      <SelectTrigger className="bg-background border-white/10 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background border-accent/20">
-                        {TIME_OPTIONS.map((time) => (
-                          <SelectItem 
-                            key={time} 
-                            value={time}
-                            className="text-white focus:bg-accent focus:text-white"
-                          >
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <span className="text-sm text-white mt-6">-</span>
-                  <div className="space-y-1">
-                    <span className="text-xs text-white/60">Schließt um</span>
-                    <Select
-                      value={slot.close}
-                      onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'close', value)}
-                    >
-                      <SelectTrigger className="bg-background border-white/10 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-background border-accent/20">
-                        {TIME_OPTIONS.map((time) => (
-                          <SelectItem 
-                            key={time} 
-                            value={time}
-                            className="text-white focus:bg-accent focus:text-white"
-                          >
-                            {time}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeTimeSlot(dayIndex, slotIndex)}
-                    className="mt-6 text-white hover:text-white hover:bg-white/10"
-                  >
-                    <Trash2 className="w-4 h-4 text-white" />
-                  </Button>
-                </div>
+                <TimeSlotComponent
+                  key={`${dayIndex}-${slotIndex}`}
+                  slot={slot}
+                  timeOptions={TIME_OPTIONS}
+                  onUpdate={(field, value) => updateTimeSlot(dayIndex, slotIndex, field, value)}
+                  onDelete={() => removeTimeSlot(dayIndex, slotIndex)}
+                  index={slotIndex}
+                />
               ))}
               {daySchedule.slots.length < MAX_SLOTS_PER_DAY && (
                 <Button
