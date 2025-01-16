@@ -28,13 +28,20 @@ const MAX_SLOTS_PER_DAY = 2;
 
 const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
-  const cleanTime = time.replace(/[^0-9:]/g, '');
-  if (!cleanTime.includes(':')) {
-    const hours = cleanTime.slice(0, 2).padStart(2, '0');
-    const minutes = cleanTime.slice(2, 4).padStart(2, '0');
-    return `${hours}:${minutes}`;
+  
+  // If the time is already in HH:mm format, return it
+  if (/^\d{2}:\d{2}$/.test(time)) {
+    return time;
   }
-  return cleanTime;
+  
+  // Clean the input to only contain numbers
+  const cleanTime = time.replace(/[^0-9]/g, '');
+  
+  // Pad with zeros if needed
+  const hours = cleanTime.slice(0, 2).padStart(2, '0');
+  const minutes = cleanTime.slice(2, 4).padStart(2, '0');
+  
+  return `${hours}:${minutes}`;
 };
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
@@ -43,7 +50,10 @@ const parseTimeSlots = (timePart: string): TimeSlot[] => {
   }
   return timePart.split(',').slice(0, MAX_SLOTS_PER_DAY).map(slot => {
     const [open, close] = slot.trim().split('-').map(t => t.trim());
-    return { open: formatTimeValue(open), close: formatTimeValue(close) };
+    return { 
+      open: formatTimeValue(open || '09:00'), 
+      close: formatTimeValue(close || '17:00') 
+    };
   });
 };
 
@@ -122,7 +132,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
 
   const updateTimeSlot = (dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
     const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots[slotIndex][field] = formatTimeValue(value);
+    newSchedule[dayIndex].slots[slotIndex][field] = value;
     updateSchedule(newSchedule);
   };
 
