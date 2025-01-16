@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Activity } from '@/types/activity';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Baby, Euro, MapPin, Clock, TreePine, Star, Edit } from 'lucide-react';
+import { Baby, Euro, MapPin, Clock, TreePine, Edit } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
 import { supabase } from '@/integrations/supabase/client';
@@ -137,7 +137,7 @@ export const ActivityCard = ({
           {averageRating !== null && (
             <div className="flex items-center gap-1">
               <span className="text-sm font-medium text-white">{averageRating.toFixed(1)}</span>
-              <Star className="w-4 h-4 fill-primary text-primary" />
+              <TreePine className="w-4 h-4 fill-primary text-primary" />
               <span className="text-sm text-white/80">({reviewCount})</span>
             </div>
           )}
