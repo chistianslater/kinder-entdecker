@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Filter, Sparkles } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { PreferencesButton } from './PreferencesButton';
-import { Filters } from '../FilterBar';
 
 interface FilterButtonsProps {
   isPreferencesActive: boolean;
@@ -46,7 +45,7 @@ export const FilterButtons = ({
       <Button
         variant="ghost"
         className="ml-auto flex items-center gap-2 text-white hover:text-primary 
-                 transition-colors duration-300 rounded-2xl"
+                 transition-all duration-300 hover:scale-105 rounded-2xl"
         onClick={onReset}
       >
         <Sparkles className="h-4 w-4" />
