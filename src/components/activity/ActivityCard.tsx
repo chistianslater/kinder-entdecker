@@ -95,7 +95,7 @@ export const ActivityCard = ({
         ).join('-')
       ).join(', ');
 
-      return { days: formattedDays, hours };
+      return { days: formattedDays, hours: hours.trim() };
     }).filter(Boolean);
 
     return formattedSchedule;
@@ -242,7 +242,7 @@ export const ActivityCard = ({
               </div>
               <CollapsibleContent className="pl-6 space-y-0.5">
                 {formattedHours.map((schedule, index) => (
-                  <div key={index} className="text-sm text-white/80">
+                  <div key={index} className="text-sm text-white">
                     <span className="font-medium">{schedule.days}:</span> {schedule.hours}
                   </div>
                 ))}
