@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Clock } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface TimeSlot {
