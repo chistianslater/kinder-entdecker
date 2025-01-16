@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Activity } from '@/types/activity';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Baby, Euro, MapPin, Clock, TreePine, Edit } from 'lucide-react';
+import { Baby, Euro, MapPin, Clock, TreePine, Edit, ChevronDown } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { ActivityBadges } from './ActivityBadges';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const placeholderImages = [
   'photo-1482938289607-e9573fc25ebb', // river between mountains
@@ -45,6 +46,7 @@ export const ActivityCard = ({
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [isOwner, setIsOwner] = useState(false);
+  const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
   const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
@@ -87,14 +89,13 @@ export const ActivityCard = ({
       const [days, hours] = line.split(':').map(s => s.trim());
       if (!hours) return null;
 
-      // Capitalize first letter of each day
       const formattedDays = days.split(',').map(day => 
         day.trim().split('-').map(d => 
           d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
         ).join('-')
       ).join(', ');
 
-      return `${formattedDays}: ${hours}`;
+      return { days: formattedDays, hours };
     }).filter(Boolean);
 
     return formattedSchedule;
@@ -211,12 +212,22 @@ export const ActivityCard = ({
           )}
 
           {formattedHours && (
-            <div className="flex flex-col gap-1">
+            <Collapsible
+              open={isOpeningHoursOpen}
+              onOpenChange={setIsOpeningHoursOpen}
+              className="space-y-2"
+            >
               <div className="flex items-center justify-between text-sm text-white/90">
-                <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2 text-white" />
-                  <span className="font-medium">Öffnungszeiten</span>
-                </div>
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="p-0 h-auto hover:bg-transparent hover:text-white/80 flex items-center gap-2"
+                  >
+                    <Clock className="w-4 h-4 text-white" />
+                    <span className="font-medium">Öffnungszeiten</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpeningHoursOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+                </CollapsibleTrigger>
                 {openStatus !== null && (
                   <Badge 
                     className={`ml-2 ${
@@ -229,14 +240,14 @@ export const ActivityCard = ({
                   </Badge>
                 )}
               </div>
-              <div className="pl-6 space-y-0.5">
-                {formattedHours.map((hours, index) => (
+              <CollapsibleContent className="pl-6 space-y-0.5">
+                {formattedHours.map((schedule, index) => (
                   <div key={index} className="text-sm text-white/80">
-                    {hours}
+                    <span className="font-medium">{schedule.days}:</span> {schedule.hours}
                   </div>
                 ))}
-              </div>
-            </div>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
       </CardContent>
