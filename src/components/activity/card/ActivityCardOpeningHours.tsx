@@ -102,9 +102,9 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
             key={index} 
             className="text-sm text-white/90 border-b border-white/10 py-2 last:border-0"
           >
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-[1fr_auto] gap-4">
               <span className="font-medium">{schedule.days}:</span>
-              <span>{schedule.hours}</span>
+              <span className="text-right">{schedule.hours}</span>
             </div>
           </div>
         ))}
