@@ -1,7 +1,8 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface TimeSlot {
   open: string;
@@ -14,18 +15,17 @@ interface DaySchedule {
 }
 
 const DAYS = [
+  'Sonntag',
   'Montag',
   'Dienstag',
   'Mittwoch',
   'Donnerstag',
   'Freitag',
-  'Samstag',
-  'Sonntag'
+  'Samstag'
 ];
 
 const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
-  // Add :00 if only hours are provided
   return time.includes(':') ? time : `${time}:00`;
 };
 
@@ -117,69 +117,75 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-accent rounded-lg p-4">
       {schedule.map((daySchedule, dayIndex) => (
-        <div key={daySchedule.day} className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-white">{daySchedule.day}</span>
-            {daySchedule.slots.length === 0 ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => addTimeSlot(dayIndex)}
-                className="text-white border-white/20 hover:bg-white/10"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Öffnungszeit hinzufügen
-              </Button>
-            ) : null}
+        <div key={daySchedule.day} className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Checkbox
+              checked={daySchedule.slots.length === 0}
+              onCheckedChange={(checked) => {
+                const newSchedule = [...schedule];
+                newSchedule[dayIndex].slots = checked ? [] : [{ open: '00:00', close: '00:00' }];
+                updateSchedule(newSchedule);
+              }}
+              className="border-white/20"
+            />
+            <div className="flex items-center justify-between w-full">
+              <span className="text-lg text-white">{daySchedule.day}</span>
+              {daySchedule.slots.length === 0 ? (
+                <span className="text-white/60">Geschlossen</span>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => addTimeSlot(dayIndex)}
+                  className="text-white hover:text-white hover:bg-white/10"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
-          {daySchedule.slots.length > 0 ? (
-            <div className="space-y-2">
+          {daySchedule.slots.length > 0 && (
+            <div className="space-y-2 pl-8">
               {daySchedule.slots.map((slot, slotIndex) => (
-                <div key={slotIndex} className="flex items-center gap-2">
-                  <Input
-                    type="time"
-                    value={slot.open}
-                    onChange={(e) =>
-                      updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
-                    }
-                    className="w-32"
-                  />
-                  <span className="text-white">-</span>
-                  <Input
-                    type="time"
-                    value={slot.close}
-                    onChange={(e) =>
-                      updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
-                    }
-                    className="w-32"
-                  />
+                <div key={slotIndex} className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
+                  <div className="space-y-1">
+                    <span className="text-sm text-white/60">Öffnet um</span>
+                    <Input
+                      type="time"
+                      value={slot.open}
+                      onChange={(e) =>
+                        updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
+                      }
+                      className="bg-background border-white/10"
+                    />
+                  </div>
+                  <span className="text-white mt-6">-</span>
+                  <div className="space-y-1">
+                    <span className="text-sm text-white/60">Schließt um</span>
+                    <Input
+                      type="time"
+                      value={slot.close}
+                      onChange={(e) =>
+                        updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
+                      }
+                      className="bg-background border-white/10"
+                    />
+                  </div>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={() => removeTimeSlot(dayIndex, slotIndex)}
-                    className="text-white border-white/20 hover:bg-white/10"
+                    className="mt-6 text-white hover:text-white hover:bg-white/10"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => addTimeSlot(dayIndex)}
-                className="text-white border-white/20 hover:bg-white/10"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Weitere Öffnungszeit
-              </Button>
             </div>
-          ) : (
-            <div className="text-sm text-muted-foreground">Geschlossen</div>
           )}
         </div>
       ))}
