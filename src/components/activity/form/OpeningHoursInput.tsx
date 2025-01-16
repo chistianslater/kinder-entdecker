@@ -28,7 +28,6 @@ const MAX_SLOTS_PER_DAY = 2;
 
 const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
-  // Remove any non-time characters and ensure HH:mm format
   const cleanTime = time.replace(/[^0-9:]/g, '');
   if (!cleanTime.includes(':')) {
     const hours = cleanTime.slice(0, 2).padStart(2, '0');
@@ -159,7 +158,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                           }
                           className="bg-background border-white/10 text-white pl-8"
                         />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" color="white" />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4" stroke="white" />
                       </div>
                     </div>
                     <span className="text-sm text-white mt-6">-</span>
@@ -174,7 +173,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                           }
                           className="bg-background border-white/10 text-white pl-8"
                         />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" color="white" />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4" stroke="white" />
                       </div>
                     </div>
                     <Button
