@@ -46,7 +46,7 @@ export const FilterButtons = ({
       <Button
         variant="ghost"
         className="ml-auto flex items-center gap-2 text-white hover:text-primary 
-                 transition-colors duration-300"
+                 transition-colors duration-300 rounded-2xl"
         onClick={onReset}
       >
         <Sparkles className="h-4 w-4" />
