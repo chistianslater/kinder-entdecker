@@ -18,7 +18,9 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
     const scheduleLines = openingHours.split('\n');
     const formattedSchedule = scheduleLines.map(line => {
       const [days, hours] = line.split(':').map(s => s.trim());
-      if (!hours) return null;
+      if (!hours || hours === 'Geschlossen') {
+        return { days, hours: 'Geschlossen' };
+      }
 
       const formattedDays = days.split(',').map(day => 
         day.trim().split('-').map(d => 
@@ -26,7 +28,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         ).join('-')
       ).join(', ');
 
-      return { days: formattedDays, hours: hours.trim() };
+      return { days: formattedDays, hours };
     }).filter(Boolean);
 
     return formattedSchedule;
@@ -36,26 +38,21 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
     if (!activity.opening_hours) return null;
 
     const now = new Date();
-    const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' }).toLowerCase();
+    const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' });
     const currentTime = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
     const isOpen = activity.opening_hours.toLowerCase().split('\n').some(schedule => {
       const [days, hours] = schedule.split(':').map(s => s.trim());
-      if (!hours) return false;
+      if (!hours || hours === 'Geschlossen') return false;
 
-      const isDayIncluded = days.split(',').some(dayRange => {
-        const [start, end] = dayRange.split('-').map(d => d.trim());
-        const daysOfWeek = ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag', 'sonntag'];
-        const startIdx = daysOfWeek.indexOf(start.toLowerCase());
-        const endIdx = end ? daysOfWeek.indexOf(end.toLowerCase()) : startIdx;
-        const currentIdx = daysOfWeek.indexOf(currentDay);
-        return currentIdx >= startIdx && currentIdx <= endIdx;
-      });
-
+      const isDayIncluded = days.toLowerCase().includes(currentDay.toLowerCase());
       if (!isDayIncluded) return false;
 
-      const [openTime, closeTime] = hours.split('-').map(t => t.trim());
-      return currentTime >= openTime && currentTime <= closeTime;
+      const timeSlots = hours.split(',').map(slot => slot.trim());
+      return timeSlots.some(slot => {
+        const [openTime, closeTime] = slot.split('-').map(t => t.trim());
+        return currentTime >= openTime && currentTime <= closeTime;
+      });
     });
 
     return isOpen;
