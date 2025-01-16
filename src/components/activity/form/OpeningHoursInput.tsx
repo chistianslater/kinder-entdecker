@@ -68,14 +68,19 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
 
   const updateSchedule = (newSchedule: DaySchedule[]) => {
     setSchedule(newSchedule);
-    // Convert schedule to string format
+    // Convert schedule to string format with proper padding for single-digit hours
     const formattedSchedule = newSchedule
       .map(day => {
         if (day.isClosed) {
           return `${day.day}: Geschlossen`;
         }
         const slots = day.slots
-          .map(slot => `${slot.open}-${slot.close}`)
+          .map(slot => {
+            // Ensure proper padding for hours and minutes
+            const formattedOpen = slot.open.padStart(5, '0');
+            const formattedClose = slot.close.padStart(5, '0');
+            return `${formattedOpen}-${formattedClose}`;
+          })
           .join(', ');
         return `${day.day}: ${slots}`;
       })
