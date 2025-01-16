@@ -100,10 +100,12 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         {formattedHours.map((schedule, index) => (
           <div 
             key={index} 
-            className="text-sm text-white/90 flex items-center justify-between border-b border-white/10 py-2 last:border-0"
+            className="text-sm text-white/90 border-b border-white/10 py-2 last:border-0"
           >
-            <span className="font-medium whitespace-nowrap">{schedule.days}:</span>
-            <span className="ml-4">{schedule.hours}</span>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">{schedule.days}:</span>
+              <span>{schedule.hours}</span>
+            </div>
           </div>
         ))}
       </CollapsibleContent>
