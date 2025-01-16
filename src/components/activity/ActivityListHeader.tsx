@@ -21,7 +21,7 @@ const ActivityListHeader = ({
           <FilterBar onFiltersChange={onFiltersChange} />
           <Button 
             onClick={onCreateClick}
-            className="ml-4"
+            className="ml-4 rounded-2xl transition-all duration-300 hover:scale-105"
           >
             <Plus className="w-4 h-4 mr-2" />
             Aktivität erstellen
