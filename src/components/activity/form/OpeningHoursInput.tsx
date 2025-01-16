@@ -33,7 +33,8 @@ const DAYS = [
 
 const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
-  return time;
+  // Add :00 if only hours are provided
+  return time.includes(':') ? time : `${time}:00`;
 };
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
@@ -128,7 +129,7 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
 
   const updateTimeSlot = (dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
     const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots[slotIndex][field] = value;
+    newSchedule[dayIndex].slots[slotIndex][field] = formatTimeValue(value);
     updateSchedule(newSchedule);
   };
 
