@@ -1,183 +1,22 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-interface TimeSlot {
-  open: string;
-  close: string;
-}
-
-interface DaySchedule {
-  day: string;
-  slots: TimeSlot[];
-}
-
-const DAYS = [
-  'Montag',
-  'Dienstag',
-  'Mittwoch',
-  'Donnerstag',
-  'Freitag',
-  'Samstag',
-  'Sonntag'
-];
-
-const MAX_SLOTS_PER_DAY = 2;
-
-const parseTimeSlots = (timePart: string): TimeSlot[] => {
-  if (timePart.toLowerCase() === 'geschlossen') {
-    return [];
-  }
-  return timePart.split(',').slice(0, MAX_SLOTS_PER_DAY).map(slot => {
-    const [open, close] = slot.trim().split('-').map(t => t.trim());
-    return { 
-      open: open || '09:00', 
-      close: close || '17:00' 
-    };
-  });
-};
-
-const parseOpeningHours = (value: string): DaySchedule[] => {
-  if (!value) {
-    return DAYS.map(day => ({ day, slots: [] }));
-  }
-
-  const scheduleMap = new Map(
-    DAYS.map(day => [day, { day, slots: [] as TimeSlot[] }])
-  );
-
-  value.split('\n').forEach(line => {
-    const [days, times] = line.split(':').map(part => part.trim());
-    if (!times) return;
-
-    const timeSlots = parseTimeSlots(times);
-    days.split(',').forEach(day => {
-      const trimmedDay = day.trim();
-      const schedule = scheduleMap.get(trimmedDay);
-      if (schedule) {
-        schedule.slots = timeSlots;
-      }
-    });
-  });
-
-  return Array.from(scheduleMap.values());
-};
-
-const formatSchedule = (schedule: DaySchedule[]): string => {
-  return schedule
-    .map(({ day, slots }) => {
-      if (slots.length === 0) {
-        return `${day}: Geschlossen`;
-      }
-      const timeRanges = slots
-        .map(slot => `${slot.open}-${slot.close}`)
-        .join(', ');
-      return `${day}: ${timeRanges}`;
-    })
-    .join('\n');
-};
+import { DaySchedule as DayScheduleComponent } from './opening-hours/DaySchedule';
+import { 
+  DAYS,
+  MAX_SLOTS_PER_DAY,
+  parseOpeningHours,
+  formatSchedule,
+  type DaySchedule
+} from './opening-hours/utils';
 
 interface OpeningHoursInputProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-const TimeSlotComponent = React.memo(({ 
-  slot, 
-  timeOptions,
-  onUpdate,
-  onDelete,
-  index
-}: { 
-  slot: TimeSlot;
-  timeOptions: string[];
-  onUpdate: (field: 'open' | 'close', value: string) => void;
-  onDelete: () => void;
-  index: number;
-}) => (
-  <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
-    <div className="space-y-1">
-      <span className="text-xs text-white/60">Öffnet um</span>
-      <Select
-        value={slot.open}
-        onValueChange={(value) => onUpdate('open', value)}
-      >
-        <SelectTrigger className="bg-background border-white/10 text-white">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="bg-background border-accent/20">
-          {timeOptions.map((time) => (
-            <SelectItem 
-              key={time} 
-              value={time}
-              className="text-white focus:bg-accent focus:text-white"
-            >
-              {time}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-    <span className="text-sm text-white mt-6">-</span>
-    <div className="space-y-1">
-      <span className="text-xs text-white/60">Schließt um</span>
-      <Select
-        value={slot.close}
-        onValueChange={(value) => onUpdate('close', value)}
-      >
-        <SelectTrigger className="bg-background border-white/10 text-white">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="bg-background border-accent/20">
-          {timeOptions.map((time) => (
-            <SelectItem 
-              key={time} 
-              value={time}
-              className="text-white focus:bg-accent focus:text-white"
-            >
-              {time}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      onClick={onDelete}
-      className="mt-6 text-white hover:text-white hover:bg-white/10"
-    >
-      <Trash2 className="w-4 h-4 text-white" />
-    </Button>
-  </div>
-));
-
-TimeSlotComponent.displayName = 'TimeSlotComponent';
-
 function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() =>
     parseOpeningHours(value)
   );
-
-  const TIME_OPTIONS = React.useMemo(() => {
-    const options = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute of [0, 30]) {
-        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        options.push(timeString);
-      }
-    }
-    return options;
-  }, []);
 
   const updateSchedule = React.useCallback((newSchedule: DaySchedule[]) => {
     const formattedValue = formatSchedule(newSchedule);
@@ -187,7 +26,15 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     }
   }, [onChange, value]);
 
-  const addTimeSlot = React.useCallback((dayIndex: number) => {
+  const handleDayToggle = React.useCallback((dayIndex: number, checked: boolean) => {
+    setSchedule(prevSchedule => {
+      const newSchedule = [...prevSchedule];
+      newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
+      return newSchedule;
+    });
+  }, []);
+
+  const handleAddSlot = React.useCallback((dayIndex: number) => {
     setSchedule(prevSchedule => {
       const newSchedule = [...prevSchedule];
       if (newSchedule[dayIndex].slots.length < MAX_SLOTS_PER_DAY) {
@@ -198,15 +45,12 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     });
   }, []);
 
-  const removeTimeSlot = React.useCallback((dayIndex: number, slotIndex: number) => {
-    setSchedule(prevSchedule => {
-      const newSchedule = [...prevSchedule];
-      newSchedule[dayIndex].slots.splice(slotIndex, 1);
-      return newSchedule;
-    });
-  }, []);
-
-  const updateTimeSlot = React.useCallback((dayIndex: number, slotIndex: number, field: 'open' | 'close', value: string) => {
+  const handleUpdateSlot = React.useCallback((
+    dayIndex: number, 
+    slotIndex: number, 
+    field: 'open' | 'close', 
+    value: string
+  ) => {
     setSchedule(prevSchedule => {
       const newSchedule = [...prevSchedule];
       newSchedule[dayIndex].slots[slotIndex][field] = value;
@@ -214,10 +58,10 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     });
   }, []);
 
-  const handleDayToggle = React.useCallback((dayIndex: number, checked: boolean) => {
+  const handleDeleteSlot = React.useCallback((dayIndex: number, slotIndex: number) => {
     setSchedule(prevSchedule => {
       const newSchedule = [...prevSchedule];
-      newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
+      newSchedule[dayIndex].slots.splice(slotIndex, 1);
       return newSchedule;
     });
   }, []);
@@ -232,41 +76,18 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   return (
     <div className="space-y-4 bg-accent rounded-lg p-4">
       {schedule.map((daySchedule, dayIndex) => (
-        <div key={daySchedule.day} className="space-y-3">
-          <div className="flex items-center gap-3">
-            <Checkbox
-              checked={daySchedule.slots.length > 0}
-              onCheckedChange={(checked) => handleDayToggle(dayIndex, checked as boolean)}
-              className="border-white/20"
-            />
-            <span className="text-base text-white">{daySchedule.day}</span>
-          </div>
-          {daySchedule.slots.length > 0 && (
-            <div className="space-y-4 pl-8">
-              {daySchedule.slots.map((slot, slotIndex) => (
-                <TimeSlotComponent
-                  key={`${dayIndex}-${slotIndex}`}
-                  slot={slot}
-                  timeOptions={TIME_OPTIONS}
-                  onUpdate={(field, value) => updateTimeSlot(dayIndex, slotIndex, field, value)}
-                  onDelete={() => removeTimeSlot(dayIndex, slotIndex)}
-                  index={slotIndex}
-                />
-              ))}
-              {daySchedule.slots.length < MAX_SLOTS_PER_DAY && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => addTimeSlot(dayIndex)}
-                  className="text-white hover:text-white hover:bg-white/10 w-full"
-                >
-                  <Plus className="w-4 h-4 text-white" />
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+        <DayScheduleComponent
+          key={daySchedule.day}
+          day={daySchedule.day}
+          slots={daySchedule.slots}
+          onDayToggle={(checked) => handleDayToggle(dayIndex, checked)}
+          onAddSlot={() => handleAddSlot(dayIndex)}
+          onUpdateSlot={(slotIndex, field, value) => 
+            handleUpdateSlot(dayIndex, slotIndex, field, value)
+          }
+          onDeleteSlot={(slotIndex) => handleDeleteSlot(dayIndex, slotIndex)}
+          maxSlots={MAX_SLOTS_PER_DAY}
+        />
       ))}
     </div>
   );
