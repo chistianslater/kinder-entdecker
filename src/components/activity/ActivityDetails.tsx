@@ -5,6 +5,7 @@ import { Activity } from '@/types/activity';
 import { ImageGallery } from './ImageGallery';
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { formatOpeningHours, isCurrentlyOpen } from '@/utils/openingHoursFormatter';
 
 interface ActivityDetailsProps {
   activity: Activity;
@@ -15,6 +16,9 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
     const encodedAddress = encodeURIComponent(activity.location);
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   };
+
+  const formattedHours = activity.opening_hours ? formatOpeningHours(activity.opening_hours) : null;
+  const openStatus = activity.opening_hours ? isCurrentlyOpen(activity.opening_hours) : null;
 
   return (
     <div className="space-y-8">
@@ -52,9 +56,35 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
         <Separator className="bg-accent/20" />
 
-        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
-          <Clock className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.opening_hours || 'Nicht angegeben'}</span>
+        <div className="flex flex-col gap-4 p-4 bg-accent/10 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Clock className="w-5 h-5 text-primary" />
+              <span className="text-white">Öffnungszeiten</span>
+            </div>
+            {openStatus !== null && (
+              <div className={`px-2 py-1 rounded-md text-xs font-medium ${
+                openStatus 
+                  ? "bg-[#F2FCE2] text-green-700" 
+                  : "bg-[#FFDEE2] text-red-700"
+              }`}>
+                {openStatus ? "Geöffnet" : "Geschlossen"}
+              </div>
+            )}
+          </div>
+          {formattedHours && (
+            <div className="pl-8 space-y-1">
+              {formattedHours.map((item, index) => (
+                <div 
+                  key={index} 
+                  className="text-sm text-white/90 flex items-start"
+                >
+                  <span className="w-24 font-normal">{item.days}</span>
+                  <span className="font-normal">{item.hours}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <Separator className="bg-accent/20" />
