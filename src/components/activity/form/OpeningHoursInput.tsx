@@ -26,24 +26,6 @@ const DAYS = [
 
 const MAX_SLOTS_PER_DAY = 2;
 
-const formatTimeValue = (time: string): string => {
-  if (!time) return '00:00';
-  
-  // If the time is already in HH:mm format, return it
-  if (/^\d{2}:\d{2}$/.test(time)) {
-    return time;
-  }
-  
-  // Clean the input to only contain numbers
-  const cleanTime = time.replace(/[^0-9]/g, '');
-  
-  // Pad with zeros if needed
-  const hours = cleanTime.slice(0, 2).padStart(2, '0');
-  const minutes = cleanTime.slice(2, 4).padStart(2, '0');
-  
-  return `${hours}:${minutes}`;
-};
-
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
   if (timePart.toLowerCase() === 'geschlossen') {
     return [];
@@ -51,8 +33,8 @@ const parseTimeSlots = (timePart: string): TimeSlot[] => {
   return timePart.split(',').slice(0, MAX_SLOTS_PER_DAY).map(slot => {
     const [open, close] = slot.trim().split('-').map(t => t.trim());
     return { 
-      open: formatTimeValue(open || '09:00'), 
-      close: formatTimeValue(close || '17:00') 
+      open: open || '09:00', 
+      close: close || '17:00' 
     };
   });
 };
