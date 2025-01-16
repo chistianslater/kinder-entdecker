@@ -19,12 +19,12 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
     const formattedSchedule = [];
     
     for (let i = 0; i < parts.length; i++) {
-      const day = parts[i].replace(':', ''); // Remove any colons from day names
+      const day = parts[i].replace(':', ''); // Remove any existing colons from day names
       const hours = parts[i + 1];
       
       if (hours) {
         formattedSchedule.push({
-          days: day,
+          days: day + ':', // Add colon after the day
           hours: hours
         });
         i++; // Skip the next part since we used it as hours
@@ -94,9 +94,9 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         {formattedHours.map((schedule, index) => (
           <div 
             key={index} 
-            className="text-base text-white/90 flex items-start"
+            className="text-sm text-white/90 flex items-start"
           >
-            <span className="w-32 font-normal">{schedule.days}</span>
+            <span className="w-24 font-normal">{schedule.days}</span>
             <span className="font-normal">{schedule.hours}</span>
           </div>
         ))}
