@@ -32,8 +32,8 @@ const DAYS = [
 
 const MAX_SLOTS_PER_DAY = 2;
 
-// Generate time options in 30-minute intervals
-const TIME_OPTIONS = (() => {
+// Memoize TIME_OPTIONS to prevent recreation on each render
+const TIME_OPTIONS = React.useMemo(() => {
   const options = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute of [0, 30]) {
@@ -42,7 +42,7 @@ const TIME_OPTIONS = (() => {
     }
   }
   return options;
-})();
+}, []);
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
   if (timePart.toLowerCase() === 'geschlossen') {
@@ -107,13 +107,7 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     parseOpeningHours(value)
   );
 
-  React.useEffect(() => {
-    const newSchedule = parseOpeningHours(value);
-    if (JSON.stringify(newSchedule) !== JSON.stringify(schedule)) {
-      setSchedule(newSchedule);
-    }
-  }, [value]);
-
+  // Memoize handlers to prevent recreation on each render
   const updateSchedule = React.useCallback((newSchedule: DaySchedule[]) => {
     const formattedValue = formatSchedule(newSchedule);
     if (formattedValue !== value) {
@@ -147,6 +141,14 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     updateSchedule(newSchedule);
   }, [schedule, updateSchedule]);
 
+  // Update local state when prop value changes
+  React.useEffect(() => {
+    const newSchedule = parseOpeningHours(value);
+    if (JSON.stringify(newSchedule) !== JSON.stringify(schedule)) {
+      setSchedule(newSchedule);
+    }
+  }, [value]);
+
   return (
     <div className="space-y-4 bg-accent rounded-lg p-4">
       {schedule.map((daySchedule, dayIndex) => (
@@ -162,63 +164,61 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
           {daySchedule.slots.length > 0 && (
             <div className="space-y-4 pl-8">
               {daySchedule.slots.map((slot, slotIndex) => (
-                <div key={slotIndex} className="space-y-2">
-                  <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
-                    <div className="space-y-1">
-                      <span className="text-xs text-white/60">Öffnet um</span>
-                      <Select
-                        value={slot.open}
-                        onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'open', value)}
-                      >
-                        <SelectTrigger className="bg-background border-white/10 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border-accent/20">
-                          {TIME_OPTIONS.map((time) => (
-                            <SelectItem 
-                              key={time} 
-                              value={time}
-                              className="text-white focus:bg-accent focus:text-white"
-                            >
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <span className="text-sm text-white mt-6">-</span>
-                    <div className="space-y-1">
-                      <span className="text-xs text-white/60">Schließt um</span>
-                      <Select
-                        value={slot.close}
-                        onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'close', value)}
-                      >
-                        <SelectTrigger className="bg-background border-white/10 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border-accent/20">
-                          {TIME_OPTIONS.map((time) => (
-                            <SelectItem 
-                              key={time} 
-                              value={time}
-                              className="text-white focus:bg-accent focus:text-white"
-                            >
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeTimeSlot(dayIndex, slotIndex)}
-                      className="mt-6 text-white hover:text-white hover:bg-white/10"
+                <div key={slotIndex} className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
+                  <div className="space-y-1">
+                    <span className="text-xs text-white/60">Öffnet um</span>
+                    <Select
+                      value={slot.open}
+                      onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'open', value)}
                     >
-                      <Trash2 className="w-4 h-4 text-white" />
-                    </Button>
+                      <SelectTrigger className="bg-background border-white/10 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background border-accent/20">
+                        {TIME_OPTIONS.map((time) => (
+                          <SelectItem 
+                            key={time} 
+                            value={time}
+                            className="text-white focus:bg-accent focus:text-white"
+                          >
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                  <span className="text-sm text-white mt-6">-</span>
+                  <div className="space-y-1">
+                    <span className="text-xs text-white/60">Schließt um</span>
+                    <Select
+                      value={slot.close}
+                      onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'close', value)}
+                    >
+                      <SelectTrigger className="bg-background border-white/10 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-background border-accent/20">
+                        {TIME_OPTIONS.map((time) => (
+                          <SelectItem 
+                            key={time} 
+                            value={time}
+                            className="text-white focus:bg-accent focus:text-white"
+                          >
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeTimeSlot(dayIndex, slotIndex)}
+                    className="mt-6 text-white hover:text-white hover:bg-white/10"
+                  >
+                    <Trash2 className="w-4 h-4 text-white" />
+                  </Button>
                 </div>
               ))}
               {daySchedule.slots.length < MAX_SLOTS_PER_DAY && (
