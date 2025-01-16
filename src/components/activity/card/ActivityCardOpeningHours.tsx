@@ -30,9 +30,12 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
 
       // Format each time slot in the hours string
       const formattedHours = hours.split(',').map(slot => {
-        const [start, end] = slot.trim().split('-').map(t => t.trim());
-        return `${start} - ${end} Uhr`;
-      }).join(', ');
+        const times = slot.trim().split('-');
+        if (times.length !== 2) return null;
+        const [start, end] = times;
+        if (!start || !end) return null;
+        return `${start.trim()} - ${end.trim()} Uhr`;
+      }).filter(Boolean).join(', ');
 
       return { days: formattedDays, hours: formattedHours };
     }).filter(Boolean);
