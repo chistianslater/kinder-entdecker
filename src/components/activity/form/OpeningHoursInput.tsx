@@ -31,6 +31,15 @@ const DAYS = [
   'Sonntag'
 ];
 
+const formatTimeValue = (time: string | undefined): string => {
+  if (!time) return '00:00';
+  // Ensure the time is in HH:MM format
+  const [hours, minutes] = time.split(':');
+  const formattedHours = hours?.padStart(2, '0') || '00';
+  const formattedMinutes = minutes?.padStart(2, '0') || '00';
+  return `${formattedHours}:${formattedMinutes}`;
+};
+
 export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() => {
     try {
@@ -47,8 +56,11 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
         }
         const timePart = dayLine.split(':')[1];
         const timeSlots = timePart.split(',').map(slot => {
-          const [open, close] = slot.trim().split('-').map(t => t.trim());
-          return { open, close };
+          const [open, close] = slot.trim().split('-').map(t => t?.trim());
+          return { 
+            open: formatTimeValue(open), 
+            close: formatTimeValue(close)
+          };
         });
         return {
           day,
@@ -68,7 +80,6 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
 
   const updateSchedule = (newSchedule: DaySchedule[]) => {
     setSchedule(newSchedule);
-    // Convert schedule to string format with proper padding for single-digit hours
     const formattedSchedule = newSchedule
       .map(day => {
         if (day.isClosed) {
@@ -76,9 +87,8 @@ export function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
         }
         const slots = day.slots
           .map(slot => {
-            // Ensure proper padding for hours and minutes
-            const formattedOpen = slot.open.padStart(5, '0');
-            const formattedClose = slot.close.padStart(5, '0');
+            const formattedOpen = formatTimeValue(slot.open);
+            const formattedClose = formatTimeValue(slot.close);
             return `${formattedOpen}-${formattedClose}`;
           })
           .join(', ');
