@@ -23,9 +23,11 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
       const hours = parts[i + 1];
       
       if (hours) {
+        // Add "Uhr" after the time if it's not "Geschlossen"
+        const formattedHours = hours === 'Geschlossen' ? hours : hours + ' Uhr';
         formattedSchedule.push({
           days: day + ':', // Add colon after the day
-          hours: hours
+          hours: formattedHours
         });
         i++; // Skip the next part since we used it as hours
       }
