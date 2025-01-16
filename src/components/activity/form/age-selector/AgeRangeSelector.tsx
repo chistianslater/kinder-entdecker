@@ -9,7 +9,6 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { X } from "lucide-react";
 
 const ageRanges = [
@@ -17,7 +16,7 @@ const ageRanges = [
   { value: "4-6", label: "4-6 Jahre" },
   { value: "7-12", label: "7-12 Jahre" },
   { value: "13-16", label: "13-16 Jahre" },
-  { value: "all", label: "Alle Altersgruppen" },
+  { value: "all", label: "Alle Jahre" },
 ];
 
 interface AgeRangeSelectorProps {
@@ -25,11 +24,11 @@ interface AgeRangeSelectorProps {
 }
 
 export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
-  const handleAgeRangeSelect = (checked: boolean, value: string) => {
+  const handleAgeRangeSelect = (value: string) => {
     const currentValues = form.getValues("age_range") || [];
-    const newValues = checked
-      ? [...currentValues, value]
-      : currentValues.filter((v) => v !== value);
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
     form.setValue("age_range", newValues, { shouldValidate: true });
   };
 
@@ -48,32 +47,19 @@ export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
           <FormLabel className="text-lg font-medium text-white">Altersgruppe</FormLabel>
           <FormControl>
             <div className="space-y-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="flex flex-wrap gap-2">
                 {ageRanges.map((range) => (
-                  <div
+                  <button
                     key={range.value}
-                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200
+                    type="button"
+                    onClick={() => handleAgeRangeSelect(range.value)}
+                    className={`px-4 py-2 rounded-full transition-all duration-200 text-sm
                               ${field.value?.includes(range.value)
-                                ? 'bg-primary/20 border border-primary'
-                                : 'bg-accent/20 border border-accent/20 hover:border-accent/40'}`}
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-secondary/80 text-white hover:bg-accent/80'}`}
                   >
-                    <Checkbox
-                      id={`age-${range.value}`}
-                      checked={field.value?.includes(range.value)}
-                      onCheckedChange={(checked) => 
-                        handleAgeRangeSelect(checked as boolean, range.value)
-                      }
-                      className="border-white/20 data-[state=checked]:bg-primary 
-                               data-[state=checked]:text-primary-foreground"
-                    />
-                    <label
-                      htmlFor={`age-${range.value}`}
-                      className="text-sm font-medium leading-none cursor-pointer
-                               text-white hover:text-primary transition-colors"
-                    >
-                      {range.label}
-                    </label>
-                  </div>
+                    {range.label}
+                  </button>
                 ))}
               </div>
               {field.value && field.value.length > 0 && (

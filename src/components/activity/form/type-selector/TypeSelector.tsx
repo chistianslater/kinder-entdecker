@@ -9,7 +9,6 @@ import {
 import { UseFormReturn } from "react-hook-form";
 import { FormData } from "../../types";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { X } from "lucide-react";
 
 const activityTypes = [
@@ -25,6 +24,14 @@ interface TypeSelectorProps {
 }
 
 export function TypeSelector({ form }: TypeSelectorProps) {
+  const handleTypeSelect = (value: string) => {
+    const currentValues = form.getValues("type") || [];
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    form.setValue("type", newValues, { shouldValidate: true });
+  };
+
   return (
     <FormField
       control={form.control}
@@ -32,41 +39,23 @@ export function TypeSelector({ form }: TypeSelectorProps) {
       render={({ field }) => {
         const currentValues = Array.isArray(field.value) ? field.value : [];
 
-        const handleTypeSelect = (checked: boolean, value: string) => {
-          const updatedValues = checked
-            ? [...currentValues, value]
-            : currentValues.filter((v) => v !== value);
-          form.setValue("type", updatedValues, { shouldValidate: true });
-        };
-
         return (
           <FormItem className="space-y-4">
             <FormLabel className="text-lg font-medium text-white">Typ</FormLabel>
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="flex flex-wrap gap-2">
                 {activityTypes.map((type) => (
-                  <div
+                  <button
                     key={type.value}
-                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200
+                    type="button"
+                    onClick={() => handleTypeSelect(type.value)}
+                    className={`px-4 py-2 rounded-full transition-all duration-200 text-sm
                               ${currentValues.includes(type.value)
-                                ? 'bg-primary/20 border border-primary'
-                                : 'bg-accent/20 border border-accent/20 hover:border-accent/40'}`}
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-secondary/80 text-white hover:bg-accent/80'}`}
                   >
-                    <FormControl>
-                      <Checkbox
-                        checked={currentValues.includes(type.value)}
-                        onCheckedChange={(checked) => 
-                          handleTypeSelect(checked as boolean, type.value)
-                        }
-                        className="border-white/20 data-[state=checked]:bg-primary 
-                                 data-[state=checked]:text-primary-foreground"
-                      />
-                    </FormControl>
-                    <FormLabel className="text-sm font-medium cursor-pointer m-0
-                                       text-white hover:text-primary transition-colors">
-                      {type.label}
-                    </FormLabel>
-                  </div>
+                    {type.label}
+                  </button>
                 ))}
               </div>
               {currentValues.length > 0 && (
@@ -82,7 +71,7 @@ export function TypeSelector({ form }: TypeSelectorProps) {
                         className="ml-2 hover:text-primary transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleTypeSelect(false, type);
+                          handleTypeSelect(type);
                         }}
                       >
                         <X className="h-3 w-3" />
