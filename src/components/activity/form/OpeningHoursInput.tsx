@@ -1,5 +1,6 @@
 import React from 'react';
 import { DaySchedule as DayScheduleComponent } from './opening-hours/DaySchedule';
+import { Switch } from "@/components/ui/switch";
 import { 
   DAYS,
   MAX_SLOTS_PER_DAY,
@@ -17,20 +18,22 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() =>
     parseOpeningHours(value)
   );
+  const [isAlwaysOpen, setIsAlwaysOpen] = React.useState(() => 
+    value.toLowerCase() === '24/7'
+  );
 
   const updateSchedule = React.useCallback((newSchedule: DaySchedule[]) => {
-    const formattedValue = formatSchedule(newSchedule);
+    const formattedValue = formatSchedule(newSchedule, isAlwaysOpen);
     if (formattedValue !== value) {
       onChange(formattedValue);
       setSchedule(newSchedule);
     }
-  }, [onChange, value]);
+  }, [onChange, value, isAlwaysOpen]);
 
   const handleDayToggle = React.useCallback((dayIndex: number, checked: boolean) => {
     setSchedule(prevSchedule => {
       const newSchedule = [...prevSchedule];
       newSchedule[dayIndex].slots = checked ? [{ open: '09:00', close: '17:00' }] : [];
-      newSchedule[dayIndex].isAlwaysOpen = false;
       return newSchedule;
     });
   }, []);
@@ -67,24 +70,36 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
     });
   }, []);
 
-  const handleAlwaysOpenChange = React.useCallback((dayIndex: number, checked: boolean) => {
-    setSchedule(prevSchedule => {
-      const newSchedule = [...prevSchedule];
-      newSchedule[dayIndex].isAlwaysOpen = checked;
-      return newSchedule;
-    });
-  }, []);
-
-  React.useEffect(() => {
-    const formattedValue = formatSchedule(schedule);
-    if (formattedValue !== value) {
+  const handleAlwaysOpenChange = React.useCallback((checked: boolean) => {
+    setIsAlwaysOpen(checked);
+    if (checked) {
+      onChange('24/7');
+    } else {
+      const formattedValue = formatSchedule(schedule, false);
       onChange(formattedValue);
     }
-  }, [schedule, onChange, value]);
+  }, [onChange, schedule]);
+
+  React.useEffect(() => {
+    if (!isAlwaysOpen) {
+      const formattedValue = formatSchedule(schedule, false);
+      if (formattedValue !== value) {
+        onChange(formattedValue);
+      }
+    }
+  }, [schedule, onChange, value, isAlwaysOpen]);
 
   return (
     <div className="space-y-4 bg-accent rounded-lg p-4">
-      {schedule.map((daySchedule, dayIndex) => (
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
+        <span className="text-sm text-white/60">Immer geöffnet</span>
+        <Switch
+          checked={isAlwaysOpen}
+          onCheckedChange={handleAlwaysOpenChange}
+        />
+      </div>
+
+      {!isAlwaysOpen && schedule.map((daySchedule, dayIndex) => (
         <DayScheduleComponent
           key={daySchedule.day}
           day={daySchedule.day}
@@ -96,8 +111,6 @@ function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
           }
           onDeleteSlot={(slotIndex) => handleDeleteSlot(dayIndex, slotIndex)}
           maxSlots={MAX_SLOTS_PER_DAY}
-          isAlwaysOpen={daySchedule.isAlwaysOpen || false}
-          onAlwaysOpenChange={(checked) => handleAlwaysOpenChange(dayIndex, checked)}
         />
       ))}
     </div>

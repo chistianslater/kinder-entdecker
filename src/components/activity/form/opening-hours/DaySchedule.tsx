@@ -2,25 +2,22 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { TimeSlot } from './TimeSlot';
+import { TimeSlot as TimeSlotComponent } from './TimeSlot';
 import { generateTimeOptions } from './utils';
-import { Switch } from "@/components/ui/switch";
 
-interface TimeSlotType {
+interface TimeSlot {
   open: string;
   close: string;
 }
 
 interface DayScheduleProps {
   day: string;
-  slots: TimeSlotType[];
+  slots: TimeSlot[];
   onDayToggle: (checked: boolean) => void;
   onAddSlot: () => void;
   onUpdateSlot: (slotIndex: number, field: 'open' | 'close', value: string) => void;
   onDeleteSlot: (slotIndex: number) => void;
   maxSlots: number;
-  isAlwaysOpen: boolean;
-  onAlwaysOpenChange: (checked: boolean) => void;
 }
 
 export const DaySchedule = React.memo(({
@@ -31,36 +28,24 @@ export const DaySchedule = React.memo(({
   onUpdateSlot,
   onDeleteSlot,
   maxSlots,
-  isAlwaysOpen,
-  onAlwaysOpenChange,
 }: DayScheduleProps) => {
   const timeOptions = React.useMemo(() => generateTimeOptions(), []);
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Checkbox
-            checked={slots.length > 0 || isAlwaysOpen}
-            onCheckedChange={(checked) => onDayToggle(checked as boolean)}
-            className="border-white/20"
-          />
-          <span className="text-base text-white">{day}</span>
-        </div>
-        {slots.length > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-white/60">Immer geöffnet</span>
-            <Switch
-              checked={isAlwaysOpen}
-              onCheckedChange={onAlwaysOpenChange}
-            />
-          </div>
-        )}
+      <div className="flex items-center gap-3">
+        <Checkbox
+          checked={slots.length > 0}
+          onCheckedChange={(checked) => onDayToggle(checked as boolean)}
+          className="border-white/20"
+        />
+        <span className="text-base text-white">{day}</span>
       </div>
-      {slots.length > 0 && !isAlwaysOpen && (
+      
+      {slots.length > 0 && (
         <div className="space-y-4 pl-8">
           {slots.map((slot, slotIndex) => (
-            <TimeSlot
+            <TimeSlotComponent
               key={`${day}-${slotIndex}`}
               slot={slot}
               timeOptions={timeOptions}
