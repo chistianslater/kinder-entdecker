@@ -102,7 +102,7 @@ interface OpeningHoursInputProps {
   onChange: (value: string) => void;
 }
 
-export const OpeningHoursInput = React.memo(({ value, onChange }: OpeningHoursInputProps) => {
+function OpeningHoursInput({ value, onChange }: OpeningHoursInputProps) {
   const [schedule, setSchedule] = React.useState<DaySchedule[]>(() =>
     parseOpeningHours(value)
   );
@@ -238,6 +238,9 @@ export const OpeningHoursInput = React.memo(({ value, onChange }: OpeningHoursIn
       ))}
     </div>
   );
-});
+}
 
-OpeningHoursInput.displayName = 'OpeningHoursInput';
+export const MemoizedOpeningHoursInput = React.memo(OpeningHoursInput);
+MemoizedOpeningHoursInput.displayName = 'OpeningHoursInput';
+
+export { MemoizedOpeningHoursInput as OpeningHoursInput };
