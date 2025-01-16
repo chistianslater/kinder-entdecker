@@ -79,6 +79,27 @@ export const ActivityCard = ({
     fetchRatings();
   }, [activity.id]);
 
+  const formatOpeningHours = (openingHours: string) => {
+    if (!openingHours) return null;
+
+    const scheduleLines = openingHours.split('\n');
+    const formattedSchedule = scheduleLines.map(line => {
+      const [days, hours] = line.split(':').map(s => s.trim());
+      if (!hours) return null;
+
+      // Capitalize first letter of each day
+      const formattedDays = days.split(',').map(day => 
+        day.trim().split('-').map(d => 
+          d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
+        ).join('-')
+      ).join(', ');
+
+      return `${formattedDays}: ${hours}`;
+    }).filter(Boolean);
+
+    return formattedSchedule;
+  };
+
   const isCurrentlyOpen = () => {
     if (!activity.opening_hours) return null;
 
@@ -90,7 +111,6 @@ export const ActivityCard = ({
       const [days, hours] = schedule.split(':').map(s => s.trim());
       if (!hours) return false;
 
-      // Check if current day is in the schedule
       const isDayIncluded = days.split(',').some(dayRange => {
         const [start, end] = dayRange.split('-').map(d => d.trim());
         const daysOfWeek = ['montag', 'dienstag', 'mittwoch', 'donnerstag', 'freitag', 'samstag', 'sonntag'];
@@ -102,7 +122,6 @@ export const ActivityCard = ({
 
       if (!isDayIncluded) return false;
 
-      // Check if current time is within opening hours
       const [openTime, closeTime] = hours.split('-').map(t => t.trim());
       return currentTime >= openTime && currentTime <= closeTime;
     });
@@ -111,6 +130,7 @@ export const ActivityCard = ({
   };
 
   const openStatus = isCurrentlyOpen();
+  const formattedHours = activity.opening_hours ? formatOpeningHours(activity.opening_hours) : null;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-3xl bg-black/5 backdrop-blur-md border border-white/10">
@@ -190,23 +210,32 @@ export const ActivityCard = ({
             </div>
           )}
 
-          {activity.opening_hours && (
-            <div className="flex items-center justify-between text-sm text-white/90">
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2 text-white" />
-                {activity.opening_hours}
+          {formattedHours && (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-sm text-white/90">
+                <div className="flex items-center">
+                  <Clock className="w-4 h-4 mr-2 text-white" />
+                  <span className="font-medium">Öffnungszeiten</span>
+                </div>
+                {openStatus !== null && (
+                  <Badge 
+                    className={`ml-2 ${
+                      openStatus 
+                        ? "bg-[#F2FCE2] text-green-700 hover:bg-[#F2FCE2]" 
+                        : "bg-[#FFDEE2] text-red-700 hover:bg-[#FFDEE2]"
+                    }`}
+                  >
+                    {openStatus ? "Geöffnet" : "Geschlossen"}
+                  </Badge>
+                )}
               </div>
-              {openStatus !== null && (
-                <Badge 
-                  className={`ml-2 ${
-                    openStatus 
-                      ? "bg-[#F2FCE2] text-green-700 hover:bg-[#F2FCE2]" 
-                      : "bg-[#FFDEE2] text-red-700 hover:bg-[#FFDEE2]"
-                  }`}
-                >
-                  {openStatus ? "Geöffnet" : "Geschlossen"}
-                </Badge>
-              )}
+              <div className="pl-6 space-y-0.5">
+                {formattedHours.map((hours, index) => (
+                  <div key={index} className="text-sm text-white/80">
+                    {hours}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
