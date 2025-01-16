@@ -13,7 +13,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
   const [isOpeningHoursOpen, setIsOpeningHoursOpen] = useState(false);
 
   const formatOpeningHours = (openingHours: string) => {
-    if (!openingHours) return null;
+    if (!openingHours || openingHours.trim() === '') return null;
 
     const scheduleLines = openingHours.split('\n');
     const formattedSchedule = scheduleLines.map(line => {
@@ -26,7 +26,10 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
       const formattedHours = times.split(',').map(slot => {
         const [start, end] = slot.trim().split('-').map(t => t.trim());
         if (!start || !end) return null;
-        const formatTime = (time: string) => time.includes(':') ? time : `${time}:00`;
+        const formatTime = (time: string) => {
+          if (time.includes(':')) return time;
+          return `${time}:00`;
+        };
         return `${formatTime(start)} - ${formatTime(end)} Uhr`;
       }).filter(Boolean).join(', ');
 
@@ -45,7 +48,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
 
     const isOpen = activity.opening_hours.toLowerCase().split('\n').some(schedule => {
       const [days, hours] = schedule.split(':').map(s => s.trim());
-      if (!hours || hours === 'Geschlossen') return false;
+      if (!hours || hours.toLowerCase() === 'geschlossen') return false;
 
       const isDayIncluded = days.toLowerCase().includes(currentDay.toLowerCase());
       if (!isDayIncluded) return false;
@@ -63,7 +66,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
   const formattedHours = activity.opening_hours ? formatOpeningHours(activity.opening_hours) : null;
   const openStatus = isCurrentlyOpen();
 
-  if (!formattedHours) return null;
+  if (!activity.opening_hours || !formattedHours) return null;
 
   return (
     <Collapsible
@@ -94,9 +97,9 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
           </Badge>
         )}
       </div>
-      <CollapsibleContent className="pl-6 space-y-0.5">
+      <CollapsibleContent className="pl-6 space-y-1">
         {formattedHours.map((schedule, index) => (
-          <div key={index} className="text-sm text-white whitespace-nowrap flex justify-between items-center w-full pr-2">
+          <div key={index} className="text-sm text-white/90 whitespace-nowrap flex justify-between items-center w-full pr-2">
             <span className="font-medium min-w-[100px]">{schedule.days}:</span>
             <span className="ml-2">{schedule.hours}</span>
           </div>
