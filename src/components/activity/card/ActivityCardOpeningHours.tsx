@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Activity } from '@/types/activity';
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Clock, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -28,7 +27,7 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
         
         formattedSchedule.push({
           days: day,
-          hours: times === 'Geschlossen' ? 'geschlossen' : `${times} Uhr`
+          hours: times === 'Geschlossen' ? 'geschlossen' : times
         });
       }
     }
@@ -85,25 +84,23 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
           </Button>
         </CollapsibleTrigger>
         {openStatus !== null && (
-          <Badge 
-            className={`ml-2 ${
-              openStatus 
-                ? "bg-[#F2FCE2] text-green-700 hover:bg-[#F2FCE2]" 
-                : "bg-[#FFDEE2] text-red-700 hover:bg-[#FFDEE2]"
-            }`}
-          >
+          <div className={`ml-2 px-2 py-1 rounded-md text-xs font-medium ${
+            openStatus 
+              ? "bg-[#F2FCE2] text-green-700" 
+              : "bg-[#FFDEE2] text-red-700"
+          }`}>
             {openStatus ? "Geöffnet" : "Geschlossen"}
-          </Badge>
+          </div>
         )}
       </div>
       <CollapsibleContent className="pl-6">
         {formattedHours.map((schedule, index) => (
           <div 
             key={index} 
-            className="text-sm text-white/90 py-1.5 last:border-0"
+            className="text-sm text-white/90 py-1"
           >
-            <div className="grid grid-cols-[120px_1fr] items-center">
-              <span className="font-medium">{schedule.days}</span>
+            <div className="flex">
+              <span className="w-[140px] font-medium">{schedule.days}</span>
               <span>{schedule.hours}</span>
             </div>
           </div>
