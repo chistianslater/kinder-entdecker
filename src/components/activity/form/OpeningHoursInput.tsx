@@ -171,7 +171,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                       onClick={() => removeTimeSlot(dayIndex, slotIndex)}
                       className="mt-6 text-white hover:text-white hover:bg-white/10"
                     >
-                      <Trash2 className="w-4 h-4 text-white" />
+                      <Trash2 className="w-4 h-4 stroke-white" />
                     </Button>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                   onClick={() => addTimeSlot(dayIndex)}
                   className="text-white hover:text-white hover:bg-white/10 w-full"
                 >
-                  <Plus className="w-4 h-4 text-white" />
+                  <Plus className="w-4 h-4 stroke-white" />
                 </Button>
               )}
             </div>
