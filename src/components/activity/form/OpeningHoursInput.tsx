@@ -153,12 +153,10 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         <Input
                           type="time"
                           value={slot.open}
-                          onChange={(e) =>
-                            updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)
-                          }
+                          onChange={(e) => updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)}
                           className="bg-background border-white/10 text-white pl-8"
                         />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4" stroke="white" />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
                       </div>
                     </div>
                     <span className="text-sm text-white mt-6">-</span>
@@ -168,12 +166,10 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         <Input
                           type="time"
                           value={slot.close}
-                          onChange={(e) =>
-                            updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)
-                          }
+                          onChange={(e) => updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)}
                           className="bg-background border-white/10 text-white pl-8"
                         />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4" stroke="white" />
+                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
                       </div>
                     </div>
                     <Button
