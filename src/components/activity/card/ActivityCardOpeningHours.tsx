@@ -15,26 +15,26 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
   const formatOpeningHours = (openingHours: string) => {
     if (!openingHours || openingHours.trim() === '') return null;
 
-    const scheduleLines = openingHours.split('\n');
-    const formattedSchedule = scheduleLines.map(line => {
-      const [days, times] = line.split(':').map(s => s.trim());
-      if (!times || times.toLowerCase() === 'geschlossen') {
-        return { days, hours: 'Geschlossen' };
+    // Split the opening hours string by spaces to get individual day entries
+    const entries = openingHours.split(' ');
+    const formattedSchedule = [];
+    
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      if (entry.endsWith(':')) {
+        // This is a day label
+        const day = entry.slice(0, -1); // Remove the trailing colon
+        const times = entries[i + 1];
+        
+        // Skip the next entry since we've used it
+        i++;
+        
+        formattedSchedule.push({
+          days: day,
+          hours: times === 'Geschlossen' ? 'Geschlossen' : times
+        });
       }
-
-      const formattedDays = days;
-      const formattedHours = times.split(',').map(slot => {
-        const [start, end] = slot.trim().split('-').map(t => t.trim());
-        if (!start || !end) return null;
-        const formatTime = (time: string) => {
-          if (time.includes(':')) return time;
-          return `${time}:00`;
-        };
-        return `${formatTime(start)} - ${formatTime(end)} Uhr`;
-      }).filter(Boolean).join(', ');
-
-      return { days: formattedDays, hours: formattedHours };
-    });
+    }
 
     return formattedSchedule;
   };
@@ -46,18 +46,20 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
     const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' });
     const currentTime = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-    const isOpen = activity.opening_hours.toLowerCase().split('\n').some(schedule => {
-      const [days, hours] = schedule.split(':').map(s => s.trim());
-      if (!hours || hours.toLowerCase() === 'geschlossen') return false;
+    const isOpen = activity.opening_hours.split(' ').some((part, index, array) => {
+      if (part.endsWith(':')) {
+        const day = part.slice(0, -1);
+        const times = array[index + 1];
+        
+        if (!times || times === 'Geschlossen') return false;
+        
+        const isDayIncluded = day.toLowerCase() === currentDay.toLowerCase();
+        if (!isDayIncluded) return false;
 
-      const isDayIncluded = days.toLowerCase().includes(currentDay.toLowerCase());
-      if (!isDayIncluded) return false;
-
-      const timeSlots = hours.split(',').map(slot => slot.trim());
-      return timeSlots.some(slot => {
-        const [openTime, closeTime] = slot.split('-').map(t => t.trim());
-        return currentTime >= openTime && currentTime <= closeTime;
-      });
+        const [start, end] = times.split('-').map(t => t.trim());
+        return currentTime >= start && currentTime <= end;
+      }
+      return false;
     });
 
     return isOpen;
