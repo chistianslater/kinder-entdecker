@@ -24,6 +24,8 @@ const DAYS = [
   'Sonntag'
 ];
 
+const MAX_SLOTS_PER_DAY = 2;
+
 const formatTimeValue = (time: string): string => {
   if (!time) return '00:00';
   return time.includes(':') ? time : `${time}:00`;
@@ -33,7 +35,7 @@ const parseTimeSlots = (timePart: string): TimeSlot[] => {
   if (timePart.toLowerCase() === 'geschlossen') {
     return [];
   }
-  return timePart.split(',').map(slot => {
+  return timePart.split(',').slice(0, MAX_SLOTS_PER_DAY).map(slot => {
     const [open, close] = slot.trim().split('-').map(t => t.trim());
     return { open: formatTimeValue(open), close: formatTimeValue(close) };
   });
@@ -100,8 +102,10 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
 
   const addTimeSlot = (dayIndex: number) => {
     const newSchedule = [...schedule];
-    newSchedule[dayIndex].slots.push({ open: '00:00', close: '00:00' });
-    updateSchedule(newSchedule);
+    if (newSchedule[dayIndex].slots.length < MAX_SLOTS_PER_DAY) {
+      newSchedule[dayIndex].slots.push({ open: '00:00', close: '00:00' });
+      updateSchedule(newSchedule);
+    }
   };
 
   const removeTimeSlot = (dayIndex: number, slotIndex: number) => {
@@ -130,7 +134,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
               }}
               className="border-white/20"
             />
-            <span className="text-lg text-white">{daySchedule.day}</span>
+            <span className="text-base text-white">{daySchedule.day}</span>
           </div>
           {daySchedule.slots.length > 0 && (
             <div className="space-y-4 pl-8">
@@ -138,7 +142,7 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                 <div key={slotIndex} className="space-y-2">
                   <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
                     <div className="space-y-1">
-                      <span className="text-sm text-white/60">Öffnet um</span>
+                      <span className="text-xs text-white/60">Öffnet um</span>
                       <Input
                         type="time"
                         value={slot.open}
@@ -148,9 +152,9 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                         className="bg-background border-white/10"
                       />
                     </div>
-                    <span className="text-white mt-6">-</span>
+                    <span className="text-sm text-white mt-6">-</span>
                     <div className="space-y-1">
-                      <span className="text-sm text-white/60">Schließt um</span>
+                      <span className="text-xs text-white/60">Schließt um</span>
                       <Input
                         type="time"
                         value={slot.close}
@@ -172,15 +176,17 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                   </div>
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => addTimeSlot(dayIndex)}
-                className="text-white hover:text-white hover:bg-white/10 w-full"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
+              {daySchedule.slots.length < MAX_SLOTS_PER_DAY && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => addTimeSlot(dayIndex)}
+                  className="text-white hover:text-white hover:bg-white/10 w-full"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           )}
         </div>
