@@ -12,11 +12,12 @@ const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
     queryKey: ['weather', location],
     queryFn: async () => {
       try {
+        if (!location.trim()) {
+          return null;
+        }
+
         const { data, error } = await supabase.functions.invoke('get-weather', {
-          body: { location },
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          body: { location: location.trim() },
         });
         
         if (error) {
@@ -29,7 +30,7 @@ const WeatherInfo: React.FC<WeatherInfoProps> = ({ location }) => {
         return null;
       }
     },
-    enabled: !!location,
+    enabled: !!location && location.trim().length > 0,
     retry: 1,
     staleTime: 1000 * 60 * 15, // Cache for 15 minutes
   });
