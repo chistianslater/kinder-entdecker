@@ -8,11 +8,15 @@ interface ActivityCardDetailsProps {
 }
 
 export const ActivityCardDetails = ({ activity }: ActivityCardDetailsProps) => {
+  // Extract city and country from location string
+  const locationParts = activity.location.split(',');
+  const cityAndCountry = locationParts.slice(-2).join(',').trim();
+
   return (
     <div className="space-y-4">
       <div className="flex items-center text-sm text-white/90">
         <MapPin className="w-4 h-4 mr-2 text-white" />
-        {activity.location}
+        {cityAndCountry}
       </div>
 
       <div className="flex items-center text-sm text-white/90">
