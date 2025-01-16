@@ -99,11 +99,13 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
           </Badge>
         )}
       </div>
-      <CollapsibleContent className="pl-6 space-y-1">
+      <CollapsibleContent className="pl-6 space-y-2">
         {formattedHours.map((schedule, index) => (
-          <div key={index} className="text-sm text-white/90 whitespace-nowrap flex justify-between items-center w-full pr-2">
-            <span className="font-medium min-w-[100px]">{schedule.days}:</span>
-            <span className="ml-2">{schedule.hours}</span>
+          <div key={index} className="text-sm text-white/90 flex flex-col w-full">
+            <div className="flex justify-between items-center pr-2">
+              <span className="font-medium min-w-[100px]">{schedule.days}:</span>
+              <span>{schedule.hours}</span>
+            </div>
           </div>
         ))}
       </CollapsibleContent>
