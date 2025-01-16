@@ -66,7 +66,7 @@ const FilterBar = ({ onFiltersChange }: FilterBarProps) => {
 
   return (
     <div className="sticky top-0 z-50">
-      <div className="p-4 md:p-6 mb-6">
+      <div className="py-4 md:py-6 mb-6">
         <div className="flex items-center gap-3 flex-wrap">
           <FilterButtons 
             isPreferencesActive={isPreferencesActive}
