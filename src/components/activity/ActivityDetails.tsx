@@ -66,16 +66,47 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
         <Separator className="bg-accent/20" />
 
-        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
-          <Users className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.age_range || 'Nicht angegeben'}</span>
+        <div className="flex flex-col gap-4 p-4 bg-accent/10 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Users className="w-5 h-5 text-primary" />
+            <span className="text-white">Altersgruppe</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {activity.age_range?.map((age) => (
+              <div
+                key={age}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white"
+              >
+                <Users className="h-4 w-4" />
+                {age === 'all' ? 'Alle Jahre' : `${age} Jahre`}
+              </div>
+            ))}
+          </div>
         </div>
 
         <Separator className="bg-accent/20" />
 
-        <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
-          <Tag className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.type}</span>
+        <div className="flex flex-col gap-4 p-4 bg-accent/10 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Tag className="w-5 h-5 text-primary" />
+            <span className="text-white">Aktivitätstyp</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Array.isArray(activity.type) ? activity.type.map((type) => (
+              <div
+                key={type}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white"
+              >
+                <Tag className="h-4 w-4" />
+                {type}
+              </div>
+            )) : (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white">
+                <Tag className="h-4 w-4" />
+                {activity.type}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
