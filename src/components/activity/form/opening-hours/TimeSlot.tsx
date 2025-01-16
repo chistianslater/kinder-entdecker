@@ -37,7 +37,9 @@ export const TimeSlot = React.memo(({
         <SelectTrigger className="bg-background border-white/10 text-white">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="bg-background border-accent/20">
+        <SelectContent 
+          className="bg-background border-accent/20 max-h-[200px] overflow-auto"
+        >
           {timeOptions.map((time) => (
             <SelectItem 
               key={time} 
@@ -60,7 +62,9 @@ export const TimeSlot = React.memo(({
         <SelectTrigger className="bg-background border-white/10 text-white">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="bg-background border-accent/20">
+        <SelectContent 
+          className="bg-background border-accent/20 max-h-[200px] overflow-auto"
+        >
           {timeOptions.map((time) => (
             <SelectItem 
               key={time} 
