@@ -3,6 +3,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, Clock } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TimeSlot {
   open: string;
@@ -25,6 +32,20 @@ const DAYS = [
 ];
 
 const MAX_SLOTS_PER_DAY = 2;
+
+// Generate time options in 30-minute intervals
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute of [0, 30]) {
+      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      options.push(timeString);
+    }
+  }
+  return options;
+};
+
+const TIME_OPTIONS = generateTimeOptions();
 
 const parseTimeSlots = (timePart: string): TimeSlot[] => {
   if (timePart.toLowerCase() === 'geschlossen') {
@@ -141,28 +162,48 @@ export const OpeningHoursInput = ({ value, onChange }: OpeningHoursInputProps) =
                   <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-3 items-center">
                     <div className="space-y-1">
                       <span className="text-xs text-white/60">Öffnet um</span>
-                      <div className="relative">
-                        <Input
-                          type="time"
-                          value={slot.open}
-                          onChange={(e) => updateTimeSlot(dayIndex, slotIndex, 'open', e.target.value)}
-                          className="bg-background border-white/10 text-white pl-8"
-                        />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
-                      </div>
+                      <Select
+                        value={slot.open}
+                        onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'open', value)}
+                      >
+                        <SelectTrigger className="bg-background border-white/10 text-white">
+                          <SelectValue placeholder="Öffnungszeit" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-accent/20">
+                          {TIME_OPTIONS.map((time) => (
+                            <SelectItem 
+                              key={time} 
+                              value={time}
+                              className="text-white focus:bg-accent focus:text-white"
+                            >
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <span className="text-sm text-white mt-6">-</span>
                     <div className="space-y-1">
                       <span className="text-xs text-white/60">Schließt um</span>
-                      <div className="relative">
-                        <Input
-                          type="time"
-                          value={slot.close}
-                          onChange={(e) => updateTimeSlot(dayIndex, slotIndex, 'close', e.target.value)}
-                          className="bg-background border-white/10 text-white pl-8"
-                        />
-                        <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
-                      </div>
+                      <Select
+                        value={slot.close}
+                        onValueChange={(value) => updateTimeSlot(dayIndex, slotIndex, 'close', value)}
+                      >
+                        <SelectTrigger className="bg-background border-white/10 text-white">
+                          <SelectValue placeholder="Schließzeit" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-accent/20">
+                          {TIME_OPTIONS.map((time) => (
+                            <SelectItem 
+                              key={time} 
+                              value={time}
+                              className="text-white focus:bg-accent focus:text-white"
+                            >
+                              {time}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <Button
                       type="button"
