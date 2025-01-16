@@ -51,17 +51,17 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Clock className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.opening_hours || 'Not specified'}</span>
+          <span className="text-white">{activity.opening_hours || 'Nicht angegeben'}</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Euro className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.price_range || 'Not specified'}</span>
+          <span className="text-white">{activity.price_range || 'Nicht angegeben'}</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
           <Users className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.age_range || 'Not specified'}</span>
+          <span className="text-white">{activity.age_range || 'Nicht angegeben'}</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg">
