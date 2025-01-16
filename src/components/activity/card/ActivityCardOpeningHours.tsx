@@ -15,18 +15,15 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
   const formatOpeningHours = (openingHours: string) => {
     if (!openingHours || openingHours.trim() === '') return null;
 
-    // Split the opening hours string by spaces to get individual day entries
     const entries = openingHours.split(' ');
     const formattedSchedule = [];
     
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
       if (entry.endsWith(':')) {
-        // This is a day label
-        const day = entry.slice(0, -1); // Remove the trailing colon
+        const day = entry.slice(0, -1);
         const times = entries[i + 1];
         
-        // Skip the next entry since we've used it
         i++;
         
         formattedSchedule.push({
@@ -101,11 +98,12 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
       </div>
       <CollapsibleContent className="pl-6 space-y-2">
         {formattedHours.map((schedule, index) => (
-          <div key={index} className="text-sm text-white/90 flex flex-col w-full">
-            <div className="flex justify-between items-center pr-2">
-              <span className="font-medium min-w-[100px]">{schedule.days}:</span>
-              <span>{schedule.hours}</span>
-            </div>
+          <div 
+            key={index} 
+            className="text-sm text-white/90 grid grid-cols-[120px,1fr] gap-2 items-center border-b border-white/10 pb-2 last:border-0 last:pb-0"
+          >
+            <span className="font-medium">{schedule.days}:</span>
+            <span className="text-right">{schedule.hours}</span>
           </div>
         ))}
       </CollapsibleContent>
