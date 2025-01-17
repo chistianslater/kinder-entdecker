@@ -114,7 +114,7 @@ export const ActivityReviews = ({ activity }: ActivityReviewsProps) => {
                       variant="ghost"
                       size="sm"
                       onClick={() => setEditingReviewId(review.id)}
-                      className="h-8"
+                      className="h-8 text-white hover:text-white/80 hover:bg-white/10"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
