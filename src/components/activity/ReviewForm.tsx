@@ -1,11 +1,13 @@
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { TreePine, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { RatingInput } from './review/RatingInput';
+import { FileUpload } from './review/FileUpload';
 
 interface ReviewFormProps {
   activity: Activity;
@@ -18,13 +20,17 @@ interface ReviewFormProps {
   onCancelEdit?: () => void;
 }
 
-export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }: ReviewFormProps) => {
+export const ReviewForm = ({ 
+  activity, 
+  onSuccess, 
+  existingReview, 
+  onCancelEdit 
+}: ReviewFormProps) => {
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState(existingReview?.comment || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [captions, setCaptions] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
 
   const { data: userReview } = useQuery({
@@ -50,13 +56,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
     if (event.target.files) {
       const files = Array.from(event.target.files);
       setSelectedFiles(prev => [...prev, ...files]);
-      
-      // Initialize captions for new files
-      const newCaptions = { ...captions };
-      files.forEach(file => {
-        newCaptions[file.name] = '';
-      });
-      setCaptions(newCaptions);
     }
   };
 
@@ -88,7 +87,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         return;
       }
 
-      // Submit review
       const { error: reviewError } = await supabase
         .from('reviews')
         .upsert({
@@ -101,7 +99,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
 
       if (reviewError) throw reviewError;
 
-      // Handle media uploads
       for (const file of selectedFiles) {
         const fileExt = file.name.split('.').pop();
         const filePath = `${activity.id}/${Math.random()}.${fileExt}`;
@@ -120,7 +117,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         const insertData = {
           activity_id: activity.id,
           user_id: user.id,
-          caption: captions[file.name] || file.name,
           ...(file.type.startsWith('image/') 
             ? { image_url: publicUrl }
             : { video_url: publicUrl }
@@ -145,7 +141,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         setComment('');
         setRating(0);
         setSelectedFiles([]);
-        setCaptions({});
       }
       onSuccess?.();
       onCancelEdit?.();
@@ -161,32 +156,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
     }
   };
 
-  const renderTrees = () => {
-    return Array.from({ length: 5 }).map((_, index) => {
-      const treeValue = index + 1;
-      const isFilled = (hoveredRating || rating) >= treeValue;
-      
-      return (
-        <button
-          key={index}
-          type="button"
-          onClick={() => setRating(treeValue)}
-          onMouseEnter={() => setHoveredRating(treeValue)}
-          onMouseLeave={() => setHoveredRating(0)}
-          className="p-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
-        >
-          <TreePine 
-            className={`w-6 h-6 transition-colors ${
-              isFilled 
-                ? 'fill-primary text-primary' 
-                : 'fill-muted text-muted hover:fill-primary/20 hover:text-primary/20'
-            }`}
-          />
-        </button>
-      );
-    });
-  };
-
   if (userReview && !existingReview) {
     return null;
   }
@@ -199,9 +168,14 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
           Wie würdest du diese Aktivität bewerten?
         </div>
       )}
-      <div className="flex space-x-1">
-        {renderTrees()}
-      </div>
+      
+      <RatingInput
+        rating={rating}
+        hoveredRating={hoveredRating}
+        onRatingChange={setRating}
+        onHoverChange={setHoveredRating}
+      />
+      
       <Textarea
         placeholder="Schreibe einen Kommentar..."
         value={comment}
@@ -209,50 +183,11 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         className="min-h-[100px] text-white placeholder:text-white/50"
       />
       
-      <div className="space-y-4 border-t pt-4">
-        <input
-          type="file"
-          multiple
-          accept="image/*,video/*"
-          onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-full file:border-0
-            file:text-sm file:font-semibold
-            file:bg-primary file:text-white
-            hover:file:bg-primary/90"
-        />
-        
-        {selectedFiles.length > 0 && (
-          <div className="space-y-4">
-            {selectedFiles.map((file, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-white/70">{file.name}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeFile(index)}
-                    className="text-white/70 hover:text-white"
-                  >
-                    Entfernen
-                  </Button>
-                </div>
-                <Textarea
-                  placeholder={`${file.type.startsWith('image/') ? 'Bildunterschrift' : 'Videobeschreibung'} (optional)`}
-                  value={captions[file.name] || ''}
-                  onChange={(e) => setCaptions(prev => ({
-                    ...prev,
-                    [file.name]: e.target.value
-                  }))}
-                  className="text-white placeholder:text-white/50"
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <FileUpload
+        onFileChange={handleFileChange}
+        selectedFiles={selectedFiles}
+        onRemoveFile={removeFile}
+      />
 
       <div className="flex gap-2">
         <Button 
