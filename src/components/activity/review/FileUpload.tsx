@@ -18,11 +18,11 @@ export const FileUpload = ({
         multiple
         accept="image/*,video/*"
         onChange={onFileChange}
-        className="block w-full text-sm text-black
+        className="block w-full text-white text-sm
           file:mr-4 file:py-2 file:px-4
           file:rounded-full file:border-0
           file:text-sm file:font-semibold
-          file:bg-primary file:text-white
+          file:bg-primary file:text-black
           hover:file:bg-primary/90"
       />
       
