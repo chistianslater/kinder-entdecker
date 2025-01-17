@@ -17,7 +17,6 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
             className="flex items-center gap-1 rounded-2xl ml-2 bg-black/30 backdrop-blur-md border border-white/40"
           >
             <Building2 className="w-4 h-4" />
-            Unternehmensbeitrag
           </Badge>
         )}
         {activity.approved_at ? (
@@ -26,7 +25,6 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
             className="flex items-center gap-1 rounded-2xl bg-green-500/30 backdrop-blur-md border border-green-500/40"
           >
             <CheckCircle2 className="w-4 h-4" />
-            Genehmigt
           </Badge>
         ) : (
           <Badge 
@@ -34,7 +32,6 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
             className="flex items-center gap-1 rounded-2xl bg-yellow-500/30 backdrop-blur-md border border-yellow-500/40"
           >
             <Clock className="w-4 h-4" />
-            Ausstehend
           </Badge>
         )}
       </div>

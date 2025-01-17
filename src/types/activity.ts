@@ -17,4 +17,6 @@ export interface Activity {
   created_by: string | null;
   claimed_by: string | null;
   image_url: string | null;
+  approved_at: string | null;
+  approved_by: string | null;
 }
