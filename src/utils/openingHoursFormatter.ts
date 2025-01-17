@@ -1,5 +1,10 @@
 export const formatOpeningHours = (openingHours: string) => {
   if (!openingHours || openingHours.trim() === '') return null;
+  
+  // Handle 24/7 case
+  if (openingHours.toLowerCase() === '24/7') {
+    return [{ days: 'Alle Tage:', hours: '24/7' }];
+  }
 
   // Split by spaces and filter out empty strings
   const parts = openingHours.split(/\s+/).filter(part => part);
@@ -25,6 +30,11 @@ export const formatOpeningHours = (openingHours: string) => {
 
 export const isCurrentlyOpen = (openingHours: string | null) => {
   if (!openingHours) return null;
+  
+  // Handle 24/7 case
+  if (openingHours.toLowerCase() === '24/7') {
+    return true;
+  }
 
   const now = new Date();
   const currentDay = now.toLocaleDateString('de-DE', { weekday: 'long' });

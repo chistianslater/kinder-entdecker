@@ -35,10 +35,16 @@ export const ActivityCardOpeningHours = ({ activity }: ActivityCardOpeningHoursP
             <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpeningHoursOpen ? 'rotate-180' : ''}`} />
           </Button>
         </CollapsibleTrigger>
-        <OpeningStatusBadge isOpen={openStatus} />
+        <OpeningStatusBadge isOpen={openStatus} openingHours={activity.opening_hours} />
       </div>
       <CollapsibleContent>
-        <ScheduleList schedule={formattedHours} />
+        {activity.opening_hours.toLowerCase() === '24/7' ? (
+          <div className="text-sm text-white/70 pl-6">
+            Immer geöffnet (24/7)
+          </div>
+        ) : (
+          <ScheduleList schedule={formattedHours} />
+        )}
       </CollapsibleContent>
     </Collapsible>
   );
