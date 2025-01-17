@@ -86,7 +86,6 @@ export const CarouselItem = ({ image, activityTitle, onImageDelete }: CarouselIt
           <User className="w-4 h-4" />
           <span className="text-sm font-medium">{image.photographer}</span>
         </div>
-        <p className="text-xs text-white/90 mt-1">{image.caption}</p>
       </div>
     </div>
   );
