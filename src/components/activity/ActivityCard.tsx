@@ -47,6 +47,7 @@ export const ActivityCard = ({
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
   const [isOwner, setIsOwner] = useState(false);
+  const [displayImage, setDisplayImage] = useState<string | null>(null);
   const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
@@ -81,6 +82,39 @@ export const ActivityCard = ({
     fetchRatings();
   }, [activity.id]);
 
+  useEffect(() => {
+    const fetchImages = async () => {
+      // First, check if there's a main image
+      if (activity.image_url) {
+        setDisplayImage(activity.image_url);
+        return;
+      }
+
+      // If no main image, fetch all photos for this activity
+      const { data: photos, error } = await supabase
+        .from('photos')
+        .select('image_url')
+        .eq('activity_id', activity.id);
+
+      if (error) {
+        console.error('Error fetching photos:', error);
+        setDisplayImage(getRandomPlaceholder());
+        return;
+      }
+
+      if (photos && photos.length > 0) {
+        // Randomly select one photo
+        const randomIndex = Math.floor(Math.random() * photos.length);
+        setDisplayImage(photos[randomIndex].image_url);
+      } else {
+        // If no photos available, use a placeholder
+        setDisplayImage(getRandomPlaceholder());
+      }
+    };
+
+    fetchImages();
+  }, [activity.id, activity.image_url]);
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-3xl bg-black/5 backdrop-blur-md border border-white/10">
       <div className="relative">
@@ -88,9 +122,8 @@ export const ActivityCard = ({
         <div 
           className="h-48 bg-cover bg-center cursor-pointer rounded-t-2xl" 
           style={{ 
-            backgroundImage: activity.image_url 
-              ? `url(${activity.image_url})` 
-              : `url(${getRandomPlaceholder()})` 
+            backgroundImage: displayImage ? `url(${displayImage})` : undefined,
+            backgroundColor: !displayImage ? 'rgba(0,0,0,0.1)' : undefined
           }}
           onClick={() => onSelect(activity)}
         />
