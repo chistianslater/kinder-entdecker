@@ -1,7 +1,7 @@
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { TreePine, MessageSquare, Pencil, ImagePlus, Video } from 'lucide-react';
+import { TreePine, MessageSquare } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { Activity } from '@/types/activity';
 import { useQuery } from '@tanstack/react-query';
@@ -24,7 +24,6 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
   const [comment, setComment] = useState(existingReview?.comment || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [mediaType, setMediaType] = useState<'photo' | 'video'>('photo');
   const [captions, setCaptions] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
 
@@ -211,31 +210,10 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
       />
       
       <div className="space-y-4 border-t pt-4">
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={mediaType === 'photo' ? 'default' : 'outline'}
-            onClick={() => setMediaType('photo')}
-            className={`flex items-center gap-2 ${mediaType !== 'photo' && 'text-white border-white/20 hover:bg-white/10'}`}
-          >
-            <ImagePlus className="w-4 h-4" />
-            Fotos
-          </Button>
-          <Button
-            type="button"
-            variant={mediaType === 'video' ? 'default' : 'outline'}
-            onClick={() => setMediaType('video')}
-            className={`flex items-center gap-2 ${mediaType !== 'video' && 'text-white border-white/20 hover:bg-white/10'}`}
-          >
-            <Video className="w-4 h-4" />
-            Videos
-          </Button>
-        </div>
-        
         <input
           type="file"
           multiple
-          accept={mediaType === 'photo' ? 'image/*' : 'video/*'}
+          accept="image/*,video/*"
           onChange={handleFileChange}
           className="block w-full text-sm text-gray-500
             file:mr-4 file:py-2 file:px-4
@@ -268,6 +246,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
                     ...prev,
                     [file.name]: e.target.value
                   }))}
+                  className="text-white placeholder:text-white/50"
                 />
               </div>
             ))}
