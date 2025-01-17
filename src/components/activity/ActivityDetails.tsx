@@ -36,6 +36,15 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
       <ImageGallery activity={activity} />
 
+      {activity.description && (
+        <>
+          <div className="p-4 bg-accent/10 rounded-lg">
+            <p className="text-white/90 whitespace-pre-wrap">{activity.description}</p>
+          </div>
+          <Separator className="bg-accent/20" />
+        </>
+      )}
+
       <h3 className="text-lg font-semibold text-primary">Details</h3>
       <div className="grid gap-6">
         <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
