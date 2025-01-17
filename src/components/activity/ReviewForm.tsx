@@ -23,9 +23,9 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState(existingReview?.comment || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [mediaType, setMediaType] = useState<'photo' | 'video'>('photo');
-  const [caption, setCaption] = useState('');
+  const [captions, setCaptions] = useState<{ [key: string]: string }>({});
   const { toast } = useToast();
 
   const { data: userReview } = useQuery({
@@ -48,9 +48,21 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      setSelectedFiles(prev => [...prev, ...files]);
+      
+      // Initialize captions for new files
+      const newCaptions = { ...captions };
+      files.forEach(file => {
+        newCaptions[file.name] = '';
+      });
+      setCaptions(newCaptions);
     }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,30 +102,34 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
 
       if (reviewError) throw reviewError;
 
-      // Handle media upload if a file is selected
-      if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop();
+      // Handle media uploads
+      for (const file of selectedFiles) {
+        const fileExt = file.name.split('.').pop();
         const filePath = `${activity.id}/${Math.random()}.${fileExt}`;
-        const bucket = mediaType === 'photo' ? 'activity-photos' : 'activity-videos';
+        const bucket = file.type.startsWith('image/') ? 'activity-photos' : 'activity-videos';
 
         const { error: uploadError } = await supabase.storage
           .from(bucket)
-          .upload(filePath, selectedFile);
+          .upload(filePath, file);
 
         if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(filePath);
 
         const insertData = {
           activity_id: activity.id,
           user_id: user.id,
-          caption,
-          ...(mediaType === 'photo' 
-            ? { image_url: filePath }
-            : { video_url: filePath }
+          caption: captions[file.name] || file.name,
+          ...(file.type.startsWith('image/') 
+            ? { image_url: publicUrl }
+            : { video_url: publicUrl }
           )
         };
 
         const { error: mediaError } = await supabase
-          .from(mediaType === 'photo' ? 'photos' : 'videos')
+          .from(file.type.startsWith('image/') ? 'photos' : 'videos')
           .insert(insertData);
 
         if (mediaError) throw mediaError;
@@ -129,8 +145,8 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
       if (!existingReview) {
         setComment('');
         setRating(0);
-        setSelectedFile(null);
-        setCaption('');
+        setSelectedFiles([]);
+        setCaptions({});
       }
       onSuccess?.();
       onCancelEdit?.();
@@ -203,7 +219,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
             className={`flex items-center gap-2 ${mediaType !== 'photo' && 'text-white border-white/20 hover:bg-white/10'}`}
           >
             <ImagePlus className="w-4 h-4" />
-            Foto
+            Fotos
           </Button>
           <Button
             type="button"
@@ -212,12 +228,13 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
             className={`flex items-center gap-2 ${mediaType !== 'video' && 'text-white border-white/20 hover:bg-white/10'}`}
           >
             <Video className="w-4 h-4" />
-            Video
+            Videos
           </Button>
         </div>
         
         <input
           type="file"
+          multiple
           accept={mediaType === 'photo' ? 'image/*' : 'video/*'}
           onChange={handleFileChange}
           className="block w-full text-sm text-gray-500
@@ -228,12 +245,33 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
             hover:file:bg-primary/90"
         />
         
-        {selectedFile && (
-          <Textarea
-            placeholder={`${mediaType === 'photo' ? 'Bildunterschrift' : 'Videobeschreibung'} (optional)`}
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-          />
+        {selectedFiles.length > 0 && (
+          <div className="space-y-4">
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/70">{file.name}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFile(index)}
+                    className="text-white/70 hover:text-white"
+                  >
+                    Entfernen
+                  </Button>
+                </div>
+                <Textarea
+                  placeholder={`${file.type.startsWith('image/') ? 'Bildunterschrift' : 'Videobeschreibung'} (optional)`}
+                  value={captions[file.name] || ''}
+                  onChange={(e) => setCaptions(prev => ({
+                    ...prev,
+                    [file.name]: e.target.value
+                  }))}
+                />
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
