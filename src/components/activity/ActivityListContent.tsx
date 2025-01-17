@@ -27,7 +27,6 @@ const ActivityListContent = ({
           activity={activity}
           onSelect={onSelect}
           onClaim={onClaim}
-          onEdit={onEdit}
           showClaimButton={showClaimButton}
           onRefresh={onRefresh}
         />

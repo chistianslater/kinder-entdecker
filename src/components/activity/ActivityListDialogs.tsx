@@ -29,6 +29,7 @@ const ActivityListDialogs = ({
         activity={selectedActivity}
         isOpen={selectedActivity !== null}
         onClose={onCloseDetail}
+        onEdit={(activity) => onEditDialogChange(true)}
       />
 
       <CreateActivityDialog
