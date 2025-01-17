@@ -7,26 +7,34 @@ export const useActivityImage = (activityId: string, mainImageUrl: string | null
 
   useEffect(() => {
     const fetchImages = async () => {
-      if (mainImageUrl) {
-        setDisplayImage(mainImageUrl);
-        return;
-      }
+      try {
+        // Get all available images (main image + user uploaded photos)
+        const { data: photos, error } = await supabase
+          .from('photos')
+          .select('image_url')
+          .eq('activity_id', activityId);
 
-      const { data: photos, error } = await supabase
-        .from('photos')
-        .select('image_url')
-        .eq('activity_id', activityId);
+        if (error) {
+          console.error('Error fetching photos:', error);
+          setDisplayImage(getRandomPlaceholder());
+          return;
+        }
 
-      if (error) {
-        console.error('Error fetching photos:', error);
-        setDisplayImage(getRandomPlaceholder());
-        return;
-      }
+        // Combine main image with user photos if they exist
+        const allImages = [
+          ...(mainImageUrl ? [{ image_url: mainImageUrl }] : []),
+          ...(photos || [])
+        ];
 
-      if (photos && photos.length > 0) {
-        const randomIndex = Math.floor(Math.random() * photos.length);
-        setDisplayImage(photos[randomIndex].image_url);
-      } else {
+        if (allImages.length > 0) {
+          // Randomly select an image from all available images
+          const randomIndex = Math.floor(Math.random() * allImages.length);
+          setDisplayImage(allImages[randomIndex].image_url);
+        } else {
+          setDisplayImage(getRandomPlaceholder());
+        }
+      } catch (error) {
+        console.error('Error in useActivityImage:', error);
         setDisplayImage(getRandomPlaceholder());
       }
     };
