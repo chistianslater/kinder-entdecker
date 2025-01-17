@@ -15,8 +15,8 @@ interface ActivityBadgesProps {
 
 export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => {
   return (
-    <div className={`flex items-center justify-between w-full z-[5] ${className || ''}`}>
-      <div className="flex gap-2">
+    <div className={`flex items-center justify-between w-full ${className || ''}`}>
+      <div className="flex gap-2 relative z-50">
         {activity.is_business && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -30,7 +30,8 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
               </TooltipTrigger>
               <TooltipContent 
                 side="bottom" 
-                className="bg-black/90 text-white border-white/10"
+                className="bg-black/90 text-white border-white/10 z-[100]"
+                sideOffset={5}
               >
                 <p>Business Activity</p>
               </TooltipContent>
@@ -50,7 +51,8 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
               </TooltipTrigger>
               <TooltipContent 
                 side="bottom" 
-                className="bg-black/90 text-white border-white/10"
+                className="bg-black/90 text-white border-white/10 z-[100]"
+                sideOffset={5}
               >
                 <p>Approved Activity</p>
               </TooltipContent>
@@ -69,7 +71,8 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
               </TooltipTrigger>
               <TooltipContent 
                 side="bottom" 
-                className="bg-black/90 text-white border-white/10"
+                className="bg-black/90 text-white border-white/10 z-[100]"
+                sideOffset={5}
               >
                 <p>Pending Approval</p>
               </TooltipContent>
