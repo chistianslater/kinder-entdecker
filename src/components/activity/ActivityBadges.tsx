@@ -1,6 +1,12 @@
 import { Activity } from '@/types/activity';
 import { Badge } from "@/components/ui/badge";
 import { Building2, CheckCircle2, Clock } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ActivityBadgesProps {
   activity: Activity;
@@ -12,27 +18,54 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
     <div className={`flex items-center justify-between w-full z-[5] ${className || ''}`}>
       <div className="flex gap-2">
         {activity.is_business && (
-          <Badge 
-            variant="secondary" 
-            className="flex items-center gap-1 rounded-2xl ml-2 bg-black/30 backdrop-blur-md border border-white/40"
-          >
-            <Building2 className="w-4 h-4" />
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge 
+                  variant="secondary" 
+                  className="flex items-center justify-center w-8 h-8 p-0 rounded-full bg-black/30 backdrop-blur-md border border-white/40"
+                >
+                  <Building2 className="w-4 h-4" />
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Business Activity</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         {activity.approved_at ? (
-          <Badge 
-            variant="secondary" 
-            className="flex items-center gap-1 rounded-2xl bg-green-500/30 backdrop-blur-md border border-green-500/40"
-          >
-            <CheckCircle2 className="w-4 h-4" />
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge 
+                  variant="secondary" 
+                  className="flex items-center justify-center w-8 h-8 p-0 rounded-full bg-green-500/30 backdrop-blur-md border border-green-500/40"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Approved Activity</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : (
-          <Badge 
-            variant="secondary" 
-            className="flex items-center gap-1 rounded-2xl bg-yellow-500/30 backdrop-blur-md border border-yellow-500/40"
-          >
-            <Clock className="w-4 h-4" />
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge 
+                  variant="secondary" 
+                  className="flex items-center justify-center w-8 h-8 p-0 rounded-full bg-yellow-500/30 backdrop-blur-md border border-yellow-500/40"
+                >
+                  <Clock className="w-4 h-4" />
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Pending Approval</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
       </div>
     </div>
