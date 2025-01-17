@@ -15,7 +15,6 @@ interface ActivityCardProps {
   activity: Activity;
   onSelect: (activity: Activity) => void;
   onClaim?: (activityId: string) => void;
-  onEdit?: (activity: Activity) => void;
   showClaimButton?: boolean;
   onRefresh?: () => void;
 }
@@ -24,7 +23,6 @@ export const ActivityCard = ({
   activity, 
   onSelect, 
   onClaim,
-  onEdit,
   showClaimButton = false,
   onRefresh
 }: ActivityCardProps) => {
@@ -59,7 +57,6 @@ export const ActivityCard = ({
       <ActivityCardActions 
         activity={activity}
         onClaim={onClaim}
-        onEdit={onEdit}
         showClaimButton={showClaimButton}
         isOwner={isOwner}
         isAdmin={isAdmin}
