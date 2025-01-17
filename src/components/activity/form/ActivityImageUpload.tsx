@@ -13,6 +13,7 @@ import { UseFormReturn } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FormData } from "../types";
+import imageCompression from "browser-image-compression";
 
 interface ActivityImageUploadProps {
   form: UseFormReturn<FormData>;
@@ -31,6 +32,22 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
     }
   }, [form]);
 
+  const compressImage = async (file: File) => {
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      return compressedFile;
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      return file;
+    }
+  };
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       if (!event.target.files || event.target.files.length === 0) {
@@ -48,24 +65,28 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
+      // Increase size limit to 10MB
+      if (file.size > 10 * 1024 * 1024) {
         toast({
           title: "Fehler",
-          description: "Das Bild darf nicht größer als 5MB sein.",
+          description: "Das Bild darf nicht größer als 10MB sein.",
           variant: "destructive",
         });
         return;
       }
 
+      // Compress image if it's larger than 2MB
+      const processedFile = file.size > 2 * 1024 * 1024 ? await compressImage(file) : file;
+
       const fileExt = file.name.split('.').pop();
       const filePath = `${crypto.randomUUID()}.${fileExt}`;
 
-      const localPreviewUrl = URL.createObjectURL(file);
+      const localPreviewUrl = URL.createObjectURL(processedFile);
       setPreviewUrl(localPreviewUrl);
 
       const { error: uploadError } = await supabase.storage
         .from('activity-photos')
-        .upload(filePath, file, {
+        .upload(filePath, processedFile, {
           cacheControl: '3600',
           upsert: false,
           contentType: file.type
@@ -77,10 +98,8 @@ export function ActivityImageUpload({ form }: ActivityImageUploadProps) {
         .from('activity-photos')
         .getPublicUrl(filePath);
 
-      // Set the image URL in the form
       form.setValue('image_url', publicUrl);
 
-      // Only create a photo record if we're editing an existing activity
       const activityId = form.getValues('id');
       if (activityId) {
         const { data: { user } } = await supabase.auth.getUser();
