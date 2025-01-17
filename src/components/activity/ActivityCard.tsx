@@ -33,6 +33,7 @@ interface ActivityCardProps {
   onClaim?: (activityId: string) => void;
   onEdit?: (activity: Activity) => void;
   showClaimButton?: boolean;
+  onRefresh?: () => void;
 }
 
 export const ActivityCard = ({ 
@@ -40,7 +41,8 @@ export const ActivityCard = ({
   onSelect, 
   onClaim,
   onEdit,
-  showClaimButton = false 
+  showClaimButton = false,
+  onRefresh
 }: ActivityCardProps) => {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number>(0);
@@ -110,6 +112,7 @@ export const ActivityCard = ({
         showClaimButton={showClaimButton}
         isOwner={isOwner}
         isAdmin={isAdmin}
+        onApprove={onRefresh}
       />
     </Card>
   );

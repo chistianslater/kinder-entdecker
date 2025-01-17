@@ -73,6 +73,7 @@ const ActivityList = () => {
             onClaim={handleClaimActivity}
             onEdit={setActivityToEdit}
             showClaimButton={!!businessProfile}
+            onRefresh={fetchActivities}
           />
         )}
       </div>

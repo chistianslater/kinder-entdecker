@@ -12,6 +12,8 @@ export type Database = {
       activities: {
         Row: {
           age_range: string[] | null
+          approved_at: string | null
+          approved_by: string | null
           claimed_by: string | null
           coordinates: unknown | null
           created_at: string | null
@@ -32,6 +34,8 @@ export type Database = {
         }
         Insert: {
           age_range?: string[] | null
+          approved_at?: string | null
+          approved_by?: string | null
           claimed_by?: string | null
           coordinates?: unknown | null
           created_at?: string | null
@@ -52,6 +56,8 @@ export type Database = {
         }
         Update: {
           age_range?: string[] | null
+          approved_at?: string | null
+          approved_by?: string | null
           claimed_by?: string | null
           coordinates?: unknown | null
           created_at?: string | null
