@@ -207,7 +207,7 @@ export const ReviewForm = ({ activity, onSuccess, existingReview, onCancelEdit }
         placeholder="Schreibe einen Kommentar..."
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className="min-h-[100px]"
+        className="min-h-[100px] text-white placeholder:text-white/50"
       />
       
       <div className="space-y-4 border-t pt-4">
