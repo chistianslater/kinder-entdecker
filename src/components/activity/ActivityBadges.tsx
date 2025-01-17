@@ -34,7 +34,7 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
                 className="bg-black/90 text-white border-white/10"
                 sideOffset={8}
               >
-                <p>Geschäftliche Aktivität</p>
+                <p>Unternehmenseintrag</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
