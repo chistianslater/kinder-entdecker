@@ -16,7 +16,7 @@ interface ActivityBadgesProps {
 export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => {
   return (
     <div className={`flex items-center justify-between w-full ${className || ''}`}>
-      <div className="flex gap-2 relative z-50">
+      <div className="flex gap-2 relative">
         {activity.is_business && (
           <TooltipProvider>
             <Tooltip>
@@ -30,10 +30,11 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
               </TooltipTrigger>
               <TooltipContent 
                 side="bottom" 
-                className="bg-black/90 text-white border-white/10 z-[100]"
-                sideOffset={5}
+                align="start"
+                className="bg-black/90 text-white border-white/10"
+                sideOffset={8}
               >
-                <p>Business Activity</p>
+                <p>Geschäftliche Aktivität</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -51,10 +52,11 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
               </TooltipTrigger>
               <TooltipContent 
                 side="bottom" 
-                className="bg-black/90 text-white border-white/10 z-[100]"
-                sideOffset={5}
+                align="start"
+                className="bg-black/90 text-white border-white/10"
+                sideOffset={8}
               >
-                <p>Approved Activity</p>
+                <p>Geprüfte Aktivität</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -71,10 +73,11 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
               </TooltipTrigger>
               <TooltipContent 
                 side="bottom" 
-                className="bg-black/90 text-white border-white/10 z-[100]"
-                sideOffset={5}
+                align="start"
+                className="bg-black/90 text-white border-white/10"
+                sideOffset={8}
               >
-                <p>Pending Approval</p>
+                <p>Ausstehende Genehmigung</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
