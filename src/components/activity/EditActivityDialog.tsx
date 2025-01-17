@@ -28,15 +28,17 @@ export function EditActivityDialog({
         <DialogHeader>
           <DialogTitle className="text-white">Aktivität bearbeiten</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
-          <CreateActivityForm
-            initialData={activity}
-            onSuccess={() => {
-              onSuccess();
-              onOpenChange(false);
-            }}
-            onCancel={() => onOpenChange(false)}
-          />
+        <ScrollArea className="h-[calc(90vh-8rem)]">
+          <div className="px-6 pb-6">
+            <CreateActivityForm
+              initialData={activity}
+              onSuccess={() => {
+                onSuccess();
+                onOpenChange(false);
+              }}
+              onCancel={() => onOpenChange(false)}
+            />
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
