@@ -18,9 +18,9 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
     <div className={`flex items-center justify-between w-full z-[5] ${className || ''}`}>
       <div className="flex gap-2">
         {activity.is_business && (
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Badge 
                   variant="secondary" 
                   className="flex items-center justify-center w-8 h-8 p-0 rounded-full bg-black/30 backdrop-blur-md border border-white/40"
@@ -28,16 +28,19 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
                   <Building2 className="w-4 h-4" />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent 
+                side="bottom" 
+                className="bg-black/90 text-white border-white/10"
+              >
                 <p>Business Activity</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )}
         {activity.approved_at ? (
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Badge 
                   variant="secondary" 
                   className="flex items-center justify-center w-8 h-8 p-0 rounded-full bg-green-500/30 backdrop-blur-md border border-green-500/40"
@@ -45,15 +48,18 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
                   <CheckCircle2 className="w-4 h-4" />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent 
+                side="bottom" 
+                className="bg-black/90 text-white border-white/10"
+              >
                 <p>Approved Activity</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         ) : (
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Badge 
                   variant="secondary" 
                   className="flex items-center justify-center w-8 h-8 p-0 rounded-full bg-yellow-500/30 backdrop-blur-md border border-yellow-500/40"
@@ -61,7 +67,10 @@ export const ActivityBadges = ({ activity, className }: ActivityBadgesProps) => 
                   <Clock className="w-4 h-4" />
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent 
+                side="bottom" 
+                className="bg-black/90 text-white border-white/10"
+              >
                 <p>Pending Approval</p>
               </TooltipContent>
             </Tooltip>
