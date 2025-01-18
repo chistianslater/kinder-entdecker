@@ -29,6 +29,7 @@ interface OnboardingFormProps {
 export const OnboardingForm = ({ onComplete, onFiltersChange, onSkip, initialPreferences }: OnboardingFormProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
+  
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -100,7 +101,7 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, onSkip, initialPre
                 type="button" 
                 variant="outline"
                 onClick={previousStep}
-                className="w-1/2"
+                className="w-1/2 text-white hover:text-white"
               >
                 Zurück
               </Button>
