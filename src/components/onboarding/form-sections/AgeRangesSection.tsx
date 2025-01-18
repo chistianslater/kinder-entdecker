@@ -22,7 +22,6 @@ export const AgeRangesSection = ({ form }: AgeRangesSectionProps) => {
       name="childAgeRanges"
       render={() => (
         <FormItem>
-          <FormLabel className="text-xl font-medium text-white">Für welche Altersgruppen suchen Sie Aktivitäten?</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {ageRanges.map((item) => (
               <FormField
@@ -30,7 +29,7 @@ export const AgeRangesSection = ({ form }: AgeRangesSectionProps) => {
                 control={form.control}
                 name="childAgeRanges"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 animate-fade-in">
                     <FormControl>
                       <Checkbox
                         checked={field.value?.includes(item.id)}

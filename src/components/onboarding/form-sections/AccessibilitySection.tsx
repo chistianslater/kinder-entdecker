@@ -22,7 +22,6 @@ export const AccessibilitySection = ({ form }: AccessibilitySectionProps) => {
       name="accessibilityNeeds"
       render={() => (
         <FormItem>
-          <FormLabel className="text-xl font-medium text-white">Besondere Bedürfnisse</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {accessibilityOptions.map((item) => (
               <FormField
@@ -30,7 +29,7 @@ export const AccessibilitySection = ({ form }: AccessibilitySectionProps) => {
                 control={form.control}
                 name="accessibilityNeeds"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 animate-fade-in">
                     <FormControl>
                       <Checkbox
                         checked={field.value?.includes(item.id)}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -8,14 +8,13 @@ import { InterestsSection } from './form-sections/InterestsSection';
 import { AgeRangesSection } from './form-sections/AgeRangesSection';
 import { DistanceSection } from './form-sections/DistanceSection';
 import { AccessibilitySection } from './form-sections/AccessibilitySection';
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Filters } from '../FilterBar';
 import { OnboardingFormData, FormSchema } from './types';
 
 const formSchema = z.object({
-  interests: z.array(z.string()).min(1, "Bitte wählen Sie mindestens ein Interesse aus"),
-  childAgeRanges: z.array(z.string()).min(1, "Bitte wählen Sie mindestens eine Altersgruppe aus"),
+  interests: z.array(z.string()).min(1, "Bitte wähle mindestens ein Interesse aus"),
+  childAgeRanges: z.array(z.string()).min(1, "Bitte wähle mindestens eine Altersgruppe aus"),
   maxDistance: z.string(),
   accessibilityNeeds: z.array(z.string()),
 });
@@ -28,6 +27,7 @@ interface OnboardingFormProps {
 
 export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences }: OnboardingFormProps) => {
   const { toast } = useToast();
+  const [step, setStep] = useState(0);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,9 +38,27 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences
     },
   });
 
+  const sections = [
+    { component: InterestsSection, title: "Was interessiert dich?" },
+    { component: AgeRangesSection, title: "Für welche Altersgruppen suchst du?" },
+    { component: DistanceSection, title: "Wie weit möchtest du maximal fahren?" },
+    { component: AccessibilitySection, title: "Hast du besondere Bedürfnisse?" }
+  ];
+
+  const nextStep = () => {
+    if (step < sections.length - 1) {
+      setStep(step + 1);
+    }
+  };
+
+  const previousStep = () => {
+    if (step > 0) {
+      setStep(step - 1);
+    }
+  };
+
   const onSubmit = async (values: FormSchema) => {
     try {
-      // Convert form values to filters
       const filters: Filters = {
         type: values.interests[0],
         ageRange: values.childAgeRanges[0],
@@ -51,30 +69,58 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences
       onComplete();
 
       toast({
-        title: "Erfolg",
-        description: "Ihre Präferenzen wurden erfolgreich gespeichert.",
+        title: "Super!",
+        description: "Deine Präferenzen wurden gespeichert.",
       });
     } catch (error) {
       console.error('Error saving preferences:', error);
       toast({
-        title: "Fehler",
-        description: "Ihre Präferenzen konnten nicht gespeichert werden.",
+        title: "Ups!",
+        description: "Deine Präferenzen konnten nicht gespeichert werden.",
         variant: "destructive",
       });
     }
   };
 
+  const CurrentSection = sections[step].component;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <InterestsSection form={form} />
-        <AgeRangesSection form={form} />
-        <DistanceSection form={form} />
-        <AccessibilitySection form={form} />
+        <div className="space-y-6 animate-fade-in">
+          <h2 className="text-xl font-medium text-white mb-4">{sections[step].title}</h2>
+          <CurrentSection form={form} />
+        </div>
         
-        <Button type="submit" className="w-full">
-          Präferenzen speichern
-        </Button>
+        <div className="flex justify-between space-x-4 mt-8">
+          {step > 0 && (
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={previousStep}
+              className="w-1/2"
+            >
+              Zurück
+            </Button>
+          )}
+          
+          {step < sections.length - 1 ? (
+            <Button 
+              type="button" 
+              onClick={nextStep}
+              className={step === 0 ? "w-full" : "w-1/2"}
+            >
+              Weiter
+            </Button>
+          ) : (
+            <Button 
+              type="submit"
+              className={step === 0 ? "w-full" : "w-1/2"}
+            >
+              Los geht's!
+            </Button>
+          )}
+        </div>
       </form>
     </Form>
   );

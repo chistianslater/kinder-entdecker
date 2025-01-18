@@ -14,12 +14,11 @@ export const DistanceSection = ({ form }: DistanceSectionProps) => {
       control={form.control}
       name="maxDistance"
       render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-xl font-medium text-white">Wie weit möchten Sie maximal fahren?</FormLabel>
+        <FormItem className="animate-fade-in">
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger className="text-white bg-secondary border-accent/20">
-                <SelectValue placeholder="Wählen Sie eine maximale Entfernung" />
+                <SelectValue placeholder="Wähle eine maximale Entfernung" />
               </SelectTrigger>
             </FormControl>
             <SelectContent className="bg-secondary border-accent/20">

@@ -23,7 +23,6 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
       name="interests"
       render={() => (
         <FormItem>
-          <FormLabel className="text-xl font-medium text-white">Welche Art von Aktivitäten interessieren Sie?</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {interests.map((item) => (
               <FormField
@@ -31,7 +30,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                 control={form.control}
                 name="interests"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 animate-fade-in">
                     <FormControl>
                       <Checkbox
                         checked={field.value?.includes(item.id)}
