@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OnboardingForm } from './OnboardingForm';
 import { Filters } from '../FilterBar';
@@ -16,6 +16,11 @@ export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange, onComple
     onComplete?.();
   };
 
+  const handleSkip = () => {
+    onOpenChange(false);
+    onComplete?.();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] animate-fade-in">
@@ -28,6 +33,7 @@ export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange, onComple
         <OnboardingForm 
           onComplete={handleComplete}
           onFiltersChange={onFiltersChange}
+          onSkip={handleSkip}
         />
       </DialogContent>
     </Dialog>

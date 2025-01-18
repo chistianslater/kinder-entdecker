@@ -22,10 +22,11 @@ const formSchema = z.object({
 interface OnboardingFormProps {
   onComplete: () => void;
   onFiltersChange: (filters: Filters) => void;
+  onSkip: () => void;
   initialPreferences?: OnboardingFormData;
 }
 
-export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences }: OnboardingFormProps) => {
+export const OnboardingForm = ({ onComplete, onFiltersChange, onSkip, initialPreferences }: OnboardingFormProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const form = useForm<FormSchema>({
@@ -92,34 +93,45 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences
           <CurrentSection form={form} />
         </div>
         
-        <div className="flex justify-between space-x-4 mt-8">
-          {step > 0 && (
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={previousStep}
-              className="w-1/2"
-            >
-              Zurück
-            </Button>
-          )}
+        <div className="flex flex-col space-y-4">
+          <div className="flex justify-between space-x-4">
+            {step > 0 && (
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={previousStep}
+                className="w-1/2"
+              >
+                Zurück
+              </Button>
+            )}
+            
+            {step < sections.length - 1 ? (
+              <Button 
+                type="button" 
+                onClick={nextStep}
+                className={step === 0 ? "w-full" : "w-1/2"}
+              >
+                Weiter
+              </Button>
+            ) : (
+              <Button 
+                type="submit"
+                className={step === 0 ? "w-full" : "w-1/2"}
+              >
+                Los geht's!
+              </Button>
+            )}
+          </div>
           
-          {step < sections.length - 1 ? (
-            <Button 
-              type="button" 
-              onClick={nextStep}
-              className={step === 0 ? "w-full" : "w-1/2"}
-            >
-              Weiter
-            </Button>
-          ) : (
-            <Button 
-              type="submit"
-              className={step === 0 ? "w-full" : "w-1/2"}
-            >
-              Los geht's!
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="link"
+            onClick={onSkip}
+            className="text-muted-foreground hover:text-white transition-colors"
+          >
+            Ich habe bereits ein Konto
+          </Button>
         </div>
       </form>
     </Form>
