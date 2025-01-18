@@ -21,21 +21,28 @@ const ageRanges = [
 
 interface AgeRangeSelectorProps {
   form: UseFormReturn<FormData>;
+  onChange?: (value: string[]) => void;
 }
 
-export function AgeRangeSelector({ form }: AgeRangeSelectorProps) {
+export function AgeRangeSelector({ form, onChange }: AgeRangeSelectorProps) {
   const handleAgeRangeSelect = (value: string) => {
     const currentValues = form.getValues("age_range") || [];
     const newValues = currentValues.includes(value)
       ? currentValues.filter((v) => v !== value)
       : [...currentValues, value];
     form.setValue("age_range", newValues, { shouldValidate: true });
+    if (onChange) {
+      onChange(newValues);
+    }
   };
 
   const removeAgeRange = (valueToRemove: string) => {
     const currentValues = form.getValues("age_range") || [];
     const newValues = currentValues.filter((value) => value !== valueToRemove);
     form.setValue("age_range", newValues, { shouldValidate: true });
+    if (onChange) {
+      onChange(newValues);
+    }
   };
 
   return (

@@ -55,6 +55,16 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
     }
   };
 
+  // Subscribe to form changes
+  React.useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name && onChange) {
+        handleChange(name as keyof ActivityFormData, value[name as keyof ActivityFormData]);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch, onChange]);
+
   const formattedHours = activity.opening_hours ? formatOpeningHours(activity.opening_hours) : null;
   const openStatus = activity.opening_hours ? isCurrentlyOpen(activity.opening_hours) : null;
 
@@ -185,7 +195,10 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
               <span className="text-white">Altersgruppe</span>
             </div>
             {isEditing ? (
-              <AgeRangeSelector form={form} />
+              <AgeRangeSelector 
+                form={form} 
+                onChange={(value) => handleChange('age_range', value)}
+              />
             ) : (
               <div className="flex flex-wrap gap-2">
                 {activity.age_range?.map((age) => (
@@ -209,7 +222,10 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
               <span className="text-white">Aktivitätstyp</span>
             </div>
             {isEditing ? (
-              <TypeSelector form={form} />
+              <TypeSelector 
+                form={form}
+                onChange={(value) => handleChange('type', value)}
+              />
             ) : (
               <div className="flex flex-wrap gap-2">
                 {Array.isArray(activity.type) ? activity.type.map((type) => (
