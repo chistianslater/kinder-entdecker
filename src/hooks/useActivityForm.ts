@@ -14,7 +14,10 @@ export function useActivityForm(onSuccess?: () => void) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const coordinates = await fetchCoordinates(data.location);
+      let coordinates = null;
+      if (data.location) {
+        coordinates = await fetchCoordinates(data.location);
+      }
 
       const activityData = {
         title: data.title,
@@ -25,32 +28,43 @@ export function useActivityForm(onSuccess?: () => void) {
         age_range: data.age_range,
         price_range: data.price_range,
         opening_hours: data.opening_hours,
+        website_url: data.website_url,
         ticket_url: data.ticket_url,
         image_url: data.image_url,
         updated_at: new Date().toISOString(),
       };
 
-      if (initialData) {
-        const { error } = await supabase
+      let result;
+      
+      if (initialData?.id) {
+        // Update existing activity
+        const { data: updatedActivity, error } = await supabase
           .from('activities')
           .update(activityData)
-          .eq('id', initialData.id);
+          .eq('id', initialData.id)
+          .select()
+          .single();
 
         if (error) throw error;
+        result = updatedActivity;
 
         toast({
           title: "Erfolg",
           description: "Aktivität wurde erfolgreich aktualisiert.",
         });
       } else {
-        const { error } = await supabase
+        // Create new activity
+        const { data: newActivity, error } = await supabase
           .from('activities')
           .insert({
             ...activityData,
             created_by: user.id,
-          });
+          })
+          .select()
+          .single();
 
         if (error) throw error;
+        result = newActivity;
 
         toast({
           title: "Erfolg",
@@ -58,7 +72,11 @@ export function useActivityForm(onSuccess?: () => void) {
         });
       }
 
-      if (onSuccess) onSuccess();
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      return result;
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -66,6 +84,7 @@ export function useActivityForm(onSuccess?: () => void) {
         description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
