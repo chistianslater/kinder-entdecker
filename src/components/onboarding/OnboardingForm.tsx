@@ -66,7 +66,7 @@ export const OnboardingForm = ({
 
   const nextStep = async () => {
     const currentFields = getCurrentStepFields();
-    const isValid = await form.trigger(currentFields);
+    const isValid = await form.trigger(currentFields as any);
     
     if (isValid) {
       if (step < sections.length - 1) {

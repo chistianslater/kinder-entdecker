@@ -27,12 +27,6 @@ export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange, onComple
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] animate-fade-in">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">Willkommen bei TinyTrails!</DialogTitle>
-        </DialogHeader>
-        <p className="text-muted-foreground mb-6">
-          Lass uns gemeinsam herausfinden, welche Aktivitäten am besten zu dir passen.
-        </p>
         <OnboardingForm 
           onComplete={handleComplete}
           onFiltersChange={onFiltersChange}
