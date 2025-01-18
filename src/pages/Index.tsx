@@ -84,6 +84,8 @@ const Index = () => {
                     anchorTextColor: '#000000',
                     dividerBackground: 'rgba(255, 255, 255, 0.08)',
                     defaultButtonText: '#000000',
+                    defaultButtonBackground: '#B5FF2B',
+                    defaultButtonBackgroundHover: '#9EE619',
                   },
                   fonts: {
                     bodyFontFamily: 'Inter var, sans-serif',
