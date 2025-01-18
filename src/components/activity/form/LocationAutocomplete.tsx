@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, X } from "lucide-react";
 import debounce from 'lodash/debounce';
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LocationSuggestion {
   id: string;
@@ -20,6 +21,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [inputValue, setInputValue] = useState(value);
+  const { toast } = useToast();
 
   const fetchSuggestions = useCallback(
     debounce(async (query: string) => {
@@ -32,21 +34,29 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
       setIsLoading(true);
 
       try {
-        const { data: { token }, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
-        if (tokenError) throw tokenError;
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) {
+          console.error('Error fetching token:', error);
+          throw error;
+        }
+
+        if (!data?.token) {
+          throw new Error('No token received');
+        }
 
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
             query
-          )}.json?access_token=${token}&country=de&types=place,locality,neighborhood,address&language=de`
+          )}.json?access_token=${data.token}&country=de&types=place,locality,neighborhood,address&language=de`
         );
 
         if (!response.ok) {
           throw new Error('Failed to fetch location suggestions');
         }
 
-        const data = await response.json();
-        const features = Array.isArray(data.features) ? data.features : [];
+        const responseData = await response.json();
+        const features = Array.isArray(responseData.features) ? responseData.features : [];
         const newSuggestions = features.map((feature: any) => ({
           id: feature.id,
           place_name: feature.place_name,
@@ -57,12 +67,17 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
         setShowSuggestions(true);
       } catch (err) {
         console.error('Error fetching location suggestions:', err);
+        toast({
+          title: "Fehler",
+          description: "Standortvorschläge konnten nicht geladen werden.",
+          variant: "destructive",
+        });
         setSuggestions([]);
       } finally {
         setIsLoading(false);
       }
     }, 300),
-    []
+    [toast]
   );
 
   const handleSelect = (suggestion: LocationSuggestion) => {
