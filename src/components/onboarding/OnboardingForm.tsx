@@ -3,12 +3,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { InterestsSection } from './form-sections/InterestsSection';
 import { AgeRangesSection } from './form-sections/AgeRangesSection';
 import { DistanceSection } from './form-sections/DistanceSection';
 import { AccessibilitySection } from './form-sections/AccessibilitySection';
+import { WelcomeScreen } from './form-sections/WelcomeScreen';
+import { FormNavigation } from './form-sections/FormNavigation';
 import { useToast } from "@/components/ui/use-toast";
 import { Filters } from '../FilterBar';
 import { OnboardingFormData, FormSchema } from './types';
@@ -83,16 +84,11 @@ export const OnboardingForm = ({
 
   const getCurrentStepFields = () => {
     switch (step) {
-      case 0:
-        return ['interests'];
-      case 1:
-        return ['childAgeRanges'];
-      case 2:
-        return ['maxDistance'];
-      case 3:
-        return ['accessibilityNeeds'];
-      default:
-        return [];
+      case 0: return ['interests'];
+      case 1: return ['childAgeRanges'];
+      case 2: return ['maxDistance'];
+      case 3: return ['accessibilityNeeds'];
+      default: return [];
     }
   };
 
@@ -126,41 +122,19 @@ export const OnboardingForm = ({
     }
   };
 
-  const handleBack = () => {
-    if (step === 0) {
-      setShowWelcome(true);
-    } else {
-      previousStep();
-    }
-  };
-
-  const CurrentSection = sections[step]?.component;
-
   if (showWelcome) {
     return (
-      <div className="space-y-6 text-center">
-        <h2 className="text-2xl font-semibold text-white">Willkommen bei TinyTrails!</h2>
-        <p className="text-muted-foreground">
-          Lass uns gemeinsam herausfinden, welche Aktivitäten am besten zu dir passen.
-        </p>
-        <div className="flex flex-col space-y-4 pt-4">
-          <Button onClick={() => setShowWelcome(false)}>
-            Loslegen
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              setShowWelcome(false);
-              setStep(sections.length);
-            }}
-            className="text-white hover:text-white"
-          >
-            Ohne Vorlieben registrieren
-          </Button>
-        </div>
-      </div>
+      <WelcomeScreen 
+        onStart={() => setShowWelcome(false)}
+        onSkipPreferences={() => {
+          setShowWelcome(false);
+          setStep(sections.length);
+        }}
+      />
     );
   }
+
+  const CurrentSection = sections[step]?.component;
 
   return (
     <Form {...form}>
@@ -209,7 +183,6 @@ export const OnboardingForm = ({
                         button_label: 'Registrieren',
                         loading_button_label: 'Registrierung...',
                         social_provider_text: 'Mit {{provider}} registrieren',
-                        link_text: 'Kein Konto? Registrieren',
                       },
                       sign_in: {
                         email_label: 'E-Mail Adresse',
@@ -219,7 +192,6 @@ export const OnboardingForm = ({
                         button_label: 'Registrieren',
                         loading_button_label: 'Anmeldung...',
                         social_provider_text: 'Mit {{provider}} anmelden',
-                        link_text: 'Bereits ein Konto? Anmelden',
                       },
                     },
                   }}
@@ -232,44 +204,12 @@ export const OnboardingForm = ({
         </div>
         
         {step < sections.length && (
-          <div className="flex flex-col space-y-4">
-            <div className="flex justify-between space-x-4">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={handleBack}
-                className="w-1/2 text-white hover:text-white"
-              >
-                Zurück
-              </Button>
-              
-              {step < sections.length - 1 ? (
-                <Button 
-                  type="button" 
-                  onClick={nextStep}
-                  className="w-1/2"
-                >
-                  Weiter
-                </Button>
-              ) : (
-                <Button 
-                  type="submit"
-                  className="w-1/2"
-                >
-                  Weiter zum Konto
-                </Button>
-              )}
-            </div>
-            
-            <Button
-              type="button"
-              variant="link"
-              onClick={onSkip}
-              className="text-muted-foreground hover:text-white transition-colors"
-            >
-              Ich habe bereits ein Konto
-            </Button>
-          </div>
+          <FormNavigation
+            onBack={previousStep}
+            onNext={nextStep}
+            onSkip={onSkip}
+            isLastStep={step === sections.length - 1}
+          />
         )}
       </form>
     </Form>
