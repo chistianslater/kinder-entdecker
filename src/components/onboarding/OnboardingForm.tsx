@@ -59,6 +59,8 @@ export const OnboardingForm = ({
     { component: AccessibilitySection, title: "Hast du besondere Bedürfnisse?" }
   ];
 
+  const totalSteps = showAuth ? sections.length + 1 : sections.length;
+
   const nextStep = () => {
     if (step < sections.length - 1) {
       setStep(step + 1);
@@ -106,6 +108,29 @@ export const OnboardingForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {step === 0 && (
+          <p className="text-muted-foreground mb-6">
+            Lass uns gemeinsam herausfinden, welche Aktivitäten am besten zu dir passen.
+          </p>
+        )}
+        
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            {Array.from({ length: totalSteps }).map((_, index) => (
+              <div
+                key={index}
+                className={`h-2 w-2 rounded-full transition-colors ${
+                  index === step ? 'bg-primary' : 
+                  index < step ? 'bg-primary/50' : 'bg-muted'
+                }`}
+              />
+            ))}
+          </div>
+          <span className="text-sm text-muted-foreground">
+            Schritt {step + 1} von {totalSteps}
+          </span>
+        </div>
+
         <div className="space-y-6 animate-fade-in">
           {step < sections.length ? (
             <>
