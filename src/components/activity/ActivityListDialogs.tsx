@@ -23,13 +23,17 @@ const ActivityListDialogs = ({
   onEditDialogChange,
   onSuccess,
 }: ActivityListDialogsProps) => {
+  const handleEdit = (activity: Activity) => {
+    onEditDialogChange(true);
+  };
+
   return (
     <>
       <DetailView 
         activity={selectedActivity}
         isOpen={selectedActivity !== null}
         onClose={onCloseDetail}
-        onEdit={(activity) => onEditDialogChange(true)}
+        onEdit={handleEdit}
       />
 
       <CreateActivityDialog
