@@ -13,6 +13,8 @@ import { TypeSelector } from './form/type-selector/TypeSelector';
 import { AgeRangeSelector } from './form/age-selector/AgeRangeSelector';
 import { LocationAutocomplete } from './form/LocationAutocomplete';
 import { useForm } from 'react-hook-form';
+import { ActivityFormData, activityFormSchema } from './form/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 interface ActivityDetailsProps {
   activity: Activity;
@@ -21,8 +23,22 @@ interface ActivityDetailsProps {
 }
 
 export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetailsProps) => {
-  const form = useForm({
-    defaultValues: activity
+  const form = useForm<ActivityFormData>({
+    resolver: zodResolver(activityFormSchema),
+    defaultValues: {
+      id: activity.id,
+      title: activity.title,
+      description: activity.description || '',
+      location: activity.location,
+      coordinates: activity.coordinates,
+      type: Array.isArray(activity.type) ? activity.type : [],
+      age_range: activity.age_range || [],
+      price_range: activity.price_range || '',
+      opening_hours: activity.opening_hours || '',
+      website_url: activity.website_url || '',
+      ticket_url: activity.ticket_url || '',
+      image_url: activity.image_url || '',
+    }
   });
 
   const handleNavigate = () => {
@@ -30,7 +46,7 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
   };
 
-  const handleChange = (field: keyof Activity, value: any) => {
+  const handleChange = (field: keyof ActivityFormData, value: any) => {
     if (onChange) {
       onChange({
         ...activity,
