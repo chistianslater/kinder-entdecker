@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { InterestsSection } from './form-sections/InterestsSection';
 import { AgeRangesSection } from './form-sections/AgeRangesSection';
 import { DistanceSection } from './form-sections/DistanceSection';
@@ -41,6 +42,7 @@ export const OnboardingForm = ({
 }: OnboardingFormProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
+  const [showWelcome, setShowWelcome] = useState(true);
   
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -60,16 +62,37 @@ export const OnboardingForm = ({
   ];
 
   const totalSteps = showAuth ? sections.length + 1 : sections.length;
+  const progress = ((step + 1) / totalSteps) * 100;
 
-  const nextStep = () => {
-    if (step < sections.length - 1) {
-      setStep(step + 1);
+  const nextStep = async () => {
+    const currentFields = getCurrentStepFields();
+    const isValid = await form.trigger(currentFields);
+    
+    if (isValid) {
+      if (step < sections.length - 1) {
+        setStep(step + 1);
+      }
     }
   };
 
   const previousStep = () => {
     if (step > 0) {
       setStep(step - 1);
+    }
+  };
+
+  const getCurrentStepFields = () => {
+    switch (step) {
+      case 0:
+        return ['interests'];
+      case 1:
+        return ['childAgeRanges'];
+      case 2:
+        return ['maxDistance'];
+      case 3:
+        return ['accessibilityNeeds'];
+      default:
+        return [];
     }
   };
 
@@ -105,32 +128,36 @@ export const OnboardingForm = ({
 
   const CurrentSection = sections[step]?.component;
 
+  if (showWelcome) {
+    return (
+      <div className="space-y-6 text-center">
+        <h2 className="text-2xl font-semibold text-white">Willkommen bei TinyTrails!</h2>
+        <p className="text-muted-foreground">
+          Lass uns gemeinsam herausfinden, welche Aktivitäten am besten zu dir passen.
+        </p>
+        <div className="flex flex-col space-y-4 pt-4">
+          <Button onClick={() => setShowWelcome(false)}>
+            Loslegen
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setShowWelcome(false);
+              setStep(sections.length);
+            }}
+          >
+            Ohne Vorlieben registrieren
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {step === 0 && (
-          <p className="text-muted-foreground mb-6">
-            Lass uns gemeinsam herausfinden, welche Aktivitäten am besten zu dir passen.
-          </p>
-        )}
+        <Progress value={progress} className="h-2" />
         
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-2">
-            {Array.from({ length: totalSteps }).map((_, index) => (
-              <div
-                key={index}
-                className={`h-2 w-2 rounded-full transition-colors ${
-                  index === step ? 'bg-primary' : 
-                  index < step ? 'bg-primary/50' : 'bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-sm text-muted-foreground">
-            Schritt {step + 1} von {totalSteps}
-          </span>
-        </div>
-
         <div className="space-y-6 animate-fade-in">
           {step < sections.length ? (
             <>
@@ -185,14 +212,6 @@ export const OnboardingForm = ({
                         social_provider_text: 'Mit {{provider}} anmelden',
                         link_text: 'Bereits ein Konto? Anmelden',
                       },
-                      forgotten_password: {
-                        email_label: 'E-Mail Adresse',
-                        password_label: 'Passwort',
-                        email_input_placeholder: 'Deine E-Mail Adresse',
-                        button_label: 'Passwort zurücksetzen',
-                        loading_button_label: 'Sende Anweisungen...',
-                        link_text: 'Passwort vergessen?',
-                      },
                     },
                   }}
                   theme="dark"
@@ -203,8 +222,8 @@ export const OnboardingForm = ({
           )}
         </div>
         
-        <div className="flex flex-col space-y-4">
-          {step < sections.length && (
+        {step < sections.length && (
+          <div className="flex flex-col space-y-4">
             <div className="flex justify-between space-x-4">
               {step > 0 && (
                 <Button 
@@ -234,17 +253,17 @@ export const OnboardingForm = ({
                 </Button>
               )}
             </div>
-          )}
-          
-          <Button
-            type="button"
-            variant="link"
-            onClick={onSkip}
-            className="text-muted-foreground hover:text-white transition-colors"
-          >
-            Ich habe bereits ein Konto
-          </Button>
-        </div>
+            
+            <Button
+              type="button"
+              variant="link"
+              onClick={onSkip}
+              className="text-muted-foreground hover:text-white transition-colors"
+            >
+              Ich habe bereits ein Konto
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );
