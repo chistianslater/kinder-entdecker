@@ -60,7 +60,7 @@ export const AccountTab = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
-      <h2 className="text-2xl font-semibold">Account Einstellungen</h2>
+      <h2 className="text-2xl font-semibold text-white">Account Einstellungen</h2>
       
       <div className="space-y-6">
         <div className="space-y-4">
@@ -76,20 +76,26 @@ export const AccountTab = () => {
           />
         </div>
 
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-medium mb-2">Account löschen</h3>
-          <p className="text-muted-foreground mb-4">
+        <div className="border-t border-white/10 pt-6">
+          <h3 className="text-lg font-medium mb-2 text-white">Account löschen</h3>
+          <p className="text-white/60 mb-4">
             Wenn Sie Ihren Account löschen, werden alle Ihre Daten unwiderruflich gelöscht.
           </p>
           <Button variant="destructive">Account löschen</Button>
         </div>
 
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-medium mb-2">Abmelden</h3>
-          <p className="text-muted-foreground mb-4">
+        <div className="border-t border-white/10 pt-6">
+          <h3 className="text-lg font-medium mb-2 text-white">Abmelden</h3>
+          <p className="text-white/60 mb-4">
             Sie können sich jederzeit wieder mit Ihren Zugangsdaten anmelden.
           </p>
-          <Button variant="outline" onClick={handleSignOut}>Abmelden</Button>
+          <Button 
+            variant="outline" 
+            onClick={handleSignOut}
+            className="text-white border-white/20 hover:bg-white/10"
+          >
+            Abmelden
+          </Button>
         </div>
       </div>
     </div>

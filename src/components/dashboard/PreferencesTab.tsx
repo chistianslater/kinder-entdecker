@@ -71,7 +71,7 @@ export const PreferencesTab = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4">Meine Präferenzen</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-white">Meine Präferenzen</h2>
       <OnboardingForm 
         onComplete={() => {}} 
         onFiltersChange={handleFiltersChange}

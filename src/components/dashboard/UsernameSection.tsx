@@ -46,15 +46,21 @@ export const UsernameSection = ({ username, setUsername, onUpdate }: UsernameSec
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="username">Benutzername</Label>
+      <Label htmlFor="username" className="text-white">Benutzername</Label>
       <div className="flex gap-2">
         <Input
           id="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Dein Benutzername"
+          className="text-white bg-accent/10 border-white/10 placeholder:text-white/40"
         />
-        <Button onClick={handleUpdateUsername}>Speichern</Button>
+        <Button 
+          onClick={handleUpdateUsername}
+          className="text-white border-white/20 hover:bg-white/10"
+        >
+          Speichern
+        </Button>
       </div>
     </div>
   );
