@@ -7,9 +7,15 @@ interface OnboardingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onFiltersChange: (filters: Filters) => void;
+  onComplete?: () => void;
 }
 
-export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange }: OnboardingDialogProps) => {
+export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange, onComplete }: OnboardingDialogProps) => {
+  const handleComplete = () => {
+    onOpenChange(false);
+    onComplete?.();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -20,7 +26,7 @@ export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange }: Onboar
           Lassen Sie uns Ihre Präferenzen einrichten, damit wir Ihnen die besten Aktivitäten empfehlen können.
         </p>
         <OnboardingForm 
-          onComplete={() => onOpenChange(false)} 
+          onComplete={handleComplete}
           onFiltersChange={onFiltersChange}
         />
       </DialogContent>

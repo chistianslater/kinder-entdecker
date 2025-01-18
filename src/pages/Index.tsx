@@ -16,7 +16,8 @@ type ViewMode = 'list' | 'map' | 'events';
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showAuth, setShowAuth] = useState(false);
   const [session, setSession] = useState<any>(null);
   const { filteredActivities, handleFiltersChange } = useActivities();
   const { toast } = useToast();
@@ -38,117 +39,108 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const checkUserPreferences = async () => {
-      if (!session?.user) return;
-
-      try {
-        const { data: preferences } = await supabase
-          .from('user_preferences')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (!preferences) {
-          setShowOnboarding(true);
-        }
-      } catch (error) {
-        console.error('Error checking user preferences:', error);
-        toast({
-          title: "Error",
-          description: "Could not load user preferences",
-          variant: "destructive",
-        });
-      }
-    };
-
-    checkUserPreferences();
-  }, [session, toast]);
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    setShowAuth(true);
+  };
 
   const renderContent = () => {
     if (!session) {
-      return (
-        <div className="max-w-md mx-auto mt-8 p-6 bg-card rounded-2xl shadow-glass border border-border">
-          <h2 className="text-2xl font-semibold mb-6 text-center text-white">Willkommen bei TinyTrails</h2>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ 
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#B5FF2B',
-                    brandAccent: '#9EE619',
-                    inputBackground: 'rgba(255, 255, 255, 0.08)',
-                    inputText: '#FFFFFF',
-                    anchorTextColor: 'rgba(255, 255, 255, 0.6)',
-                    dividerBackground: 'rgba(255, 255, 255, 0.08)',
-                    defaultButtonBackground: '#B5FF2B',
-                    defaultButtonBackgroundHover: '#9EE619',
-                    defaultButtonBorder: 'transparent',
-                    defaultButtonText: '#000000',
-                  },
-                  fonts: {
-                    bodyFontFamily: 'Inter var, sans-serif',
-                    buttonFontFamily: 'Inter var, sans-serif',
-                    inputFontFamily: 'Inter var, sans-serif',
-                    labelFontFamily: 'Inter var, sans-serif',
-                  },
-                  radii: {
-                    borderRadiusButton: '8px',
-                    buttonBorderRadius: '8px',
-                    inputBorderRadius: '8px',
-                  },
-                },
-              },
-              className: {
-                button: 'text-black',
-                anchor: 'text-gray-400 hover:text-gray-300',
-              },
-            }}
-            theme="dark"
-            providers={[]}
-            localization={{
-              variables: {
-                sign_in: {
-                  email_label: 'E-Mail Adresse',
-                  password_label: 'Passwort',
-                  email_input_placeholder: 'Deine E-Mail Adresse',
-                  password_input_placeholder: 'Dein Passwort',
-                  button_label: 'Anmelden',
-                  loading_button_label: 'Anmeldung...',
-                  social_provider_text: 'Mit {{provider}} anmelden',
-                  link_text: 'Bereits ein Konto? Anmelden',
-                },
-                sign_up: {
-                  email_label: 'E-Mail Adresse',
-                  password_label: 'Passwort',
-                  email_input_placeholder: 'Deine E-Mail Adresse',
-                  password_input_placeholder: 'Dein Passwort',
-                  button_label: 'Registrieren',
-                  loading_button_label: 'Registrierung...',
-                  social_provider_text: 'Mit {{provider}} registrieren',
-                  link_text: 'Kein Konto? Registrieren',
-                },
-                forgotten_password: {
-                  email_label: 'E-Mail Adresse',
-                  password_label: 'Passwort',
-                  email_input_placeholder: 'Deine E-Mail Adresse',
-                  button_label: 'Passwort zurücksetzen',
-                  loading_button_label: 'Sende Anweisungen...',
-                  link_text: 'Passwort vergessen?',
-                },
-                update_password: {
-                  password_label: 'Neues Passwort',
-                  password_input_placeholder: 'Dein neues Passwort',
-                  button_label: 'Passwort aktualisieren',
-                  loading_button_label: 'Passwort wird aktualisiert...',
-                },
-              },
-            }}
+      if (showOnboarding) {
+        return (
+          <OnboardingDialog 
+            open={showOnboarding} 
+            onOpenChange={setShowOnboarding}
+            onFiltersChange={handleFiltersChange}
+            onComplete={handleOnboardingComplete}
           />
-        </div>
-      );
+        );
+      }
+
+      if (showAuth) {
+        return (
+          <div className="max-w-md mx-auto mt-8 p-6 bg-card rounded-2xl shadow-glass border border-border">
+            <h2 className="text-2xl font-semibold mb-6 text-center text-white">Willkommen bei TinyTrails</h2>
+            <Auth
+              supabaseClient={supabase}
+              appearance={{ 
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: '#B5FF2B',
+                      brandAccent: '#9EE619',
+                      inputBackground: 'rgba(255, 255, 255, 0.08)',
+                      inputText: '#FFFFFF',
+                      anchorTextColor: 'rgba(255, 255, 255, 0.6)',
+                      dividerBackground: 'rgba(255, 255, 255, 0.08)',
+                      defaultButtonBackground: '#B5FF2B',
+                      defaultButtonBackgroundHover: '#9EE619',
+                      defaultButtonBorder: 'transparent',
+                      defaultButtonText: '#000000',
+                    },
+                    fonts: {
+                      bodyFontFamily: 'Inter var, sans-serif',
+                      buttonFontFamily: 'Inter var, sans-serif',
+                      inputFontFamily: 'Inter var, sans-serif',
+                      labelFontFamily: 'Inter var, sans-serif',
+                    },
+                    radii: {
+                      borderRadiusButton: '8px',
+                      buttonBorderRadius: '8px',
+                      inputBorderRadius: '8px',
+                    },
+                  },
+                },
+                className: {
+                  button: 'text-black',
+                  anchor: 'text-gray-400 hover:text-gray-300',
+                },
+              }}
+              theme="dark"
+              providers={[]}
+              localization={{
+                variables: {
+                  sign_in: {
+                    email_label: 'E-Mail Adresse',
+                    password_label: 'Passwort',
+                    email_input_placeholder: 'Deine E-Mail Adresse',
+                    password_input_placeholder: 'Dein Passwort',
+                    button_label: 'Anmelden',
+                    loading_button_label: 'Anmeldung...',
+                    social_provider_text: 'Mit {{provider}} anmelden',
+                    link_text: 'Bereits ein Konto? Anmelden',
+                  },
+                  sign_up: {
+                    email_label: 'E-Mail Adresse',
+                    password_label: 'Passwort',
+                    email_input_placeholder: 'Deine E-Mail Adresse',
+                    password_input_placeholder: 'Dein Passwort',
+                    button_label: 'Registrieren',
+                    loading_button_label: 'Registrierung...',
+                    social_provider_text: 'Mit {{provider}} registrieren',
+                    link_text: 'Kein Konto? Registrieren',
+                  },
+                  forgotten_password: {
+                    email_label: 'E-Mail Adresse',
+                    password_label: 'Passwort',
+                    email_input_placeholder: 'Deine E-Mail Adresse',
+                    button_label: 'Passwort zurücksetzen',
+                    loading_button_label: 'Sende Anweisungen...',
+                    link_text: 'Passwort vergessen?',
+                  },
+                  update_password: {
+                    password_label: 'Neues Passwort',
+                    password_input_placeholder: 'Dein neues Passwort',
+                    button_label: 'Passwort aktualisieren',
+                    loading_button_label: 'Passwort wird aktualisiert...',
+                  },
+                },
+              }}
+            />
+          </div>
+        );
+      }
     }
 
     return (
@@ -163,11 +155,6 @@ const Index = () => {
             <ActivityList />
           )}
         </div>
-        <OnboardingDialog 
-          open={showOnboarding} 
-          onOpenChange={setShowOnboarding}
-          onFiltersChange={handleFiltersChange}
-        />
       </>
     );
   };

@@ -40,33 +40,6 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, initialPreferences
 
   const onSubmit = async (values: FormSchema) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Fehler",
-          description: "Bitte melden Sie sich an, um Ihre Präferenzen zu speichern.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const preferences = {
-        user_id: user.id,
-        interests: values.interests,
-        child_age_ranges: values.childAgeRanges,
-        max_distance: parseInt(values.maxDistance),
-        accessibility_needs: values.accessibilityNeeds,
-      };
-
-      const { error } = await supabase
-        .from('user_preferences')
-        .upsert(preferences, { 
-          onConflict: 'user_id',
-          ignoreDuplicates: false 
-        });
-
-      if (error) throw error;
-
       // Convert form values to filters
       const filters: Filters = {
         type: values.interests[0],
