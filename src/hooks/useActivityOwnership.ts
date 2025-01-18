@@ -6,6 +6,11 @@ export const useActivityOwnership = (createdBy: string | null) => {
 
   useEffect(() => {
     const checkOwnership = async () => {
+      if (!createdBy) {
+        setIsOwner(false);
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setIsOwner(createdBy === user.id);

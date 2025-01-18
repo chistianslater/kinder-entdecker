@@ -28,12 +28,10 @@ const DetailView = ({ activity, isOpen, onClose, onSuccess }: DetailViewProps) =
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivity, setEditedActivity] = useState<Activity | null>(null);
-
-  // Move the early return after all hooks
-  if (!activity) return null;
-
-  const isOwner = useActivityOwnership(activity.created_by);
+  const isOwner = useActivityOwnership(activity?.created_by || null);
   const canEdit = isOwner || isAdmin;
+
+  if (!activity) return null;
 
   const handleEditToggle = () => {
     if (isEditing) {
