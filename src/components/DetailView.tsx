@@ -28,10 +28,11 @@ const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
   const isOwner = useActivityOwnership(activity.created_by);
   const canEdit = (isOwner || isAdmin) && onEdit;
 
-  const handleEdit = () => {
+  const handleEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (onEdit && activity) {
       onEdit(activity);
-      onClose(); // Close the detail view when editing
     }
   };
 
