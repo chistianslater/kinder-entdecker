@@ -94,6 +94,11 @@ const Index = () => {
                     inputFontFamily: 'Inter var, sans-serif',
                     labelFontFamily: 'Inter var, sans-serif',
                   },
+                  radii: {
+                    borderRadiusButton: '8px',
+                    buttonBorderRadius: '8px',
+                    inputBorderRadius: '8px',
+                  },
                 },
               },
               className: {
@@ -103,6 +108,44 @@ const Index = () => {
             }}
             theme="dark"
             providers={[]}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: 'E-Mail Adresse',
+                  password_label: 'Passwort',
+                  email_input_placeholder: 'Deine E-Mail Adresse',
+                  password_input_placeholder: 'Dein Passwort',
+                  button_label: 'Anmelden',
+                  loading_button_label: 'Anmeldung...',
+                  social_provider_text: 'Mit {{provider}} anmelden',
+                  link_text: 'Bereits ein Konto? Anmelden',
+                },
+                sign_up: {
+                  email_label: 'E-Mail Adresse',
+                  password_label: 'Passwort',
+                  email_input_placeholder: 'Deine E-Mail Adresse',
+                  password_input_placeholder: 'Dein Passwort',
+                  button_label: 'Registrieren',
+                  loading_button_label: 'Registrierung...',
+                  social_provider_text: 'Mit {{provider}} registrieren',
+                  link_text: 'Kein Konto? Registrieren',
+                },
+                forgotten_password: {
+                  email_label: 'E-Mail Adresse',
+                  password_label: 'Passwort',
+                  email_input_placeholder: 'Deine E-Mail Adresse',
+                  button_label: 'Passwort zurücksetzen',
+                  loading_button_label: 'Sende Anweisungen...',
+                  link_text: 'Passwort vergessen?',
+                },
+                update_password: {
+                  password_label: 'Neues Passwort',
+                  password_input_placeholder: 'Dein neues Passwort',
+                  button_label: 'Passwort aktualisieren',
+                  loading_button_label: 'Passwort wird aktualisiert...',
+                },
+              },
+            }}
           />
         </div>
       );
