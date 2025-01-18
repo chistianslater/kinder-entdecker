@@ -25,6 +25,11 @@ export function EditActivityDialog({
 }: EditActivityDialogProps) {
   const isMobile = useIsMobile();
 
+  const handleSuccess = () => {
+    onSuccess();
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`${isMobile ? 'max-w-full h-[100dvh] p-0 rounded-none' : 'max-w-2xl'} max-h-[90vh] bg-background`}>
@@ -35,10 +40,7 @@ export function EditActivityDialog({
           <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
             <CreateActivityForm
               initialData={activity}
-              onSuccess={() => {
-                onSuccess();
-                onOpenChange(false);
-              }}
+              onSuccess={handleSuccess}
               onCancel={() => onOpenChange(false)}
             />
           </div>

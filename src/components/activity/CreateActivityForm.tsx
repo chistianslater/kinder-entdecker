@@ -51,9 +51,17 @@ export function CreateActivityForm({
 
   const { handleSubmit, isSubmitting } = useActivityForm(onSuccess);
 
+  const onSubmit = async (data: FormData) => {
+    try {
+      await handleSubmit(data, initialData);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((data) => handleSubmit(data, initialData))} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <ActivityBasicInfo form={form} />
         <ActivityTypeInfo form={form} />
         <ActivityMediaUpload form={form} />

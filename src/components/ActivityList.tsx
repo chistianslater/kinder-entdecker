@@ -52,6 +52,12 @@ const ActivityList = () => {
     }
   };
 
+  const handleEditSuccess = () => {
+    fetchActivities();
+    setIsEditDialogOpen(false);
+    setSelectedActivity(null);
+  };
+
   if (loading) {
     return <LoadingState />;
   }
@@ -83,7 +89,7 @@ const ActivityList = () => {
         onCloseDetail={() => setSelectedActivity(null)}
         isEditDialogOpen={isEditDialogOpen}
         onEditDialogChange={setIsEditDialogOpen}
-        onSuccess={fetchActivities}
+        onSuccess={handleEditSuccess}
       />
     </div>
   );
