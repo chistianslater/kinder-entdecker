@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import debounce from 'lodash/debounce';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,6 +19,7 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
 
   const fetchSuggestions = useCallback(
     debounce(async (query: string) => {
@@ -66,30 +67,45 @@ export function LocationAutocomplete({ value, onChange }: LocationAutocompletePr
 
   const handleSelect = (suggestion: LocationSuggestion) => {
     const [lng, lat] = suggestion.center;
+    setInputValue(suggestion.place_name);
     onChange(suggestion.place_name, { x: lng, y: lat });
     setShowSuggestions(false);
     setSuggestions([]);
   };
 
+  const handleClear = () => {
+    setInputValue('');
+    onChange('', { x: 0, y: 0 });
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
   return (
     <div className="relative w-full">
-      <Input
-        value={value}
-        onChange={(e) => {
-          onChange(e.target.value, { x: 0, y: 0 });
-          fetchSuggestions(e.target.value);
-        }}
-        onFocus={() => setShowSuggestions(true)}
-        placeholder="Ort suchen..."
-        className="w-full text-white placeholder:text-gray-400 bg-accent border-accent"
-      />
-      
-      {isLoading && (
-        <div className="absolute right-3 top-2.5">
-          <Loader2 className="h-4 w-4 animate-spin text-white" />
+      <div className="relative">
+        <Input
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            fetchSuggestions(e.target.value);
+          }}
+          onFocus={() => setShowSuggestions(true)}
+          placeholder="Ort suchen..."
+          className="w-full text-white placeholder:text-gray-400 bg-accent border-accent pr-16"
+        />
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {inputValue && (
+            <button
+              onClick={handleClear}
+              className="p-1 hover:bg-white/10 rounded-full"
+            >
+              <X className="h-4 w-4 text-white" />
+            </button>
+          )}
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin text-white" />}
         </div>
-      )}
-
+      </div>
+      
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-accent border border-accent rounded-md shadow-md">
           <div className="p-1">

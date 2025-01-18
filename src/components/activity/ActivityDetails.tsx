@@ -109,15 +109,17 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
             <div className="flex items-center gap-3 flex-grow">
               <MapPin className="w-5 h-5 text-primary shrink-0" />
               {isEditing ? (
-                <LocationAutocomplete
-                  value={activity.location}
-                  onChange={(location, coordinates) => {
-                    handleChange('location', location);
-                    if (coordinates) {
-                      handleChange('coordinates', coordinates);
-                    }
-                  }}
-                />
+                <div className="flex-grow">
+                  <LocationAutocomplete
+                    value={activity.location}
+                    onChange={(location, coordinates) => {
+                      handleChange('location', location);
+                      if (coordinates) {
+                        handleChange('coordinates', coordinates);
+                      }
+                    }}
+                  />
+                </div>
               ) : (
                 <span className="text-white">{activity.location}</span>
               )}
