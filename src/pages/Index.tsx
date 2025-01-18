@@ -83,7 +83,7 @@ const Index = () => {
                     inputText: '#FFFFFF',
                     anchorTextColor: '#000000',
                     dividerBackground: 'rgba(255, 255, 255, 0.08)',
-                    buttonText: '#000000',
+                    defaultButtonText: '#000000',
                   },
                   fonts: {
                     bodyFontFamily: 'Inter var, sans-serif',
