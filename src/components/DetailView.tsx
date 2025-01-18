@@ -28,6 +28,13 @@ const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
   const isOwner = useActivityOwnership(activity.created_by);
   const canEdit = (isOwner || isAdmin) && onEdit;
 
+  const handleEdit = () => {
+    if (onEdit && activity) {
+      onEdit(activity);
+      onClose(); // Close the detail view when editing
+    }
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-[800px] md:max-w-[1000px] lg:max-w-[1200px] overflow-y-auto bg-background">
@@ -42,7 +49,7 @@ const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
                   variant="outline" 
                   size="sm"
                   className="rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
-                  onClick={() => onEdit(activity)}
+                  onClick={handleEdit}
                 >
                   <Edit className="w-4 h-4 mr-2" />
                   Bearbeiten
