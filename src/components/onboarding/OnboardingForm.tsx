@@ -132,6 +132,43 @@ export const OnboardingForm = ({
                         },
                       },
                     },
+                    className: {
+                      button: 'text-black',
+                      anchor: 'text-gray-400 hover:text-gray-300',
+                      label: 'text-gray-300',
+                    },
+                  }}
+                  localization={{
+                    variables: {
+                      sign_up: {
+                        email_label: 'E-Mail Adresse',
+                        password_label: 'Passwort',
+                        email_input_placeholder: 'Deine E-Mail Adresse',
+                        password_input_placeholder: 'Dein Passwort',
+                        button_label: 'Registrieren',
+                        loading_button_label: 'Registrierung...',
+                        social_provider_text: 'Mit {{provider}} registrieren',
+                        link_text: 'Kein Konto? Registrieren',
+                      },
+                      sign_in: {
+                        email_label: 'E-Mail Adresse',
+                        password_label: 'Passwort',
+                        email_input_placeholder: 'Deine E-Mail Adresse',
+                        password_input_placeholder: 'Dein Passwort',
+                        button_label: 'Registrieren',
+                        loading_button_label: 'Anmeldung...',
+                        social_provider_text: 'Mit {{provider}} anmelden',
+                        link_text: 'Bereits ein Konto? Anmelden',
+                      },
+                      forgotten_password: {
+                        email_label: 'E-Mail Adresse',
+                        password_label: 'Passwort',
+                        email_input_placeholder: 'Deine E-Mail Adresse',
+                        button_label: 'Passwort zurücksetzen',
+                        loading_button_label: 'Sende Anweisungen...',
+                        link_text: 'Passwort vergessen?',
+                      },
+                    },
                   }}
                   theme="dark"
                   providers={[]}
