@@ -184,10 +184,7 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
             <span className="text-white">Altersgruppe</span>
           </div>
           {isEditing ? (
-            <AgeRangeSelector
-              form={form}
-              onChange={(value) => handleChange('age_range', value)}
-            />
+            <AgeRangeSelector form={form} />
           ) : (
             <div className="flex flex-wrap gap-2">
               {activity.age_range?.map((age) => (
@@ -211,10 +208,7 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
             <span className="text-white">Aktivitätstyp</span>
           </div>
           {isEditing ? (
-            <TypeSelector
-              form={form}
-              onChange={(value) => handleChange('type', value)}
-            />
+            <TypeSelector form={form} />
           ) : (
             <div className="flex flex-wrap gap-2">
               {Array.isArray(activity.type) ? activity.type.map((type) => (
