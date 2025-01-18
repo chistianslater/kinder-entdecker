@@ -24,13 +24,14 @@ interface DetailViewProps {
 }
 
 const DetailView = ({ activity, isOpen, onClose, onSuccess }: DetailViewProps) => {
+  const { isAdmin } = useIsAdmin();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivity, setEditedActivity] = useState<Activity | null>(null);
-  const { toast } = useToast();
 
+  // Move the early return after all hooks
   if (!activity) return null;
 
-  const { isAdmin } = useIsAdmin();
   const isOwner = useActivityOwnership(activity.created_by);
   const canEdit = isOwner || isAdmin;
 
