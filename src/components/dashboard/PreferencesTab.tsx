@@ -76,6 +76,7 @@ export const PreferencesTab = () => {
         onComplete={() => {}} 
         onFiltersChange={handleFiltersChange}
         initialPreferences={initialPreferences || undefined}
+        onSkip={() => {}}
       />
     </div>
   );

@@ -11,6 +11,9 @@ import { AccessibilitySection } from './form-sections/AccessibilitySection';
 import { useToast } from "@/components/ui/use-toast";
 import { Filters } from '../FilterBar';
 import { OnboardingFormData, FormSchema } from './types';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 const formSchema = z.object({
   interests: z.array(z.string()).min(1, "Bitte wähle mindestens ein Interesse aus"),
@@ -24,9 +27,18 @@ interface OnboardingFormProps {
   onFiltersChange: (filters: Filters) => void;
   onSkip: () => void;
   initialPreferences?: OnboardingFormData;
+  showAuth?: boolean;
+  supabaseClient?: SupabaseClient;
 }
 
-export const OnboardingForm = ({ onComplete, onFiltersChange, onSkip, initialPreferences }: OnboardingFormProps) => {
+export const OnboardingForm = ({ 
+  onComplete, 
+  onFiltersChange, 
+  onSkip, 
+  initialPreferences,
+  showAuth,
+  supabaseClient 
+}: OnboardingFormProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   
@@ -68,7 +80,12 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, onSkip, initialPre
       };
 
       onFiltersChange(filters);
-      onComplete();
+      
+      if (showAuth && supabaseClient && step === sections.length - 1) {
+        setStep(step + 1);
+      } else {
+        onComplete();
+      }
 
       toast({
         title: "Super!",
@@ -84,46 +101,78 @@ export const OnboardingForm = ({ onComplete, onFiltersChange, onSkip, initialPre
     }
   };
 
-  const CurrentSection = sections[step].component;
+  const CurrentSection = sections[step]?.component;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-6 animate-fade-in">
-          <h2 className="text-xl font-medium text-white mb-4">{sections[step].title}</h2>
-          <CurrentSection form={form} />
+          {step < sections.length ? (
+            <>
+              <h2 className="text-xl font-medium text-white mb-4">{sections[step].title}</h2>
+              <CurrentSection form={form} />
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-medium text-white mb-4">Erstelle dein Konto</h2>
+              {supabaseClient && (
+                <Auth
+                  supabaseClient={supabaseClient}
+                  appearance={{
+                    theme: ThemeSupa,
+                    variables: {
+                      default: {
+                        colors: {
+                          brand: '#B5FF2B',
+                          brandAccent: '#9EE619',
+                          inputBackground: 'rgba(255, 255, 255, 0.08)',
+                          inputText: '#FFFFFF',
+                          anchorTextColor: 'rgba(255, 255, 255, 0.6)',
+                          dividerBackground: 'rgba(255, 255, 255, 0.08)',
+                        },
+                      },
+                    },
+                  }}
+                  theme="dark"
+                  providers={[]}
+                />
+              )}
+            </>
+          )}
         </div>
         
         <div className="flex flex-col space-y-4">
-          <div className="flex justify-between space-x-4">
-            {step > 0 && (
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={previousStep}
-                className="w-1/2 text-white hover:text-white"
-              >
-                Zurück
-              </Button>
-            )}
-            
-            {step < sections.length - 1 ? (
-              <Button 
-                type="button" 
-                onClick={nextStep}
-                className={step === 0 ? "w-full" : "w-1/2"}
-              >
-                Weiter
-              </Button>
-            ) : (
-              <Button 
-                type="submit"
-                className={step === 0 ? "w-full" : "w-1/2"}
-              >
-                Los geht's!
-              </Button>
-            )}
-          </div>
+          {step < sections.length && (
+            <div className="flex justify-between space-x-4">
+              {step > 0 && (
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={previousStep}
+                  className="w-1/2 text-white hover:text-white"
+                >
+                  Zurück
+                </Button>
+              )}
+              
+              {step < sections.length - 1 ? (
+                <Button 
+                  type="button" 
+                  onClick={nextStep}
+                  className={step === 0 ? "w-full" : "w-1/2"}
+                >
+                  Weiter
+                </Button>
+              ) : (
+                <Button 
+                  type="submit"
+                  className={step === 0 ? "w-full" : "w-1/2"}
+                >
+                  Weiter zum Konto
+                </Button>
+              )}
+            </div>
+          )}
           
           <Button
             type="button"

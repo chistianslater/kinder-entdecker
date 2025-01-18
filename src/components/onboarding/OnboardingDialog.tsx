@@ -2,6 +2,9 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OnboardingForm } from './OnboardingForm';
 import { Filters } from '../FilterBar';
+import { Auth } from '@supabase/auth-ui-react';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { supabase } from '@/integrations/supabase/client';
 
 interface OnboardingDialogProps {
   open: boolean;
@@ -34,6 +37,8 @@ export const OnboardingDialog = ({ open, onOpenChange, onFiltersChange, onComple
           onComplete={handleComplete}
           onFiltersChange={onFiltersChange}
           onSkip={handleSkip}
+          showAuth={true}
+          supabaseClient={supabase}
         />
       </DialogContent>
     </Dialog>
