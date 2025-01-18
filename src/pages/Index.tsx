@@ -69,7 +69,7 @@ const Index = () => {
     if (!session) {
       return (
         <div className="max-w-md mx-auto mt-8 p-6 bg-card rounded-2xl shadow-glass border border-border">
-          <h2 className="text-2xl font-semibold mb-6 text-center text-black">Willkommen bei TinyTrails</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center text-white">Willkommen bei TinyTrails</h2>
           <Auth
             supabaseClient={supabase}
             appearance={{ 
@@ -81,6 +81,14 @@ const Index = () => {
                     brandAccent: '#9EE619',
                     inputBackground: 'rgba(255, 255, 255, 0.08)',
                     inputText: '#FFFFFF',
+                    anchorTextColor: '#000000',
+                    dividerBackground: 'rgba(255, 255, 255, 0.08)',
+                  },
+                  fonts: {
+                    bodyFontFamily: 'Inter var, sans-serif',
+                    buttonFontFamily: 'Inter var, sans-serif',
+                    inputFontFamily: 'Inter var, sans-serif',
+                    labelFontFamily: 'Inter var, sans-serif',
                   },
                 },
               },
