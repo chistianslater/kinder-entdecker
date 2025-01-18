@@ -153,6 +153,7 @@ export const OnboardingForm = ({
               setShowWelcome(false);
               setStep(sections.length);
             }}
+            className="text-white hover:text-white"
           >
             Ohne Vorlieben registrieren
           </Button>
