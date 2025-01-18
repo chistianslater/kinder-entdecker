@@ -1,58 +1,54 @@
 import React from 'react';
 import { Activity } from '@/types/activity';
-import DetailView from '../DetailView';
+import DetailView from '@/components/DetailView';
 import { CreateActivityDialog } from './CreateActivityDialog';
 import { EditActivityDialog } from './EditActivityDialog';
 
 interface ActivityListDialogsProps {
   selectedActivity: Activity | null;
-  showCreateDialog: boolean;
-  activityToEdit: Activity | null;
   onCloseDetail: () => void;
-  onCreateDialogChange: (open: boolean) => void;
+  isEditDialogOpen: boolean;
   onEditDialogChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-const ActivityListDialogs = ({
+export const ActivityListDialogs = ({
   selectedActivity,
-  showCreateDialog,
-  activityToEdit,
   onCloseDetail,
-  onCreateDialogChange,
+  isEditDialogOpen,
   onEditDialogChange,
   onSuccess,
 }: ActivityListDialogsProps) => {
-  const handleEdit = (activity: Activity) => {
-    // Set the activity to edit and open the edit dialog
+  const handleEdit = () => {
     onEditDialogChange(true);
   };
 
   return (
     <>
-      <DetailView 
+      <DetailView
         activity={selectedActivity}
         isOpen={selectedActivity !== null}
         onClose={onCloseDetail}
-        onEdit={selectedActivity ? () => handleEdit(selectedActivity) : undefined}
+        onEdit={handleEdit}
       />
 
       <CreateActivityDialog
-        open={showCreateDialog}
-        onOpenChange={onCreateDialogChange}
+        open={false}
+        onOpenChange={() => {}}
         onSuccess={onSuccess}
       />
 
-      {activityToEdit && (
+      {selectedActivity && (
         <EditActivityDialog
-          activity={activityToEdit}
-          open={!!activityToEdit}
-          onOpenChange={(open) => !open && onEditDialogChange(open)}
-          onSuccess={onSuccess}
+          activity={selectedActivity}
+          open={isEditDialogOpen}
+          onOpenChange={onEditDialogChange}
+          onSuccess={() => {
+            onSuccess();
+            onCloseDetail();
+          }}
         />
       )}
     </>
   );
 };
-
-export default ActivityListDialogs;
