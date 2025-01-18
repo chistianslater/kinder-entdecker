@@ -81,7 +81,7 @@ const Index = () => {
                     brandAccent: '#9EE619',
                     inputBackground: 'rgba(255, 255, 255, 0.08)',
                     inputText: '#FFFFFF',
-                    anchorTextColor: '#000000',
+                    anchorTextColor: 'rgba(255, 255, 255, 0.6)',
                     dividerBackground: 'rgba(255, 255, 255, 0.08)',
                     defaultButtonBackground: '#B5FF2B',
                     defaultButtonBackgroundHover: '#9EE619',
@@ -98,7 +98,7 @@ const Index = () => {
               },
               className: {
                 button: 'text-black',
-                anchor: 'text-black',
+                anchor: 'text-gray-400 hover:text-gray-300',
               },
             }}
             theme="dark"
