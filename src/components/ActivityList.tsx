@@ -8,12 +8,12 @@ import ActivityListContent from './activity/ActivityListContent';
 import { useActivities } from '@/hooks/useActivities';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import ActivityListHeader from './activity/ActivityListHeader';
-import ActivityListDialogs from './activity/ActivityListDialogs';
+import { ActivityListDialogs } from './activity/ActivityListDialogs';
 
 const ActivityList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [activityToEdit, setActivityToEdit] = useState<Activity | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
   const { businessProfile } = useBusinessProfile();
   const { 
@@ -71,7 +71,7 @@ const ActivityList = () => {
             activities={filteredActivities}
             onSelect={setSelectedActivity}
             onClaim={handleClaimActivity}
-            onEdit={setActivityToEdit}
+            onEdit={() => setIsEditDialogOpen(true)}
             showClaimButton={!!businessProfile}
             onRefresh={fetchActivities}
           />
@@ -80,11 +80,9 @@ const ActivityList = () => {
 
       <ActivityListDialogs 
         selectedActivity={selectedActivity}
-        showCreateDialog={showCreateDialog}
-        activityToEdit={activityToEdit}
         onCloseDetail={() => setSelectedActivity(null)}
-        onCreateDialogChange={setShowCreateDialog}
-        onEditDialogChange={(open) => !open && setActivityToEdit(null)}
+        isEditDialogOpen={isEditDialogOpen}
+        onEditDialogChange={setIsEditDialogOpen}
         onSuccess={fetchActivities}
       />
     </div>
