@@ -83,9 +83,10 @@ const Index = () => {
                     inputText: '#FFFFFF',
                     anchorTextColor: '#000000',
                     dividerBackground: 'rgba(255, 255, 255, 0.08)',
-                    defaultButtonText: '#000000',
                     defaultButtonBackground: '#B5FF2B',
                     defaultButtonBackgroundHover: '#9EE619',
+                    defaultButtonBorder: 'transparent',
+                    defaultButtonText: '#000000',
                   },
                   fonts: {
                     bodyFontFamily: 'Inter var, sans-serif',
@@ -94,6 +95,10 @@ const Index = () => {
                     labelFontFamily: 'Inter var, sans-serif',
                   },
                 },
+              },
+              className: {
+                button: 'text-black',
+                anchor: 'text-black',
               },
             }}
             theme="dark"
