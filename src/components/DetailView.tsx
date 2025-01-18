@@ -18,7 +18,7 @@ interface DetailViewProps {
   activity: Activity | null;
   isOpen: boolean;
   onClose: () => void;
-  onEdit?: (activity: Activity) => void;
+  onEdit?: () => void;
 }
 
 const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
@@ -31,8 +31,8 @@ const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onEdit && activity) {
-      onEdit(activity);
+    if (onEdit) {
+      onEdit();
     }
   };
 

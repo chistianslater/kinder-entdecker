@@ -24,6 +24,7 @@ const ActivityListDialogs = ({
   onSuccess,
 }: ActivityListDialogsProps) => {
   const handleEdit = (activity: Activity) => {
+    // Set the activity to edit and open the edit dialog
     onEditDialogChange(true);
   };
 
@@ -33,7 +34,7 @@ const ActivityListDialogs = ({
         activity={selectedActivity}
         isOpen={selectedActivity !== null}
         onClose={onCloseDetail}
-        onEdit={handleEdit}
+        onEdit={selectedActivity ? () => handleEdit(selectedActivity) : undefined}
       />
 
       <CreateActivityDialog
