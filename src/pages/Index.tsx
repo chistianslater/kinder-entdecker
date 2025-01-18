@@ -69,7 +69,7 @@ const Index = () => {
     if (!session) {
       return (
         <div className="max-w-md mx-auto mt-8 p-6 bg-card rounded-2xl shadow-glass border border-border">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Willkommen bei TinyTrails</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center text-white">Willkommen bei TinyTrails</h2>
           <Auth
             supabaseClient={supabase}
             appearance={{ 
