@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -9,30 +9,78 @@ import {
 import { Activity } from '@/types/activity';
 import { ActivityDetails } from './activity/ActivityDetails';
 import { UserContributions } from './activity/UserContributions';
-import { X, Edit } from 'lucide-react';
+import { X, Edit, Save, XCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useActivityOwnership } from '@/hooks/useActivityOwnership';
+import { useToast } from './ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DetailViewProps {
   activity: Activity | null;
   isOpen: boolean;
   onClose: () => void;
-  onEdit?: () => void;
+  onSuccess?: () => void;
 }
 
-const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
+const DetailView = ({ activity, isOpen, onClose, onSuccess }: DetailViewProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedActivity, setEditedActivity] = useState<Activity | null>(null);
+  const { toast } = useToast();
+
   if (!activity) return null;
 
   const { isAdmin } = useIsAdmin();
   const isOwner = useActivityOwnership(activity.created_by);
-  const canEdit = (isOwner || isAdmin) && onEdit;
+  const canEdit = isOwner || isAdmin;
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onEdit) {
-      onEdit();
+  const handleEditToggle = () => {
+    if (isEditing) {
+      setIsEditing(false);
+      setEditedActivity(null);
+    } else {
+      setIsEditing(true);
+      setEditedActivity(activity);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!editedActivity) return;
+
+    try {
+      const { error } = await supabase
+        .from('activities')
+        .update({
+          title: editedActivity.title,
+          description: editedActivity.description,
+          location: editedActivity.location,
+          type: editedActivity.type,
+          age_range: editedActivity.age_range,
+          price_range: editedActivity.price_range,
+          opening_hours: editedActivity.opening_hours,
+          website_url: editedActivity.website_url,
+          ticket_url: editedActivity.ticket_url,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', activity.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Erfolg",
+        description: "Aktivität wurde erfolgreich aktualisiert.",
+      });
+
+      setIsEditing(false);
+      setEditedActivity(null);
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error('Error updating activity:', error);
+      toast({
+        title: "Fehler",
+        description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -42,19 +90,42 @@ const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
         <SheetHeader className="relative pb-4">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-xl font-semibold text-white">
-              {activity.title}
+              {editedActivity?.title || activity.title}
             </SheetTitle>
             <div className="flex items-center gap-4">
               {canEdit && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
-                  onClick={handleEdit}
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Bearbeiten
-                </Button>
+                isEditing ? (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+                      onClick={handleSave}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Speichern
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+                      onClick={handleEditToggle}
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Abbrechen
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+                    onClick={handleEditToggle}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Bearbeiten
+                  </Button>
+                )
               )}
               <SheetClose asChild>
                 <Button
@@ -71,7 +142,11 @@ const DetailView = ({ activity, isOpen, onClose, onEdit }: DetailViewProps) => {
         </SheetHeader>
         
         <div className="space-y-8 py-4">
-          <ActivityDetails activity={activity} />
+          <ActivityDetails 
+            activity={editedActivity || activity} 
+            isEditing={isEditing}
+            onChange={setEditedActivity}
+          />
           <div className="border-t border-white/10 pt-6">
             <UserContributions activity={activity} />
           </div>

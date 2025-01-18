@@ -6,15 +6,37 @@ import { ImageGallery } from './ImageGallery';
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatOpeningHours, isCurrentlyOpen } from '@/utils/openingHoursFormatter';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { OpeningHoursInput } from './form/OpeningHoursInput';
+import { TypeSelector } from './form/type-selector/TypeSelector';
+import { AgeRangeSelector } from './form/age-selector/AgeRangeSelector';
+import { LocationAutocomplete } from './form/LocationAutocomplete';
+import { useForm } from 'react-hook-form';
 
 interface ActivityDetailsProps {
   activity: Activity;
+  isEditing?: boolean;
+  onChange?: (activity: Activity) => void;
 }
 
-export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
+export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetailsProps) => {
+  const form = useForm({
+    defaultValues: activity
+  });
+
   const handleNavigate = () => {
     const encodedAddress = encodeURIComponent(activity.location);
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleChange = (field: keyof Activity, value: any) => {
+    if (onChange) {
+      onChange({
+        ...activity,
+        [field]: value
+      });
+    }
   };
 
   const formattedHours = activity.opening_hours ? formatOpeningHours(activity.opening_hours) : null;
@@ -36,11 +58,20 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
       <ImageGallery activity={activity} />
 
-      {activity.description && (
+      {(activity.description || isEditing) && (
         <>
-          <div className="p-4 bg-accent/10 rounded-lg">
-            <p className="text-white/90 whitespace-pre-wrap">{activity.description}</p>
-          </div>
+          {isEditing ? (
+            <Textarea
+              value={activity.description || ''}
+              onChange={(e) => handleChange('description', e.target.value)}
+              placeholder="Beschreibung der Aktivität"
+              className="min-h-[100px] text-white placeholder:text-gray-400 bg-accent border-accent"
+            />
+          ) : (
+            <div className="p-4 bg-accent/10 rounded-lg">
+              <p className="text-white/90 whitespace-pre-wrap">{activity.description}</p>
+            </div>
+          )}
           <Separator className="bg-accent/20" />
         </>
       )}
@@ -48,9 +79,21 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
       <h3 className="text-lg font-semibold text-primary">Details</h3>
       <div className="grid gap-6">
         <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
-          <div className="flex items-center gap-3">
-            <MapPin className="w-5 h-5 text-primary" />
-            <span className="text-white">{activity.location}</span>
+          <div className="flex items-center gap-3 flex-grow">
+            <MapPin className="w-5 h-5 text-primary shrink-0" />
+            {isEditing ? (
+              <LocationAutocomplete
+                value={activity.location}
+                onChange={(location, coordinates) => {
+                  handleChange('location', location);
+                  if (coordinates) {
+                    handleChange('coordinates', coordinates);
+                  }
+                }}
+              />
+            ) : (
+              <span className="text-white">{activity.location}</span>
+            )}
           </div>
           <Button 
             variant="outline" 
@@ -71,7 +114,7 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
               <Clock className="w-5 h-5 text-primary" />
               <span className="text-white">Öffnungszeiten</span>
             </div>
-            {openStatus !== null && (
+            {openStatus !== null && !isEditing && (
               <div className={`px-2 py-1 rounded-md text-xs font-medium ${
                 openStatus 
                   ? "bg-[#F2FCE2] text-green-700" 
@@ -81,7 +124,12 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
               </div>
             )}
           </div>
-          {formattedHours && (
+          {isEditing ? (
+            <OpeningHoursInput
+              value={activity.opening_hours || ''}
+              onChange={(value) => handleChange('opening_hours', value)}
+            />
+          ) : formattedHours && (
             <div className="pl-8 space-y-1">
               {formattedHours.map((item, index) => (
                 <div 
@@ -100,7 +148,16 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
 
         <div className="flex items-center gap-3 p-4 bg-accent/10 rounded-lg">
           <Euro className="w-5 h-5 text-primary" />
-          <span className="text-white">{activity.price_range || 'Nicht angegeben'}</span>
+          {isEditing ? (
+            <Input
+              value={activity.price_range || ''}
+              onChange={(e) => handleChange('price_range', e.target.value)}
+              placeholder="Preisbereich"
+              className="text-white placeholder:text-gray-400 bg-accent border-accent"
+            />
+          ) : (
+            <span className="text-white">{activity.price_range || 'Nicht angegeben'}</span>
+          )}
         </div>
 
         <Separator className="bg-accent/20" />
@@ -110,17 +167,25 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
             <Users className="w-5 h-5 text-primary" />
             <span className="text-white">Altersgruppe</span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {activity.age_range?.map((age) => (
-              <div
-                key={age}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white"
-              >
-                <Users className="h-4 w-4" />
-                {age === 'all' ? 'Alle Jahre' : `${age} Jahre`}
-              </div>
-            ))}
-          </div>
+          {isEditing ? (
+            <AgeRangeSelector
+              form={form}
+              value={activity.age_range || []}
+              onChange={(value) => handleChange('age_range', value)}
+            />
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {activity.age_range?.map((age) => (
+                <div
+                  key={age}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white"
+                >
+                  <Users className="h-4 w-4" />
+                  {age === 'all' ? 'Alle Jahre' : `${age} Jahre`}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <Separator className="bg-accent/20" />
@@ -130,22 +195,30 @@ export const ActivityDetails = ({ activity }: ActivityDetailsProps) => {
             <Tag className="w-5 h-5 text-primary" />
             <span className="text-white">Aktivitätstyp</span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {Array.isArray(activity.type) ? activity.type.map((type) => (
-              <div
-                key={type}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white"
-              >
-                <Tag className="h-4 w-4" />
-                {type}
-              </div>
-            )) : (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white">
-                <Tag className="h-4 w-4" />
-                {activity.type}
-              </div>
-            )}
-          </div>
+          {isEditing ? (
+            <TypeSelector
+              form={form}
+              value={Array.isArray(activity.type) ? activity.type : []}
+              onChange={(value) => handleChange('type', value)}
+            />
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {Array.isArray(activity.type) ? activity.type.map((type) => (
+                <div
+                  key={type}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white"
+                >
+                  <Tag className="h-4 w-4" />
+                  {type}
+                </div>
+              )) : (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm bg-[#1E2128] text-white">
+                  <Tag className="h-4 w-4" />
+                  {activity.type}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
