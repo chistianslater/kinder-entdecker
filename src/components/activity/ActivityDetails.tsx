@@ -60,7 +60,6 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-2">
         {activity.is_business && (
           <Badge 
             variant="secondary" 
@@ -186,7 +185,6 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
           {isEditing ? (
             <AgeRangeSelector
               form={form}
-              value={activity.age_range || []}
               onChange={(value) => handleChange('age_range', value)}
             />
           ) : (
@@ -214,7 +212,6 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
           {isEditing ? (
             <TypeSelector
               form={form}
-              value={Array.isArray(activity.type) ? activity.type : []}
               onChange={(value) => handleChange('type', value)}
             />
           ) : (
