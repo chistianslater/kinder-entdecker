@@ -22,7 +22,7 @@ export const AgeRangesSection = ({ form }: AgeRangesSectionProps) => {
       name="childAgeRanges"
       render={() => (
         <FormItem>
-          <FormLabel>Für welche Altersgruppen suchen Sie Aktivitäten?</FormLabel>
+          <FormLabel className="text-xl font-medium text-white">Für welche Altersgruppen suchen Sie Aktivitäten?</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {ageRanges.map((item) => (
               <FormField
@@ -42,7 +42,7 @@ export const AgeRangesSection = ({ form }: AgeRangesSectionProps) => {
                         }}
                       />
                     </FormControl>
-                    <FormLabel className="font-normal">{item.label}</FormLabel>
+                    <FormLabel className="font-normal text-white">{item.label}</FormLabel>
                   </FormItem>
                 )}
               />

@@ -23,7 +23,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
       name="interests"
       render={() => (
         <FormItem>
-          <FormLabel>Welche Art von Aktivitäten interessieren Sie?</FormLabel>
+          <FormLabel className="text-xl font-medium text-white">Welche Art von Aktivitäten interessieren Sie?</FormLabel>
           <div className="grid grid-cols-2 gap-4">
             {interests.map((item) => (
               <FormField
@@ -43,7 +43,7 @@ export const InterestsSection = ({ form }: InterestsSectionProps) => {
                         }}
                       />
                     </FormControl>
-                    <FormLabel className="font-normal">{item.label}</FormLabel>
+                    <FormLabel className="font-normal text-white">{item.label}</FormLabel>
                   </FormItem>
                 )}
               />
