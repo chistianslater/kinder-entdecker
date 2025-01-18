@@ -60,6 +60,7 @@ export const ActivityDetails = ({ activity, isEditing, onChange }: ActivityDetai
 
   return (
     <div className="space-y-8">
+      <div>
         {activity.is_business && (
           <Badge 
             variant="secondary" 
