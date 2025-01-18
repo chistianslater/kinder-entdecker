@@ -126,6 +126,14 @@ export const OnboardingForm = ({
     }
   };
 
+  const handleBack = () => {
+    if (step === 0) {
+      setShowWelcome(true);
+    } else {
+      previousStep();
+    }
+  };
+
   const CurrentSection = sections[step]?.component;
 
   if (showWelcome) {
@@ -225,29 +233,27 @@ export const OnboardingForm = ({
         {step < sections.length && (
           <div className="flex flex-col space-y-4">
             <div className="flex justify-between space-x-4">
-              {step > 0 && (
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={previousStep}
-                  className="w-1/2 text-white hover:text-white"
-                >
-                  Zurück
-                </Button>
-              )}
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={handleBack}
+                className="w-1/2 text-white hover:text-white"
+              >
+                Zurück
+              </Button>
               
               {step < sections.length - 1 ? (
                 <Button 
                   type="button" 
                   onClick={nextStep}
-                  className={step === 0 ? "w-full" : "w-1/2"}
+                  className="w-1/2"
                 >
                   Weiter
                 </Button>
               ) : (
                 <Button 
                   type="submit"
-                  className={step === 0 ? "w-full" : "w-1/2"}
+                  className="w-1/2"
                 >
                   Weiter zum Konto
                 </Button>
