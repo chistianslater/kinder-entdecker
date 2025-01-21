@@ -69,7 +69,7 @@ export const AccountSection = () => {
       >
         {session ? (
           <>
-            <DropdownMenuLabel className="text-white">My Account</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-white">Mein Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-accent/20" />
             <DropdownMenuItem
               className="text-white focus:bg-accent focus:text-white cursor-pointer"
@@ -82,14 +82,14 @@ export const AccountSection = () => {
                 className="text-white focus:bg-accent focus:text-white cursor-pointer"
                 onClick={() => navigate('/business-signup')}
               >
-                Register Business
+                Business registrieren
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
               className="text-white focus:bg-accent focus:text-white cursor-pointer"
               onClick={handleSignOut}
             >
-              Sign Out
+              Abmelden
             </DropdownMenuItem>
           </>
         ) : (
@@ -100,13 +100,13 @@ export const AccountSection = () => {
               className="text-white focus:bg-accent focus:text-white cursor-pointer"
               onClick={() => navigate('/')}
             >
-              Login
+              Anmelden
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-white focus:bg-accent focus:text-white cursor-pointer"
               onClick={() => navigate('/')}
             >
-              Register
+              Registrieren
             </DropdownMenuItem>
           </>
         )}
