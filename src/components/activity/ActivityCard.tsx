@@ -17,6 +17,7 @@ interface ActivityCardProps {
   onClaim?: (activityId: string) => void;
   showClaimButton?: boolean;
   onRefresh?: () => void;
+  onDelete?: () => void;
 }
 
 export const ActivityCard = ({ 
@@ -24,7 +25,8 @@ export const ActivityCard = ({
   onSelect, 
   onClaim,
   showClaimButton = false,
-  onRefresh
+  onRefresh,
+  onDelete
 }: ActivityCardProps) => {
   const displayImage = useActivityImage(activity.id, activity.image_url);
   const { averageRating, reviewCount } = useActivityRating(activity.id);
@@ -61,6 +63,7 @@ export const ActivityCard = ({
         isOwner={isOwner}
         isAdmin={isAdmin}
         onApprove={onRefresh}
+        onDelete={onDelete}
       />
     </Card>
   );

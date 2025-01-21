@@ -9,6 +9,7 @@ interface ActivityListContentProps {
   onEdit?: (activity: Activity) => void;
   showClaimButton: boolean;
   onRefresh?: () => void;
+  onDelete?: () => void;
 }
 
 const ActivityListContent = ({ 
@@ -17,7 +18,8 @@ const ActivityListContent = ({
   onClaim,
   onEdit,
   showClaimButton,
-  onRefresh
+  onRefresh,
+  onDelete
 }: ActivityListContentProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -29,6 +31,7 @@ const ActivityListContent = ({
           onClaim={onClaim}
           showClaimButton={showClaimButton}
           onRefresh={onRefresh}
+          onDelete={onDelete}
         />
       ))}
     </div>

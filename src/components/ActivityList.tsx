@@ -58,6 +58,10 @@ const ActivityList = () => {
     setSelectedActivity(null);
   };
 
+  const handleDelete = () => {
+    fetchActivities();
+  };
+
   if (loading) {
     return <LoadingState />;
   }
@@ -80,6 +84,7 @@ const ActivityList = () => {
             onEdit={() => setIsEditDialogOpen(true)}
             showClaimButton={!!businessProfile}
             onRefresh={fetchActivities}
+            onDelete={handleDelete}
           />
         )}
       </div>
