@@ -14,7 +14,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { UserCircle2 } from 'lucide-react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
@@ -23,6 +23,7 @@ export const AccountSection = () => {
   const { session, signOut } = useAuth();
   const { businessProfile } = useBusinessProfile();
   const [showAuth, setShowAuth] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ['profile'],
@@ -55,9 +56,14 @@ export const AccountSection = () => {
     }
   };
 
+  const handleAuthClick = () => {
+    setShowAuth(true);
+    setDropdownOpen(false);
+  };
+
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger className="cursor-pointer outline-none">
           {session ? (
             <AccountAvatar 
@@ -103,13 +109,13 @@ export const AccountSection = () => {
               <DropdownMenuSeparator className="bg-accent/20" />
               <DropdownMenuItem
                 className="text-white focus:bg-accent focus:text-white cursor-pointer"
-                onClick={() => setShowAuth(true)}
+                onClick={handleAuthClick}
               >
                 Anmelden
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-white focus:bg-accent focus:text-white cursor-pointer"
-                onClick={() => setShowAuth(true)}
+                onClick={handleAuthClick}
               >
                 Registrieren
               </DropdownMenuItem>
@@ -120,6 +126,11 @@ export const AccountSection = () => {
 
       <Dialog open={showAuth} onOpenChange={setShowAuth}>
         <DialogContent className="sm:max-w-md bg-card">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-white">
+              Anmelden oder Registrieren
+            </DialogTitle>
+          </DialogHeader>
           <Auth
             supabaseClient={supabase}
             appearance={{
