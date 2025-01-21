@@ -6,7 +6,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ActivityCardHeader } from './card/ActivityCardHeader';
 import { ActivityCardDetails } from './card/ActivityCardDetails';
 import { ActivityCardOpeningHours } from './card/ActivityCardOpeningHours';
-import { ActivityCardActions } from './card/ActivityCardActions';
+import { ActivityCardActions } from './ActivityCardActions';
 import { useActivityImage } from '@/hooks/useActivityImage';
 import { useActivityRating } from '@/hooks/useActivityRating';
 import { useActivityOwnership } from '@/hooks/useActivityOwnership';
