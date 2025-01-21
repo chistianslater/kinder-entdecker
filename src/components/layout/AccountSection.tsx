@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { UserCircle2 } from 'lucide-react';
 
 export const AccountSection = () => {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export const AccountSection = () => {
 
       return data;
     },
+    enabled: !!session,
   });
 
   const handleSignOut = async () => {
@@ -49,44 +51,65 @@ export const AccountSection = () => {
     }
   };
 
-  if (!session) {
-    return null;
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer outline-none">
-        <AccountAvatar 
-          avatarUrl={profile?.avatar_url} 
-          className="border-2 border-primary hover:border-primary/80 transition-colors"
-        />
+        {session ? (
+          <AccountAvatar 
+            avatarUrl={profile?.avatar_url} 
+            className="border-2 border-primary hover:border-primary/80 transition-colors"
+          />
+        ) : (
+          <UserCircle2 className="w-8 h-8 text-primary hover:text-primary/80 transition-colors" />
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         className="w-56 bg-secondary border-accent/20 shadow-glass z-[100]" 
         align="end"
       >
-        <DropdownMenuLabel className="text-white">My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-accent/20" />
-        <DropdownMenuItem
-          className="text-white focus:bg-accent focus:text-white cursor-pointer"
-          onClick={() => navigate('/dashboard')}
-        >
-          Dashboard
-        </DropdownMenuItem>
-        {!businessProfile && (
-          <DropdownMenuItem
-            className="text-white focus:bg-accent focus:text-white cursor-pointer"
-            onClick={() => navigate('/business-signup')}
-          >
-            Register Business
-          </DropdownMenuItem>
+        {session ? (
+          <>
+            <DropdownMenuLabel className="text-white">My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-accent/20" />
+            <DropdownMenuItem
+              className="text-white focus:bg-accent focus:text-white cursor-pointer"
+              onClick={() => navigate('/dashboard')}
+            >
+              Dashboard
+            </DropdownMenuItem>
+            {!businessProfile && (
+              <DropdownMenuItem
+                className="text-white focus:bg-accent focus:text-white cursor-pointer"
+                onClick={() => navigate('/business-signup')}
+              >
+                Register Business
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem
+              className="text-white focus:bg-accent focus:text-white cursor-pointer"
+              onClick={handleSignOut}
+            >
+              Sign Out
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuLabel className="text-white">Account</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-accent/20" />
+            <DropdownMenuItem
+              className="text-white focus:bg-accent focus:text-white cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              Login
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-white focus:bg-accent focus:text-white cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              Register
+            </DropdownMenuItem>
+          </>
         )}
-        <DropdownMenuItem
-          className="text-white focus:bg-accent focus:text-white cursor-pointer"
-          onClick={handleSignOut}
-        >
-          Sign Out
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
