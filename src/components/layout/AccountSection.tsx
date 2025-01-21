@@ -17,12 +17,15 @@ import { UserCircle2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { OnboardingDialog } from '../onboarding/OnboardingDialog';
+import { Filters } from '../FilterBar';
 
 export const AccountSection = () => {
   const navigate = useNavigate();
   const { session, signOut } = useAuth();
   const { businessProfile } = useBusinessProfile();
   const [showAuth, setShowAuth] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const { data: profile } = useQuery({
@@ -56,9 +59,23 @@ export const AccountSection = () => {
     }
   };
 
-  const handleAuthClick = () => {
+  const handleLoginClick = () => {
     setShowAuth(true);
     setDropdownOpen(false);
+  };
+
+  const handleRegisterClick = () => {
+    setShowOnboarding(true);
+    setDropdownOpen(false);
+  };
+
+  const handleFiltersChange = (filters: Filters) => {
+    // Handle filters change if needed
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    setShowAuth(true);
   };
 
   return (
@@ -109,13 +126,13 @@ export const AccountSection = () => {
               <DropdownMenuSeparator className="bg-accent/20" />
               <DropdownMenuItem
                 className="text-white focus:bg-accent focus:text-white cursor-pointer"
-                onClick={handleAuthClick}
+                onClick={handleLoginClick}
               >
                 Anmelden
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-white focus:bg-accent focus:text-white cursor-pointer"
-                onClick={handleAuthClick}
+                onClick={handleRegisterClick}
               >
                 Registrieren
               </DropdownMenuItem>
@@ -123,6 +140,13 @@ export const AccountSection = () => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <OnboardingDialog
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onFiltersChange={handleFiltersChange}
+        onComplete={handleOnboardingComplete}
+      />
 
       <Dialog open={showAuth} onOpenChange={setShowAuth}>
         <DialogContent className="sm:max-w-md bg-card">
