@@ -86,7 +86,8 @@ export const ActivityCardActions = ({
     }
   };
 
-  const canAddEvents = isAdmin || activity.claimed_by === activity.created_by;
+  // Updated logic to show Add Event button for admins and business owners
+  const canAddEvents = isAdmin || (activity.claimed_by && activity.is_business);
 
   return (
     <>
