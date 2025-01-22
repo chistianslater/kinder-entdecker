@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Activity } from '@/types/activity';
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Trash2 } from 'lucide-react';
+import { CheckCircle2, Calendar } from 'lucide-react';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { EventForm } from './event/EventForm';
 
 interface ActivityCardActionsProps {
   activity: Activity;
@@ -26,6 +28,7 @@ export const ActivityCardActions = ({
   onDelete
 }: ActivityCardActionsProps) => {
   const { toast } = useToast();
+  const [showEventDialog, setShowEventDialog] = useState(false);
 
   const handleApprove = async () => {
     try {
@@ -83,37 +86,68 @@ export const ActivityCardActions = ({
     }
   };
 
+  const canAddEvents = isAdmin || activity.claimed_by === activity.created_by;
+
   return (
-    <div className="p-4 pt-0 flex gap-2">
-      {showClaimButton && onClaim && (
-        <Button 
-          variant="outline" 
-          className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
-          onClick={() => onClaim(activity.id)}
-        >
-          Als Geschäft beanspruchen
-        </Button>
-      )}
-      {isAdmin && !activity.approved_at && (
-        <Button 
-          variant="outline" 
-          className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
-          onClick={handleApprove}
-        >
-          <CheckCircle2 className="w-4 h-4 mr-2" />
-          Genehmigen
-        </Button>
-      )}
-      {isAdmin && (
-        <Button 
-          variant="outline" 
-          className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
-          onClick={handleDelete}
-        >
-          <Trash2 className="w-4 h-4 mr-2" />
-          Löschen
-        </Button>
-      )}
-    </div>
+    <>
+      <div className="p-4 pt-0 flex gap-2 flex-wrap">
+        {showClaimButton && onClaim && (
+          <Button 
+            variant="outline" 
+            className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+            onClick={() => onClaim(activity.id)}
+          >
+            Als Geschäft beanspruchen
+          </Button>
+        )}
+        {isAdmin && !activity.approved_at && (
+          <Button 
+            variant="outline" 
+            className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+            onClick={handleApprove}
+          >
+            <CheckCircle2 className="w-4 h-4 mr-2" />
+            Genehmigen
+          </Button>
+        )}
+        {canAddEvents && (
+          <Button
+            variant="outline"
+            className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+            onClick={() => setShowEventDialog(true)}
+          >
+            <Calendar className="w-4 h-4 mr-2" />
+            Event hinzufügen
+          </Button>
+        )}
+        {isAdmin && (
+          <Button
+            variant="outline"
+            className="w-full rounded-md text-white border-white/20 hover:text-white hover:bg-white/10"
+            onClick={handleDelete}
+          >
+            Löschen
+          </Button>
+        )}
+      </div>
+
+      <Dialog open={showEventDialog} onOpenChange={setShowEventDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Neues Event erstellen</DialogTitle>
+          </DialogHeader>
+          <EventForm 
+            activityId={activity.id}
+            onSuccess={() => {
+              setShowEventDialog(false);
+              toast({
+                title: "Erfolg",
+                description: "Event wurde erfolgreich erstellt.",
+              });
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
